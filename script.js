@@ -1,5 +1,3 @@
-
-
     // 1. STATE
     var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentInvoiceTrx = null;
     var dbProduk = [], dbPemasukan = [], dbPengeluaran = [], dbTodo = [], dbUsers = [], dbPengaturan = [];
@@ -18,6 +16,8 @@
           payload.data = args[1];
         }
 
+        console.log("Mengirim request API:", payload);
+
         fetch(GAS_WEB_APP_URL, {
           redirect: "follow",
           method: "POST",
@@ -27,11 +27,24 @@
           },
         })
         .then(response => {
-          if (!response.ok) throw new Error("Gagal terhubung ke server.");
-          return response.json();
+          console.log("Menerima response dari server dengan status:", response.status);
+          if (!response.ok) throw new Error("Gagal terhubung ke server. Status: " + response.status);
+          return response.text(); // Ambil sebagai teks dulu agar bisa di-debug
         })
-        .then(data => resolve(data))
-        .catch(err => reject(err));
+        .then(text => {
+          console.log("Data mentah dari server:", text);
+          try {
+            let data = JSON.parse(text);
+            resolve(data);
+          } catch (e) {
+            console.error("Gagal parse JSON dari server. Teks:", text);
+            reject(new Error("Server mengembalikan data yang tidak valid (bukan JSON). Coba periksa pengaturan Deploy GAS Anda."));
+          }
+        })
+        .catch(err => {
+          console.error("Fetch Error:", err);
+          reject(err);
+        });
       });
     }
 
