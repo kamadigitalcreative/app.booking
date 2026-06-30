@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking - Kama Visual</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .booking-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+      border: 1px solid rgba(255,255,255,0.8);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+    .booking-header {
+      background: linear-gradient(135deg, var(--bs-primary) 0%, #00d2ff 100%);
+      padding: 30px 20px;
+      text-align: center;
+      color: white;
+    }
+    .package-card {
+      border: 2px solid transparent;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background: #f8f9fa;
+    }
+    .package-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    .package-card.selected {
+      border-color: var(--bs-primary);
+      background: rgba(0, 114, 255, 0.05);
+    }
+    .package-price {
+      font-weight: 700;
+      color: var(--bs-primary);
+    }
+    .btn-submit {
+      background: linear-gradient(135deg, var(--bs-primary) 0%, #00d2ff 100%);
+      border: none;
+      color: white;
+      font-weight: bold;
+      padding: 12px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 114, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOADING SPINNER -->
+  <div id="fullPageLoader" style="position:fixed; inset:0; background:rgba(255,255,255,0.8); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column; backdrop-filter:blur(5px);">
+    <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+    <h5 class="fw-bold text-primary">Memuat Layanan...</h5>
+  </div>
+
+  <div class="container py-5 flex-grow-1 d-flex justify-content-center align-items-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <div class="booking-card">
+        
+        <div class="booking-header">
+          <div class="brand-logo mx-auto mb-2" style="width: 60px; height: 60px; font-size: 24px; color: var(--bs-primary); background: white;">km</div>
+          <h3 class="fw-bold mb-1">Booking Layanan</h3>
+          <p class="mb-0 text-white-50 small">Pilih paket dan tentukan jadwal pemotretan Anda.</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          <form id="bookingForm" onsubmit="submitBooking(event)">
+            
+            <!-- SECTION 1: Personal Info -->
+            <h6 class="fw-bold text-muted mb-3"><i class="fa-solid fa-user me-2"></i>Informasi Data Diri</h6>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Nama Lengkap *</label>
+              <input type="text" id="clientName" class="form-control form-control-lg" required placeholder="Cth: Budi Santoso">
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">No. WhatsApp *</label>
+              <input type="tel" id="clientPhone" class="form-control form-control-lg" required placeholder="Cth: 08123456789">
+            </div>
+            <div class="mb-4">
+              <label class="form-label small fw-semibold">Alamat / Lokasi Acara</label>
+              <textarea id="clientAddress" class="form-control" rows="2" placeholder="Detail alamat..."></textarea>
+            </div>
+
+            <!-- SECTION 2: Packages -->
+            <h6 class="fw-bold text-muted mb-3"><i class="fa-solid fa-box-open me-2"></i>Pilih Paket Layanan</h6>
+            <div id="packagesContainer" class="row g-3 mb-4">
+              <!-- Dipopulasi oleh JS -->
+            </div>
+
+            <!-- SECTION 3: Date & Details -->
+            <h6 class="fw-bold text-muted mb-3"><i class="fa-regular fa-calendar-days me-2"></i>Jadwal & Catatan</h6>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Tanggal Acara *</label>
+              <input type="date" id="bookingDate" class="form-control form-control-lg" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label small fw-semibold">Catatan Khusus (Opsional)</label>
+              <textarea id="bookingNotes" class="form-control" rows="3" placeholder="Permintaan khusus..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-submit w-100 fs-5 mt-2" id="btnSubmitForm">
+              Konfirmasi Booking <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.css"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <script>
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_MRP6SWoCXMqGuLaxEDWZR8CowGZ08ccICHoAfdVw6hbfz_8PJbJA2adXcJYHaGQx/exec';
+    
+    let allProducts = [];
+    let selectedProduct = null;
+
+    function gasApi(action, payloadData = {}) {
+      let payload = { action: action, ...payloadData };
+      return fetch(GAS_WEB_APP_URL, {
+        redirect: "follow",
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+      })
+      .then(res => res.text())
+      .then(text => JSON.parse(text));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('bookingDate').setAttribute('min', today);
+
+      gasApi('getPublicProducts').then(res => {
+        document.getElementById('fullPageLoader').style.display = 'none';
+        if (res.success) {
+          allProducts = res.data;
+          renderProducts();
+        } else {
+          Swal.fire('Oops', 'Gagal memuat layanan', 'error');
+        }
+      }).catch(err => {
+        document.getElementById('fullPageLoader').style.display = 'none';
+        Swal.fire('Error', 'Sistem sedang sibuk. Coba lagi nanti.', 'error');
+      });
+    });
+
+    function renderProducts() {
+      const container = document.getElementById('packagesContainer');
+      container.innerHTML = '';
+      
+      if(allProducts.length === 0) {
+        container.innerHTML = '<div class="col-12"><div class="alert alert-info">Belum ada layanan yang tersedia.</div></div>';
+        return;
+      }
+
+      allProducts.forEach((prod, index) => {
+        const div = document.createElement('div');
+        div.className = 'col-12 col-md-6';
+        
+        let hargaFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(prod.harga || 0);
+
+        div.innerHTML = `
+          <div class="package-card p-3 h-100" id="card-${index}" onclick="selectPackage(${index})">
+            <h6 class="fw-bold mb-1">${prod.nama_produk}</h6>
+            <div class="package-price mb-2">${hargaFormatted}</div>
+            <p class="small text-muted mb-0" style="font-size: 11px;">${prod.deskripsi || ''}</p>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function selectPackage(index) {
+      document.querySelectorAll('.package-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('card-' + index).classList.add('selected');
+      selectedProduct = allProducts[index];
+    }
+
+    function submitBooking(e) {
+      e.preventDefault();
+      
+      if (!selectedProduct) {
+        return Swal.fire('Perhatian', 'Silakan pilih paket layanan terlebih dahulu.', 'warning');
+      }
+
+      const clientName = document.getElementById('clientName').value;
+      const clientPhone = document.getElementById('clientPhone').value;
+      const clientAddress = document.getElementById('clientAddress').value;
+      const bookingDate = document.getElementById('bookingDate').value;
+      const bookingNotes = document.getElementById('bookingNotes').value;
+
+      const submitBtn = document.getElementById('btnSubmitForm');
+      submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Memproses...';
+      submitBtn.disabled = true;
+
+      const bookingData = {
+        client: clientName,
+        phone: clientPhone,
+        alamat: clientAddress,
+        tanggal: bookingDate,
+        catatan: bookingNotes,
+        layanan: selectedProduct.nama_produk,
+        harga: selectedProduct.harga,
+        jumlah: 1,
+        diskon: 0,
+        dp: 0,
+        transport: 0,
+        total: selectedProduct.harga, // Default total
+        is_lunas: false
+      };
+
+      gasApi('createPublicBooking', { data: bookingData }).then(res => {
+        if (res.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Booking Berhasil!',
+            text: 'Mengarahkan ke halaman tagihan...',
+            timer: 2000,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = 'invoice.html?id=' + res.invoice_id;
+          });
+        } else {
+          Swal.fire('Oops', res.message, 'error');
+          submitBtn.innerHTML = 'Konfirmasi Booking <i class="fa-solid fa-arrow-right ms-2"></i>';
+          submitBtn.disabled = false;
+        }
+      }).catch(err => {
+        Swal.fire('Error', 'Gagal memproses booking.', 'error');
+        submitBtn.innerHTML = 'Konfirmasi Booking <i class="fa-solid fa-arrow-right ms-2"></i>';
+        submitBtn.disabled = false;
+      });
+    }
+  </script>
+</body>
+</html>
