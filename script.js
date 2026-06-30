@@ -1,17 +1,37 @@
-﻿
+
 
     // 1. STATE
     var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentInvoiceTrx = null;
     var dbProduk = [], dbPemasukan = [], dbPengeluaran = [], dbTodo = [], dbUsers = [], dbPengaturan = [];
 
-    // 2. GAS BRIDGE
+    // 2. GAS BRIDGE (DECOUPLED API)
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_MRP6SWoCXMqGuLaxEDWZR8CowGZ08ccICHoAfdVw6hbfz_8PJbJA2adXcJYHaGQx/exec';
+    
     function gasRun(funcName, ...args) {
       return new Promise((resolve, reject) => {
-        if (typeof google === 'undefined') { reject(new Error("Jalankan aplikasi ini di Server Google Apps Script.")); return; }
-        if (funcName === 'loginUser') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).loginUser(args[0], args[1]);
-        else if (funcName === 'getAllData') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getAllData();
-        else if (funcName === 'saveData') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveData(args[0], args[1]);
-        else if (funcName === 'deleteData') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).deleteData(args[0], args[1]);
+        let payload = { action: funcName };
+        if (funcName === 'loginUser') {
+          payload.username = args[0];
+          payload.password = args[1];
+        } else if (funcName === 'saveData' || funcName === 'deleteData') {
+          payload.table = args[0];
+          payload.data = args[1];
+        }
+
+        fetch(GAS_WEB_APP_URL, {
+          redirect: "follow",
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+        })
+        .then(response => {
+          if (!response.ok) throw new Error("Gagal terhubung ke server.");
+          return response.json();
+        })
+        .then(data => resolve(data))
+        .catch(err => reject(err));
       });
     }
 
