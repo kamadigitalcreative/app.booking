@@ -1,6 +1,6 @@
-    // 1. STATE
+// 1. STATE
     var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentInvoiceTrx = null;
-    var dbProduk = [], dbPemasukan = [], dbPengeluaran = [], dbTodo = [], dbUsers = [], dbPengaturan = [];
+    var dbProduk = [], dbPemasukan = [], dbPengeluaran = [], dbTodo = [], dbUsers = [], dbPengaturan = [], dbTeamUnavailability = [];
 
     // 2. GAS BRIDGE (DECOUPLED API)
     const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_MRP6SWoCXMqGuLaxEDWZR8CowGZ08ccICHoAfdVw6hbfz_8PJbJA2adXcJYHaGQx/exec';
@@ -142,6 +142,7 @@
             dbTodo = res.allData.todo || [];
             dbUsers = res.allData.users || [];
             dbPengaturan = res.allData.pengaturan || [];
+            dbTeamUnavailability = res.allData.team_unavailability || [];
             isDataLoaded = true;
             updateDynamicYears();
           }
@@ -204,7 +205,7 @@
       }
       gasRun('getAllData').then(res => {
         if (res.success) {
-          dbProduk = res.data.produk || []; dbPemasukan = res.data.pemasukan || []; dbPengeluaran = res.data.pengeluaran || []; dbTodo = res.data.todo || []; dbUsers = res.data.users || []; dbPengaturan = res.data.pengaturan || [];
+          dbProduk = res.data.produk || []; dbPemasukan = res.data.pemasukan || []; dbPengeluaran = res.data.pengeluaran || []; dbTodo = res.data.todo || []; dbUsers = res.data.users || []; dbPengaturan = res.data.pengaturan || []; dbTeamUnavailability = res.data.team_unavailability || [];
           isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
         } else { Swal.fire('Error', res.message, 'error'); }
       }).catch(err => Swal.fire('Error', "Gagal mengambil data: " + err.message, 'error'));
@@ -809,6 +810,201 @@
       Swal.fire({ icon: 'info', title: 'Menyimpan...', toast: true, position: 'bottom-end', showConfirmButton: false, timer: 2000 });
       gasRun('saveData', tableName, payload).then(res => {
         if (res.success) {
+if (htmlFee === '') htmlFee = `<tr><td colspan="8" class="text-center text-muted py-4">Belum ada tim yang bekerja pada periode ini</td></tr>`; tbFee.innerHTML = htmlFee;
+    };
+
+    window.openModalPengeluaran = function () {
+      document.getElementById('formPengeluaran').reset(); document.getElementById('pengId').value = ''; document.getElementById('pengIsEdit').value = 'false'; document.getElementById('titlePengeluaran').innerText = 'Pencatatan Pengeluaran Manual'; document.getElementById('pengTanggal').value = safeDate(new Date());
+      const elStat = document.getElementById('pengStatus'); if (elStat) elStat.value = 'Lunas'; new bootstrap.Modal(document.getElementById('modalPengeluaran')).show();
+    };
+
+    window.editPengeluaran = function (id) {
+      const p = dbPengeluaran.find(x => x.id == id); if (!p) return;
+      document.getElementById('pengId').value = p.id; document.getElementById('pengIsEdit').value = 'true'; document.getElementById('pengTanggal').value = safeDate(p.tanggal); document.getElementById('pengDetail').value = p.detail; document.getElementById('pengKategori').value = p.kategori; document.getElementById('pengNominal').value = p.nominal; document.getElementById('pengCatatan').value = p.catatan || '';
+      const elStat = document.getElementById('pengStatus'); if (elStat) elStat.value = (String(p.status_bayar).trim().toLowerCase() === 'lunas') ? 'Lunas' : 'Belum Dibayar';
+      document.getElementById('titlePengeluaran').innerText = 'Edit Pengeluaran'; new bootstrap.Modal(document.getElementById('modalPengeluaran')).show();
+    };
+
+    window.savePengeluaran = function () {
+      const elStat = document.getElementById('pengStatus');
+      const payload = { id: document.getElementById('pengId').value, isEdit: document.getElementById('pengIsEdit').value, tanggal: document.getElementById('pengTanggal').value, detail: document.getElementById('pengDetail').value, kategori: document.getElementById('pengKategori').value, nominal: document.getElementById('pengNominal').value, catatan: document.getElementById('pengCatatan').value, status_bayar: elStat ? elStat.value : 'Lunas' };
+      handleOptimisticSave('Pengeluaran', payload, dbPengeluaran, 'modalPengeluaran');
+      setTimeout(() => { const tabEl = document.querySelector('button[data-bs-target="#tab-operasional"]'); if (tabEl) new bootstrap.Tab(tabEl).show(); }, 500);
+    };
+
+    window.openModalBayarFee = function (pemId, memberName, clientName, existingId = null) {
+      document.getElementById('formBayarFee').reset(); document.getElementById('feePemId').value = pemId; document.getElementById('feeMemberName').value = memberName; document.getElementById('feePengId').value = existingId || ''; document.getElementById('displayFeeMember').innerText = memberName; document.getElementById('displayFeeJob').innerText = clientName || 'Project';
+      if (existingId) {
+        const feeRecord = dbPengeluaran.find(x => x.id == existingId);
+        if (feeRecord) { document.getElementById('feeTanggal').value = safeDate(feeRecord.tanggal); document.getElementById('feeNominal').value = feeRecord.nominal; const elStatus = document.getElementById('feeStatus'); if (elStatus) elStatus.value = String(feeRecord.status_bayar).trim().toLowerCase() === 'lunas' ? 'Lunas' : 'Belum Dibayar'; }
+      } else { document.getElementById('feeTanggal').value = safeDate(new Date()); const elStatus = document.getElementById('feeStatus'); if (elStatus) elStatus.value = 'Belum Dibayar'; }
+      new bootstrap.Modal(document.getElementById('modalBayarFee')).show();
+    };
+
+    window.saveFeeTeam = function () {
+      const pemId = document.getElementById('feePemId').value; const member = document.getElementById('feeMemberName').value; const pengId = document.getElementById('feePengId').value; const isEdit = pengId !== ''; const elStatus = document.getElementById('feeStatus');
+      const payload = { id: isEdit ? pengId : Date.now(), isEdit: isEdit ? 'true' : 'false', tanggal: document.getElementById('feeTanggal').value, detail: `Fee Team: ${member}`, kategori: 'Fee Team', nominal: document.getElementById('feeNominal').value, catatan: `PEM_ID:${pemId}|MEMBER:${member}`, status_bayar: elStatus ? elStatus.value : 'Lunas' };
+      handleOptimisticSave('Pengeluaran', payload, dbPengeluaran, 'modalBayarFee');
+    };
+
+    // 8. KALENDER & ARUS KAS
+    let calendar = null;
+    window.renderKalender = function () {
+      const calEl = document.getElementById('calendarArea');
+      if (calendar) { calendar.destroy(); calendar = null; }
+
+      let events = [];
+      dbPemasukan.forEach(p => {
+        if (p.tanggal) {
+          let tglArr = String(p.tanggal).split(',');
+          let teamArr = String(p.team || '').split('|');
+          tglArr.forEach((d, idx) => {
+            let trimD = d.trim();
+            if (trimD) {
+              let tName = teamArr.length > idx ? teamArr[idx].trim() : (teamArr[0] || 'TBA');
+              events.push({
+                title: `${p.client || 'Client'} (${tName})`,
+                start: safeDate(trimD),
+                backgroundColor: '#0072ff',
+                borderColor: '#0072ff',
+                allDay: true
+              });
+            }
+          });
+        }
+      });
+
+      calendar = new FullCalendar.Calendar(calEl, {
+        initialView: 'dayGridMonth',
+        events: events,
+        height: 550,
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,listMonth'
+        },
+        buttonText: {
+          dayGridMonth: 'Kotak',
+          listMonth: 'List'
+        },
+        datesSet: function (info) {
+          const d = info.view.currentStart;
+          document.getElementById('calTahun').value = d.getFullYear();
+          document.getElementById('calBulan').value = String(d.getMonth() + 1).padStart(2, '0');
+        }
+      });
+      calendar.render();
+    };
+
+    window.changeCalendarDate = function () { if (!calendar) return; const y = document.getElementById('calTahun').value; const m = document.getElementById('calBulan').value; calendar.gotoDate(`${y}-${m}-01`); };
+
+    window.renderArusKas = function () {
+      const tahun = document.getElementById('akTahun').value; const bulan = document.getElementById('akBulan').value;
+      let pem = dbPemasukan.filter(p => { let tgl = String(p.tanggal).split(',')[0].trim(); return (tahun === 'all' || tgl.startsWith(tahun)) && (bulan === 'all' || tgl.substring(5, 7) === bulan); });
+      let peng = dbPengeluaran.filter(p => {
+        let effectiveDate = String(p.tanggal);
+        if (p.kategori === 'Fee Team' && p.catatan && p.catatan.includes('PEM_ID:')) { let match = p.catatan.match(/PEM_ID:(\d+)/); if (match && match[1]) { let pms = dbPemasukan.find(x => String(x.id) === match[1]); if (pms && pms.tanggal) effectiveDate = String(pms.tanggal).split(',')[0].trim(); } }
+        return (tahun === 'all' || effectiveDate.startsWith(tahun)) && (bulan === 'all' || effectiveDate.substring(5, 7) === bulan);
+      });
+
+      let groupPem = {}; pem.forEach(x => { groupPem[x.layanan || 'Lainnya'] = (groupPem[x.layanan || 'Lainnya'] || 0) + Number(x.total); });
+      let groupPeng = {}; peng.filter(x => String(x.status_bayar).trim().toLowerCase() !== 'belum dibayar').forEach(x => { groupPeng[x.kategori || 'Lainnya'] = (groupPeng[x.kategori || 'Lainnya'] || 0) + Number(x.nominal); });
+      const totalPem = pem.reduce((s, i) => s + (Number(i.total) || 0), 0);
+      const totalPeng = peng.filter(x => String(x.status_bayar).trim().toLowerCase() !== 'belum dibayar').reduce((s, i) => s + (Number(i.nominal) || 0), 0);
+      const labaBersih = totalPem - totalPeng;
+
+      let pemRows = Object.keys(groupPem).map(k => `<tr><td class="ps-4 text-muted"><i class="fa-solid fa-check text-success me-2"></i> ${k}</td><td class="text-end">${formatRp(groupPem[k])}</td></tr>`).join('');
+      if (!pemRows) pemRows = `<tr><td colspan="2" class="text-center text-muted fst-italic">Tidak ada pemasukan</td></tr>`;
+      let pengRows = Object.keys(groupPeng).map(k => `<tr><td class="ps-4 text-muted"><i class="fa-solid fa-minus text-danger me-2"></i> ${k}</td><td class="text-end text-danger">${formatRp(groupPeng[k])}</td></tr>`).join('');
+      if (!pengRows) pengRows = `<tr><td colspan="2" class="text-center text-muted fst-italic">Tidak ada pengeluaran</td></tr>`;
+
+      document.getElementById('arusKasContainer').innerHTML = `<div class="card border-0 shadow-sm overflow-hidden mb-4"><div class="card-body p-0"><table class="table mb-0 table-custom"><tr style="background: rgba(32, 201, 151, 0.1);"><th class="fs-6 py-3 px-4 rounded-0 border-0 text-success"><i class="fa-solid fa-wallet me-2"></i> RINCIAN PEMASUKAN</th><th class="text-end border-0"></th></tr>${pemRows}<tr class="bg-light"><td class="fw-bold px-4 py-3">Total Pemasukan Operasional</td><td class="text-end fw-bold text-success fs-5 py-3">${formatRp(totalPem)}</td></tr><tr style="background: rgba(220, 53, 69, 0.1);"><th class="fs-6 py-3 px-4 rounded-0 border-0 text-danger"><i class="fa-solid fa-money-bill-transfer me-2"></i> RINCIAN PENGELUARAN</th><th class="text-end border-0"></th></tr>${pengRows}<tr class="bg-light"><td class="fw-bold px-4 py-3">Total Pengeluaran Operasional</td><td class="text-end fw-bold text-danger fs-5 py-3">${formatRp(totalPeng)}</td></tr><tr style="background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 114, 255, 0.1));"><th class="fs-4 py-4 px-4 border-0 text-primary">LABA BERSIH (NET PROFIT)</th><th class="text-end fs-3 fw-bold border-0 py-4 px-4 text-primary">${formatRp(labaBersih)}</th></tr></table></div></div>`;
+    };
+
+    // 9. TODO LIST
+    window.renderTodo = function () {
+      const tb = document.getElementById('tbody-todo'); if (dbTodo.length === 0) { tb.innerHTML = `<tr><td colspan="9" class="text-center text-muted py-4">Belum ada task</td></tr>`; return; }
+      tb.innerHTML = dbTodo.map((t, i) => `<tr class="${t._isSyncing ? 'syncing-item' : ''}"><td>${i + 1}</td><td class="fw-bold ${t.status === 'Done' ? 'text-decoration-line-through text-muted opacity-50' : ''}">${t.task}</td><td><span class="badge bg-light text-dark border">${t.kategori}</span></td><td><span class="badge ${t.prioritas === 'High' ? 'bg-danger' : t.prioritas === 'Medium' ? 'bg-warning' : 'bg-info'} bg-opacity-75">${t.prioritas}</span></td><td>${safeDate(t.duedate)}</td><td class="fw-bold text-success">${t.harga ? formatRp(t.harga) : '-'}</td><td class="${t.status === 'Done' ? 'text-success fw-bold' : 'text-muted'}">${t.status}</td><td><input type="checkbox" class="form-check-input shadow-sm" style="transform: scale(1.3);" ${t.status === 'Done' ? 'checked' : ''} onclick="toggleTodo(${t.id})"></td><td>${t._isSyncing ? '<span class="spinner-border spinner-border-sm text-primary"></span>' : `<button class="btn btn-sm btn-light border me-1 text-primary shadow-sm" onclick="editTodo(${t.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-light border text-danger shadow-sm" onclick="delData('Todo', ${t.id})"><i class="fa-solid fa-trash"></i></button>`}</td></tr>`).join('');
+    };
+    window.toggleTodo = function (id) { const t = dbTodo.find(x => x.id == id); if (!t) return; t.status = t.status === 'Done' ? 'Not started' : 'Done'; handleOptimisticSave('Todo', { id: t.id, isEdit: 'true', status: t.status }, dbTodo, null); };
+    window.openModalTodo = function () { document.getElementById('formTodo').reset(); document.getElementById('todoId').value = ''; document.getElementById('todoIsEdit').value = 'false'; document.getElementById('titleTodo').innerText = 'Tambah Task / Alat'; document.getElementById('todoDuedate').value = safeDate(new Date()); document.getElementById('todoHarga').value = ''; new bootstrap.Modal(document.getElementById('modalTodo')).show(); };
+    window.editTodo = function (id) { const t = dbTodo.find(x => x.id == id); if (!t) return; document.getElementById('todoId').value = t.id; document.getElementById('todoIsEdit').value = 'true'; document.getElementById('titleTodo').innerText = 'Edit Task / Alat'; document.getElementById('todoTask').value = t.task; document.getElementById('todoKategori').value = t.kategori; document.getElementById('todoPrioritas').value = t.prioritas; document.getElementById('todoDuedate').value = safeDate(t.duedate); document.getElementById('todoHarga').value = t.harga || ''; new bootstrap.Modal(document.getElementById('modalTodo')).show(); };
+    window.saveTodo = function () { const payload = { id: document.getElementById('todoId').value, isEdit: document.getElementById('todoIsEdit').value, task: document.getElementById('todoTask').value, kategori: document.getElementById('todoKategori').value, prioritas: document.getElementById('todoPrioritas').value, duedate: document.getElementById('todoDuedate').value, harga: document.getElementById('todoHarga').value, status: 'Not started' }; if (payload.isEdit === 'true') { const existing = dbTodo.find(x => String(x.id) === payload.id); if (existing) payload.status = existing.status; } handleOptimisticSave('Todo', payload, dbTodo, 'modalTodo'); };
+
+    // 10. INVOICE LOGIC & EXPORT WA
+    window.openInvoicePreview = function (id) {
+      const targetTrx = dbPemasukan.find(x => x.id == id); if (!targetTrx) return;
+      let itemsToProcess = [targetTrx]; if (targetTrx.id_trx && String(targetTrx.id_trx).trim() !== '') itemsToProcess = dbPemasukan.filter(x => String(x.id_trx).trim() === String(targetTrx.id_trx).trim());
+      currentInvoiceTrx = itemsToProcess[0];
+
+      let set = dbPengaturan.length > 0 ? dbPengaturan[0] : {};
+      document.getElementById('invBrandName').innerText = set.brand || 'Kama Visual'; document.getElementById('invBrandTagline').innerText = set.tagline || 'Prewedding, Wedding Documentation Etc.'; document.getElementById('invPhoneKama').innerText = set.phone || '081999778556'; document.getElementById('invEmailKama').innerText = set.email || 'kamabalicreative@gmail.com'; document.getElementById('invBankName').innerText = set.bank || 'Bank Central Asia'; document.getElementById('invBankAcc').innerText = set.acc || '6485602503'; document.getElementById('invBankAccName').innerText = set.acc_name || 'Ni Putu Ayu Nely Pradnyawati'; document.getElementById('invSignName').innerText = set.brand || 'Kama Visual'; document.getElementById('invNotesText').innerText = set.notes_inv || 'All prices above are fixed prices. Please confirm after payment.';
+
+      const logoCont = document.getElementById('invLogoContainer'); if (set.logo_inv && set.logo_inv.length > 20) { logoCont.innerHTML = `<img src="${set.logo_inv}" alt="Logo" style="max-height:100%; max-width:100%; object-fit:contain;">`; logoCont.style.border = 'none'; } else { logoCont.innerHTML = `km`; logoCont.style.border = '2px solid #000'; }
+      const signCont = document.getElementById('invSignatureContainer'); if (set.ttd_inv && set.ttd_inv.length > 20) { signCont.innerHTML = `<img src="${set.ttd_inv}" style="max-height: 60px; max-width: 150px; object-fit: contain;">`; } else { signCont.innerHTML = `<svg width="150" height="40" viewBox="0 0 150 40"><path d="M10,35 C30,20 60,10 80,15 C100,20 120,30 140,20" stroke="black" fill="transparent" stroke-width="2"/><path d="M50,30 C70,10 90,5 110,25" stroke="black" fill="transparent" stroke-width="1"/></svg>`; }
+
+      document.getElementById('invNo').innerText = `#INV/ ${currentInvoiceTrx.id_trx || Date.now().toString().slice(-5)}`; document.getElementById('invClient').innerText = currentInvoiceTrx.client || '-'; document.getElementById('invClientPhone').innerText = currentInvoiceTrx.phone || '-';
+
+      let allDates = []; itemsToProcess.forEach(c => { if (c.tanggal) c.tanggal.split(',').forEach(d => { let trimD = d.trim(); if (trimD && !allDates.includes(trimD)) allDates.push(trimD); }); });
+      let dateStrings = allDates.map(ds => { const d = new Date(ds); return isNaN(d) ? ds : d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }).join(' & ');
+      let dueDateStr = '-'; if (allDates.length > 0) { const firstD = new Date(allDates[0]); if (!isNaN(firstD)) { firstD.setDate(firstD.getDate() + 7); dueDateStr = firstD.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); } }
+      document.getElementById('invDate').innerText = dateStrings || '-'; document.getElementById('invDueDate').innerText = dueDateStr;
+
+      let itemsHtml = ''; let sumSub = 0, sumTrans = 0, sumDisc = 0, sumDP = 0;
+      let anyLunas = itemsToProcess.some(c => c.is_lunas === true || String(c.is_lunas) === 'true');
+
+      itemsToProcess.forEach(trx => {
+        const rowSub = (Number(trx.harga) || 0) * (Number(trx.jumlah) || 1); const rowDiskon = Number(trx.diskon) || 0;
+        itemsHtml += `<tr><td>${trx.layanan}</td><td style="text-align:center;">${trx.jumlah || 1}</td><td style="text-align:right;">${formatRp(trx.harga)}</td><td style="text-align:right;">${formatRp(rowDiskon)}</td><td style="text-align:right;">${formatRp(rowSub - rowDiskon)}</td></tr>`;
+        sumSub += (rowSub - rowDiskon); sumTrans += Number(trx.transport) || 0; sumDisc += rowDiskon; sumDP += Number(trx.dp) || 0;
+      });
+
+      document.getElementById('invItemsBody').innerHTML = itemsHtml; document.getElementById('invSubTotal').innerText = formatRp(sumSub); document.getElementById('invTransport').innerText = formatRp(sumTrans); document.getElementById('invDiskon').innerText = formatRp(sumDisc); document.getElementById('invDP').innerText = formatRp(sumDP);
+
+      let grandTotal = sumSub + sumTrans - sumDP; document.getElementById('invGrandTotal').innerText = formatRp(grandTotal);
+      const wm = document.getElementById('invWatermark'); wm.className = 'invoice-watermark'; wm.innerText = '';
+
+      if (anyLunas || grandTotal <= 0) { grandTotal = Math.max(0, grandTotal); wm.innerText = 'LUNAS'; wm.classList.add('watermark-lunas'); }
+      else if (sumDP > 0) { wm.innerText = 'DP'; wm.classList.add('watermark-dp'); }
+
+      document.getElementById('invBalance').innerText = formatRp(grandTotal);
+      document.getElementById('mainApp').style.display = 'none'; document.getElementById('invoicePreviewWrapper').style.display = 'block'; window.scrollTo(0, 0);
+    };
+
+    window.closeInvoicePreview = function () { document.getElementById('invoicePreviewWrapper').style.display = 'none'; document.getElementById('mainApp').style.display = ''; currentInvoiceTrx = null; };
+
+    window.exportJPG = function (isForWA = false) {
+      const area = document.getElementById('invoicePrintArea'); const noInv = currentInvoiceTrx.id_trx || Date.now(); Swal.fire({ title: 'Memproses Gambar...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+      html2canvas(area, { scale: 2, useCORS: true }).then(canvas => { const link = document.createElement('a'); link.download = `Invoice_${noInv}.jpg`; link.href = canvas.toDataURL('image/jpeg', 1.0); link.click(); Swal.close(); if (!isForWA) Swal.fire({ icon: 'success', title: 'Berhasil', text: 'JPG berhasil didownload', timer: 1500, showConfirmButton: false }); });
+    };
+
+    window.exportPDF = function () {
+      const area = document.getElementById('invoicePrintArea'); const noInv = currentInvoiceTrx.id_trx || Date.now(); Swal.fire({ title: 'Memproses PDF...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+      html2canvas(area, { scale: 2, useCORS: true }).then(canvas => { const imgData = canvas.toDataURL('image/jpeg', 1.0); const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4'); const pdfWidth = pdf.internal.pageSize.getWidth(); const pdfHeight = (canvas.height * pdfWidth) / canvas.width; pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight); pdf.save(`Invoice_${noInv}.pdf`); Swal.close(); });
+    };
+
+    window.kirimWA = function () {
+      if (!currentInvoiceTrx) return; let phone = currentInvoiceTrx.phone;
+      if (!phone) return Swal.fire('Oops', 'Nomor HP Client kosong. Silakan lengkapi di data Order.', 'warning');
+      phone = String(phone).replace(/\D/g, '');
+      if (phone.startsWith('0')) phone = '62' + phone.substring(1);
+      let msg = `Halo kak berikut kami kirimkan invoicenya ya kak.\nTerima kasih kak`;
+      const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+      exportJPG(true);
+      Swal.fire({ icon: 'info', title: 'Membuka WhatsApp...', text: 'JPG Invoice sedang didownload. Silakan paste/attach gambar tersebut di ruang obrolan WhatsApp.', showConfirmButton: true, confirmButtonText: 'Buka WA Sekarang' }).then(() => { window.open(waLink, '_blank'); });
+    };
+
+    // 11. CORE ENGINE (SAVE & DELETE)
+    function handleOptimisticSave(tableName, payload, dbArray, modalId) {
+      let tempId = (payload.isEdit === 'true' || payload.isEdit === true) ? payload.id : Date.now();
+      payload.id = tempId; // Ensure frontend and backend use same ID
+      let tempItem = { ...payload, _isSyncing: true };
+      let backup = JSON.parse(JSON.stringify(dbArray));
+      if (payload.isEdit === 'true' || payload.isEdit === true) { let idx = dbArray.findIndex(x => x.id == tempId); if (idx !== -1) Object.assign(dbArray[idx], tempItem); } else { dbArray.unshift(tempItem); }
+      updateDynamicYears(); routeRender(); if (modalId) { let mod = bootstrap.Modal.getInstance(document.getElementById(modalId)); if (mod) mod.hide(); }
+      Swal.fire({ icon: 'info', title: 'Menyimpan...', toast: true, position: 'bottom-end', showConfirmButton: false, timer: 2000 });
+      gasRun('saveData', tableName, payload).then(res => {
+        if (res.success) {
           let savedItem = dbArray.find(x => x.id == tempId);
           if (savedItem) delete savedItem._isSyncing;
           routeRender();
@@ -819,15 +1015,188 @@
     window.delData = function (tableName, id) {
       Swal.fire({ title: 'Hapus data?', text: 'Data tidak bisa dikembalikan!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Hapus' }).then(res => {
         if (!res.isConfirmed) return;
-        let dbArray; if (tableName === 'Produk') dbArray = dbProduk; else if (tableName === 'Pemasukan') dbArray = dbPemasukan; else if (tableName === 'Pengeluaran') dbArray = dbPengeluaran; else if (tableName === 'Users') dbArray = dbUsers; else dbArray = dbTodo;
+        let dbArray; if (tableName === 'Produk') dbArray = dbProduk; else if (tableName === 'Pemasukan') dbArray = dbPemasukan; else if (tableName === 'Pengeluaran') dbArray = dbPengeluaran; else if (tableName === 'Users') dbArray = dbUsers; else if (tableName === 'Team_Unavailability') dbArray = dbTeamUnavailability; else dbArray = dbTodo;
         let backup = JSON.parse(JSON.stringify(dbArray)); let idx = dbArray.findIndex(x => x.id == id); if (idx !== -1) dbArray.splice(idx, 1);
         updateDynamicYears(); routeRender();
         gasRun('deleteData', tableName, id).then(r => { if (!r.success) { dbArray.splice(0, dbArray.length, ...backup); updateDynamicYears(); routeRender(); Swal.fire('Error', r.message, 'error'); } });
       });
     };
 
+    // 12. TEAM UNAVAILABILITY & SLOT CONFLICT MANAGEMENT
+    window.renderUnavailability = function () {
+      const tb = document.getElementById('tbody-unavailability');
+      if (!tb) return;
+      
+      let items = dbTeamUnavailability;
+      if (currentUser && (currentUser.role === 'Fotografer' || currentUser.role === 'MUA')) {
+        items = dbTeamUnavailability.filter(x => String(x.nama_team).toLowerCase().includes(currentUser.fullname.toLowerCase()));
+      }
+
+      if (items.length === 0) {
+        tb.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Belum ada tanggal blackout / libur</td></tr>`;
+        return;
+      }
+
+      tb.innerHTML = items.map((u, i) => `
+        <tr class="${u._isSyncing ? 'syncing-item' : ''}">
+          <td>${i + 1}</td>
+          <td class="fw-bold text-slate-800">${u.nama_team || '-'}</td>
+          <td><span class="badge bg-rose-500/10 text-rose-600 border border-rose-200 font-bold">${safeDate(u.tanggal)}</span></td>
+          <td><span class="badge bg-indigo-500/10 text-indigo-600 border border-indigo-200 font-bold">${u.jam_mulai || '00:00'} - ${u.jam_selesai || '23:59'}</span></td>
+          <td class="text-slate-600 font-medium">${u.alasan || 'Off Day / Job Luar'}</td>
+          <td class="text-center">
+            ${u._isSyncing ? '<span class="spinner-border spinner-border-sm text-primary"></span>' : `
+              <button class="btn btn-sm btn-light border text-danger" onclick="delData('Team_Unavailability', ${u.id})"><i class="fa-solid fa-trash"></i></button>
+            `}
+          </td>
+        </tr>
+      `).join('');
+    };
+
+    window.openModalUnavailability = function () {
+      if (document.getElementById('formUnavailability')) document.getElementById('formUnavailability').reset();
+      if (document.getElementById('unavailId')) document.getElementById('unavailId').value = '';
+      if (document.getElementById('unavailTgl')) document.getElementById('unavailTgl').value = safeDate(new Date());
+      if (document.getElementById('unavailTeamName')) document.getElementById('unavailTeamName').value = currentUser ? currentUser.fullname : '';
+      new bootstrap.Modal(document.getElementById('modalUnavailability')).show();
+    };
+
+    window.saveUnavailability = function () {
+      const payload = {
+        id: document.getElementById('unavailId').value || Date.now(),
+        isEdit: false,
+        user_id: currentUser ? currentUser.id : '',
+        nama_team: document.getElementById('unavailTeamName').value || (currentUser ? currentUser.fullname : ''),
+        tanggal: document.getElementById('unavailTgl').value,
+        jam_mulai: document.getElementById('unavailJamMulai').value || '00:00',
+        jam_selesai: document.getElementById('unavailJamSelesai').value || '23:59',
+        alasan: document.getElementById('unavailAlasan').value || 'Off Day / Job Luar'
+      };
+      handleOptimisticSave('Team_Unavailability', payload, dbTeamUnavailability, 'modalUnavailability');
+    };
+
+    // USER MANAGEMENT IMPLEMENTATION
+    window.openModalUser = function () {
+      if (document.getElementById('formUser')) document.getElementById('formUser').reset();
+      if (document.getElementById('userId')) document.getElementById('userId').value = '';
+      if (document.getElementById('userIsEdit')) document.getElementById('userIsEdit').value = 'false';
+      if (document.getElementById('uCategory')) document.getElementById('uCategory').value = 'Fotografer';
+      if (document.getElementById('uSurcharge')) document.getElementById('uSurcharge').value = 0;
+      if (document.getElementById('uFeeDefault')) document.getElementById('uFeeDefault').value = 0;
+      if (document.getElementById('uMaxJob')) document.getElementById('uMaxJob').value = 2;
+      new bootstrap.Modal(document.getElementById('modalUser')).show();
+    };
+
+    window.editUser = function (id) {
+      const u = dbUsers.find(x => x.id == id);
+      if (!u) return;
+      document.getElementById('userId').value = u.id;
+      document.getElementById('userIsEdit').value = 'true';
+      document.getElementById('uName').value = u.username;
+      document.getElementById('uPass').value = u.password;
+      document.getElementById('uFull').value = u.fullname;
+      document.getElementById('uRole').value = u.role || 'Staff';
+      if (document.getElementById('uCategory')) document.getElementById('uCategory').value = u.kategori || u.role;
+      if (document.getElementById('uSurcharge')) document.getElementById('uSurcharge').value = u.talent_surcharge || 0;
+      if (document.getElementById('uFeeDefault')) document.getElementById('uFeeDefault').value = u.fee_default || 0;
+      if (document.getElementById('uMaxJob')) document.getElementById('uMaxJob').value = u.max_job_per_day || 2;
+
+      const aksesArr = (u.akses_menu || '').split(',');
+      document.querySelectorAll('.menu-check').forEach(cb => {
+        cb.checked = aksesArr.includes(cb.value);
+      });
+
+      new bootstrap.Modal(document.getElementById('modalUser')).show();
+    };
+
+    window.saveUser = function () {
+      const selectedMenus = Array.from(document.querySelectorAll('.menu-check:checked')).map(c => c.value).join(',');
+      const payload = {
+        id: document.getElementById('userId').value,
+        isEdit: document.getElementById('userIsEdit').value,
+        username: document.getElementById('uName').value,
+        password: document.getElementById('uPass').value,
+        fullname: document.getElementById('uFull').value,
+        role: document.getElementById('uRole').value,
+        akses_menu: selectedMenus,
+        kategori: document.getElementById('uCategory') ? document.getElementById('uCategory').value : '',
+        talent_surcharge: document.getElementById('uSurcharge') ? document.getElementById('uSurcharge').value : 0,
+        fee_default: document.getElementById('uFeeDefault') ? document.getElementById('uFeeDefault').value : 0,
+        max_job_per_day: document.getElementById('uMaxJob') ? document.getElementById('uMaxJob').value : 2
+      };
+      handleOptimisticSave('Users', payload, dbUsers, 'modalUser');
+    };
+
+    window.renderUsers = function () {
+      const tb = document.getElementById('tbody-users');
+      if (!tb) return;
+      if (dbUsers.length === 0) {
+        tb.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Belum ada user</td></tr>`;
+        return;
+      }
+      tb.innerHTML = dbUsers.map(u => `
+        <tr class="${u._isSyncing ? 'syncing-item' : ''}">
+          <td class="fw-bold text-slate-800">${u.username}</td>
+          <td>${u.fullname}</td>
+          <td><span class="badge ${u.role === 'Admin' ? 'bg-indigo-600 text-white' : u.role === 'Fotografer' ? 'bg-teal-600 text-white' : u.role === 'MUA' ? 'bg-pink-600 text-white' : 'bg-slate-500 text-white'}">${u.role}</span></td>
+          <td class="small text-slate-600">
+            ${u.role === 'Fotografer' || u.role === 'MUA' ? `<span class="font-bold text-indigo-600">Surcharge: ${formatRp(u.talent_surcharge)}</span> | Max ${u.max_job_per_day || 2} job/hari` : (u.akses_menu || '-')}
+          </td>
+          <td class="text-center">
+            ${u._isSyncing ? '<span class="spinner-border spinner-border-sm text-primary"></span>' : `
+              <button class="btn btn-sm btn-light border text-primary me-1" onclick="editUser(${u.id})"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn btn-sm btn-light border text-danger" onclick="delData('Users', ${u.id})"><i class="fa-solid fa-trash"></i></button>
+            `}
+          </td>
+        </tr>
+      `).join('');
+    };
+
+    window.checkOrderConflict = function() {
+      const tglEl = document.getElementById('pemTanggal');
+      if (!tglEl) return;
+      const tgl = tglEl.value;
+      const sTime = document.getElementById('pemJamMulai') ? document.getElementById('pemJamMulai').value : '';
+      const eTime = document.getElementById('pemJamSelesai') ? document.getElementById('pemJamSelesai').value : '';
+      const team1 = document.getElementById('pemTeam') ? document.getElementById('pemTeam').value.trim() : '';
+      const team2 = document.getElementById('pemTeam2') ? document.getElementById('pemTeam2').value.trim() : '';
+
+      const allTeams = [team1, team2].filter(x => x !== '');
+      const alertBox = document.getElementById('conflictAlert');
+      if (!alertBox) return;
+
+      if (!tgl || allTeams.length === 0) {
+        alertBox.innerHTML = '';
+        return;
+      }
+
+      let conflicts = [];
+      allTeams.forEach(tName => {
+        // Check Unavailability Sheet
+        let unavail = dbTeamUnavailability.find(u => safeDate(u.tanggal) === safeDate(tgl) && String(u.nama_team).toLowerCase().includes(tName.toLowerCase()));
+        if (unavail) {
+          conflicts.push(`🔴 <b>${tName}</b> di-block / libur pada tanggal ${tgl} (${unavail.alasan || 'Libur'})`);
+        }
+
+        // Check Existing Booked Orders
+        dbPemasukan.forEach(p => {
+          if (safeDate(p.tanggal) === safeDate(tgl) && p.team && String(p.team).toLowerCase().includes(tName.toLowerCase())) {
+            let pStart = p.jam_mulai || '';
+            let pEnd = p.jam_selesai || '';
+            if (sTime && eTime && pStart && pEnd) {
+              if (sTime < pEnd && eTime > pStart) {
+                conflicts.push(`🔴 <b>${tName}</b> bentrok jam acara dengan Client: ${p.client} (${pStart} - ${pEnd})`);
+              }
+            }
+          }
+        });
+      });
+
+      if (conflicts.length > 0) {
+        alertBox.innerHTML = `<div class="p-3 bg-rose-500/10 border border-rose-300 text-rose-700 rounded-xl text-xs space-y-1">${conflicts.join('<br>')}</div>`;
+      } else {
+        alertBox.innerHTML = `<div class="p-2.5 bg-emerald-500/10 border border-emerald-300 text-emerald-700 rounded-xl text-xs font-bold flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> Tim Tersedia / Ready! Tidak ada bentrok jam.</div>`;
+      }
+    };
+
     document.addEventListener('DOMContentLoaded', () => { checkLoginState(); });
-  
-
-
-
