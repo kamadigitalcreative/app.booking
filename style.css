@@ -1,19 +1,100 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* Glassmorphism custom styling & FullCalendar Integration */
+/* ==========================================
+   GLASSMORPHISM LITE & CORE LAYOUT STYLES
+   ========================================== */
 
-/* Glass card utility defaults */
+/* Universal Display Helpers */
 .d-none {
   display: none !important;
 }
 
+/* Base Body Background */
+body {
+  font-family: 'Inter', sans-serif;
+  color: #1e293b;
+  background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 50%, #fce7f3 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Glass card utility defaults */
 .glass-card {
-  background: rgba(255, 255, 255, 0.3) !important;
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.5) !important;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05) !important;
+  background: rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
   border-radius: 1.5rem !important;
+}
+
+/* Fail-safe Layout System */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.sidebar {
+  width: 260px;
+  background: rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border-right: 1px solid rgba(255, 255, 255, 0.6);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1040;
+  transition: transform 0.3s ease, left 0.3s ease;
+  box-shadow: 4px 0 25px rgba(31, 38, 135, 0.08);
+}
+
+.main-content {
+  flex-grow: 1;
+  margin-left: 260px;
+  width: calc(100% - 260px);
+  padding: 2rem;
+  transition: margin-left 0.3s ease;
+}
+
+/* Mobile Sidebar & Responsive Layout */
+@media (max-width: 991.98px) {
+  .sidebar {
+    left: -260px;
+  }
+  .sidebar.active {
+    left: 0 !important;
+    transform: none !important;
+    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.2);
+  }
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 1rem !important;
+  }
+  .sidebar-overlay.active {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    z-index: 1030;
+    backdrop-filter: blur(4px);
+  }
+}
+
+/* Nav Item States */
+.nav-item-custom {
+  transition: all 0.2s ease;
+}
+.nav-item-custom.active {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border-left: 4px solid #4f46e5 !important;
+  color: #4f46e5 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.15) !important;
 }
 
 /* FullCalendar styling for Glassmorphism Lite */
@@ -81,15 +162,7 @@
   color: #059669;
 }
 
-/* Smooth transitions */
-.nav-item-custom.active {
-  background: rgba(255, 255, 255, 0.5) !important;
-  border-left: 4px solid #4f46e5 !important;
-  color: #4f46e5 !important;
-  font-weight: 700 !important;
-  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.15) !important;
-}
-
+/* Loading placeholders */
 .placeholder-glow .placeholder {
   background: linear-gradient(90deg, rgba(255, 255, 255, 0.3) 25%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.3) 75%);
   background-size: 200% 100%;
