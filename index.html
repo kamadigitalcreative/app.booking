@@ -46,7 +46,7 @@
 <body class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 min-h-screen text-slate-800 font-sans antialiased selection:bg-indigo-500 selection:text-white">
 
   <!-- FULL PAGE LOADER -->
-  <div id="fullPageLoader" class="hidden fixed inset-0 z-[9999] bg-white/40 backdrop-blur-md flex flex-col justify-center items-center">
+  <div id="fullPageLoader" class="d-none fixed inset-0 z-[9999] bg-white/40 backdrop-blur-md flex flex-col justify-center items-center">
     <div class="spinner-border text-indigo-600 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
     <h5 class="font-extrabold text-2xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent appNameDisplay">KAMA VISUAL</h5>
     <p class="mt-2 text-sm font-semibold text-slate-600" id="loaderText">Memuat Sistem...</p>
@@ -66,7 +66,7 @@
       <div class="text-center mb-8">
         <div class="appLogoContainer flex justify-center items-center mx-auto mb-4">
           <div class="brand-logo w-20 h-20 text-3xl font-extrabold rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 appLogoText">SP</div>
-          <img class="appLogoImage hidden max-h-20 object-contain mx-auto" src="" alt="App Logo">
+          <img class="appLogoImage d-none max-h-20 object-contain mx-auto" src="" alt="App Logo">
         </div>
         <h3 class="text-2xl font-bold text-slate-900 tracking-tight" id="authTitle">Photo Selection</h3>
         <p class="text-sm font-medium text-slate-500 mt-1" id="authSubtitle">Client Area Management</p>
@@ -98,7 +98,7 @@
       </form>
 
       <!-- REGISTER FORM -->
-      <form id="formRegister" class="hidden space-y-4" onsubmit="event.preventDefault(); handleRegister();">
+      <form id="formRegister" class="d-none space-y-4" onsubmit="event.preventDefault(); handleRegister();">
         <div>
           <input type="text" id="regFullName" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 transition-all font-medium text-sm" required placeholder="Nama Lengkap / Studio">
         </div>
@@ -133,7 +133,7 @@
       </form>
 
       <!-- FORGOT PASSWORD FORM -->
-      <form id="formForgot" class="hidden space-y-4" onsubmit="event.preventDefault(); handleForgotPassword();">
+      <form id="formForgot" class="d-none space-y-4" onsubmit="event.preventDefault(); handleForgotPassword();">
         <div>
           <input type="email" id="forgotEmail" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 transition-all font-medium text-sm" required placeholder="Masukkan Alamat Email">
         </div>
@@ -152,23 +152,23 @@
 
   <script>
     function showAuthForm(type) {
-      document.getElementById('formLogin').classList.add('hidden');
-      document.getElementById('formRegister').classList.add('hidden');
-      document.getElementById('formForgot').classList.add('hidden');
+      document.getElementById('formLogin').classList.add('d-none');
+      document.getElementById('formRegister').classList.add('d-none');
+      document.getElementById('formForgot').classList.add('d-none');
       
       const title = document.getElementById('authTitle');
       const subtitle = document.getElementById('authSubtitle');
 
       if (type === 'login') {
-        document.getElementById('formLogin').classList.remove('hidden');
+        document.getElementById('formLogin').classList.remove('d-none');
         title.innerText = "Photo Selection";
         subtitle.innerText = "Client Area Management";
       } else if (type === 'register') {
-        document.getElementById('formRegister').classList.remove('hidden');
+        document.getElementById('formRegister').classList.remove('d-none');
         title.innerText = "Daftar Akun";
         subtitle.innerText = "Daftar sebagai fotografer baru";
       } else if (type === 'forgot') {
-        document.getElementById('formForgot').classList.remove('hidden');
+        document.getElementById('formForgot').classList.remove('d-none');
         title.innerText = "Lupa Password";
         subtitle.innerText = "Masukkan email untuk reset password";
       }
@@ -211,13 +211,13 @@
   </script>
 
   <!-- MAIN APP WRAPPER -->
-  <div id="mainApp" class="hidden min-h-screen flex">
+  <div id="mainApp" class="d-none min-h-screen flex">
     <!-- SIDEBAR -->
     <aside class="sidebar w-64 bg-white/30 backdrop-blur-md border-r border-white/50 p-6 flex flex-col fixed inset-y-0 left-0 z-40 shadow-xl transition-transform duration-300 lg:translate-x-0 -translate-x-full">
       <div class="flex items-center gap-3 mb-8">
         <div class="appLogoContainer flex items-center justify-center">
           <div class="brand-logo w-10 h-10 text-lg font-extrabold rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-md appLogoText">km</div>
-          <img class="appLogoImage hidden max-h-10 object-contain" src="" alt="App Logo">
+          <img class="appLogoImage d-none max-h-10 object-contain" src="" alt="App Logo">
         </div>
         <div>
           <h5 class="font-extrabold text-slate-900 text-base leading-tight tracking-wide appNameDisplay">Kama Visual</h5>
@@ -276,7 +276,7 @@
     </aside>
 
     <!-- SIDEBAR OVERLAY FOR MOBILE -->
-    <div class="sidebar-overlay fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+    <div class="sidebar-overlay fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 d-none lg:hidden" onclick="toggleSidebar()"></div>
 
     <!-- MAIN CONTENT -->
     <main class="flex-1 lg:ml-64 p-4 lg:p-8 w-full max-w-full overflow-x-hidden">
@@ -285,7 +285,7 @@
         <div class="flex items-center gap-2.5">
           <div class="appLogoContainer flex items-center justify-center">
             <div class="brand-logo w-8 h-8 text-xs font-bold rounded-lg bg-indigo-600 text-white flex items-center justify-center appLogoText">km</div>
-            <img class="appLogoImage hidden max-h-8 object-contain" src="" alt="App Logo">
+            <img class="appLogoImage d-none max-h-8 object-contain" src="" alt="App Logo">
           </div>
           <h6 class="font-bold text-slate-900 text-sm appNameDisplay">Kama Visual</h6>
         </div>
@@ -328,7 +328,7 @@
       </div>
 
       <!-- PAGE: PRODUK -->
-      <div id="page-produk" class="hidden space-y-6">
+      <div id="page-produk" class="d-none space-y-6">
         <div class="flex flex-wrap justify-between items-center gap-4 bg-white/30 backdrop-blur-md border border-white/50 p-6 rounded-3xl shadow-xl">
           <div>
             <h4 class="text-xl font-extrabold text-slate-900 tracking-tight">Data Produk / Jasa</h4>
@@ -360,7 +360,7 @@
       </div>
 
       <!-- PAGE: PEMASUKAN -->
-      <div id="page-pemasukan" class="hidden space-y-6">
+      <div id="page-pemasukan" class="d-none space-y-6">
         <div class="flex flex-wrap justify-between items-center gap-4 bg-white/30 backdrop-blur-md border border-white/50 p-6 rounded-3xl shadow-xl">
           <div>
             <h4 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
@@ -422,7 +422,7 @@
       </div>
 
       <!-- PAGE: PENGELUARAN -->
-      <div id="page-pengeluaran" class="hidden space-y-6">
+      <div id="page-pengeluaran" class="d-none space-y-6">
         <div class="flex flex-wrap justify-between items-center gap-4 bg-white/30 backdrop-blur-md border border-white/50 p-6 rounded-3xl shadow-xl">
           <div>
             <h4 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
@@ -515,7 +515,7 @@
       </div>
 
       <!-- PAGE: KALENDER -->
-      <div id="page-kalender" class="hidden space-y-6">
+      <div id="page-kalender" class="d-none space-y-6">
         <div class="flex flex-wrap justify-between items-center gap-4 bg-white/30 backdrop-blur-md border border-white/50 p-6 rounded-3xl shadow-xl">
           <div>
             <h4 class="text-xl font-extrabold text-slate-900 tracking-tight">Kalender Kerja</h4>
@@ -549,7 +549,7 @@
       </div>
 
       <!-- PAGE: ARUS KAS -->
-      <div id="page-aruskas" class="hidden space-y-6">
+      <div id="page-aruskas" class="d-none space-y-6">
         <div class="flex flex-wrap justify-between items-center gap-4 bg-white/30 backdrop-blur-md border border-white/50 p-6 rounded-3xl shadow-xl">
           <div>
             <h4 class="text-xl font-extrabold text-slate-900 tracking-tight">Arus Kas</h4>
@@ -582,7 +582,7 @@
       </div>
 
       <!-- PAGE: TODO -->
-      <div id="page-todo" class="hidden space-y-6">
+      <div id="page-todo" class="d-none space-y-6">
         <div class="flex flex-wrap justify-between items-center gap-4 bg-white/30 backdrop-blur-md border border-white/50 p-6 rounded-3xl shadow-xl">
           <div>
             <h4 class="text-xl font-extrabold text-slate-900 tracking-tight">To-do List & Target Beli</h4>
@@ -616,7 +616,7 @@
       </div>
 
       <!-- PAGE: PENGATURAN -->
-      <div id="page-pengaturan" class="hidden space-y-6">
+      <div id="page-pengaturan" class="d-none space-y-6">
         <div class="bg-white/30 backdrop-blur-md border border-white/50 p-6 rounded-3xl shadow-xl">
           <h4 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
             <i class="fa-solid fa-gear text-slate-500"></i> Pengaturan Sistem
@@ -660,7 +660,7 @@
                       <input type="file" id="uploadLogoInvoice" class="w-full px-3 py-2 bg-white/40 border border-white/60 rounded-xl text-xs font-medium focus:outline-none" accept="image/*" onchange="handleImageUpload(this, 'previewInvLogo', 'setLogoInvoiceHidden')">
                       <input type="hidden" id="setLogoInvoiceHidden">
                       <div class="mt-2">
-                        <img id="previewInvLogo" src="" alt="Preview Logo" class="max-h-16 hidden rounded-lg border border-white/80 p-1 bg-white">
+                        <img id="previewInvLogo" src="" alt="Preview Logo" class="max-h-16 d-none rounded-lg border border-white/80 p-1 bg-white">
                       </div>
                     </div>
                     <div>
@@ -668,7 +668,7 @@
                       <input type="file" id="uploadTtdInvoice" class="w-full px-3 py-2 bg-white/40 border border-white/60 rounded-xl text-xs font-medium focus:outline-none" accept="image/*" onchange="handleImageUpload(this, 'previewTtdInvoice', 'setTtdInvoiceHidden')">
                       <input type="hidden" id="setTtdInvoiceHidden">
                       <div class="mt-2">
-                        <img id="previewTtdInvoice" src="" alt="Preview TTD" class="max-h-16 hidden rounded-lg border border-white/80 p-1 bg-white">
+                        <img id="previewTtdInvoice" src="" alt="Preview TTD" class="max-h-16 d-none rounded-lg border border-white/80 p-1 bg-white">
                       </div>
                     </div>
                     <div>
@@ -732,7 +732,7 @@
                       <input type="file" id="uploadLogoApp" class="w-full px-3 py-2 bg-white/40 border border-white/60 rounded-xl text-xs font-medium focus:outline-none" accept="image/*" onchange="handleImageUpload(this, 'previewAppLogo', 'setLogoAppHidden')">
                       <input type="hidden" id="setLogoAppHidden">
                       <div class="mt-2">
-                        <img id="previewAppLogo" src="" alt="Preview App Logo" class="max-h-16 hidden rounded-lg border border-white/80 p-1 bg-white">
+                        <img id="previewAppLogo" src="" alt="Preview App Logo" class="max-h-16 d-none rounded-lg border border-white/80 p-1 bg-white">
                       </div>
                     </div>
                     <div>
@@ -778,7 +778,7 @@
   </div>
 
   <!-- INVOICE PREVIEW MODAL / OVERLAY -->
-  <div id="invoicePreviewWrapper" class="hidden fixed inset-0 z-[999] bg-slate-900/80 backdrop-blur-md overflow-y-auto p-4 lg:p-8">
+  <div id="invoicePreviewWrapper" class="d-none fixed inset-0 z-[999] bg-slate-900/80 backdrop-blur-md overflow-y-auto p-4 lg:p-8">
     <div class="max-w-4xl mx-auto space-y-4">
       <div class="invoice-toolbar bg-white/20 backdrop-blur-md border border-white/40 p-4 rounded-2xl shadow-xl flex flex-wrap justify-between items-center gap-3">
         <button class="py-2.5 px-4 bg-slate-800/80 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2" onclick="closeInvoicePreview()">
@@ -913,7 +913,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 hidden" id="exclusiveTglRow">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 d-none" id="exclusiveTglRow">
               <div class="md:col-span-3"></div>
               <div class="md:col-span-4">
                 <label class="block text-xs font-bold text-slate-600 mb-1">Tanggal Acara Day 2</label>
@@ -943,7 +943,7 @@
               </div>
             </div>
 
-            <div class="space-y-2 hidden" id="exclusiveAlamatRow">
+            <div class="space-y-2 d-none" id="exclusiveAlamatRow">
               <div>
                 <label class="block text-xs font-bold text-slate-600 mb-1">Alamat Acara Day 2</label>
                 <textarea class="w-full px-3 py-2 bg-white/60 border border-white/80 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-400 focus:outline-none" id="pemAlamat2" rows="2"></textarea>
@@ -959,7 +959,7 @@
               <input type="text" class="w-full px-3 py-2 bg-white/60 border border-white/80 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-400 focus:outline-none" id="pemTeam">
             </div>
 
-            <div class="hidden" id="exclusiveTeamRow">
+            <div class="d-none" id="exclusiveTeamRow">
               <label class="block text-xs font-bold text-slate-600 mb-1">Nama Team Day 2</label>
               <input type="text" class="w-full px-3 py-2 bg-white/60 border border-white/80 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-400 focus:outline-none" id="pemTeam2">
             </div>
