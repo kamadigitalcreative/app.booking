@@ -4,152 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Invoice Tagihan - Kama Visual</title>
-  
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  
-  <style>
-    body {
-      background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    .invoice-card {
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      overflow: hidden;
-    }
-    .invoice-header {
-      background: var(--bs-dark);
-      color: white;
-      padding: 30px;
-    }
-    .status-badge {
-      padding: 8px 16px;
-      border-radius: 50px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-    .status-lunas { background: #d1e7dd; color: #0f5132; }
-    .status-pending { background: #fff3cd; color: #856404; }
-    
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px dashed #e9ecef;
-    }
-    .detail-row:last-child { border-bottom: none; }
-    
-    .total-box {
-      background: rgba(0, 114, 255, 0.05);
-      border-radius: 12px;
-      padding: 20px;
-      border: 1px solid rgba(0, 114, 255, 0.1);
-    }
-    
-    .btn-pay {
-      background: linear-gradient(135deg, #00b09b, #96c93d);
-      border: none;
-      color: white;
-      font-weight: bold;
-      padding: 14px;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(0, 176, 155, 0.3);
-    }
-    .btn-pay:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 176, 155, 0.4);
-    }
-  </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 min-h-screen font-sans text-slate-800 antialiased flex flex-col justify-center items-center p-4 py-8">
 
   <!-- LOADING SPINNER -->
-  <div id="fullPageLoader" style="position:fixed; inset:0; background:rgba(255,255,255,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
-    <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
-    <h5 class="fw-bold text-primary">Memuat Tagihan...</h5>
+  <div id="fullPageLoader" class="fixed inset-0 z-[9999] bg-white/40 backdrop-blur-md flex flex-col justify-center items-center">
+    <div class="spinner-border text-indigo-600 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
+    <h5 class="font-extrabold text-xl text-indigo-700">Memuat Tagihan...</h5>
   </div>
 
-  <div class="container py-5 flex-grow-1 d-flex justify-content-center align-items-center">
-    <div class="col-12 col-md-8 col-lg-6">
-      
-      <div id="errorContainer" class="text-center d-none">
-        <i class="fa-solid fa-file-circle-xmark text-danger mb-3" style="font-size: 60px;"></i>
-        <h4 class="fw-bold">Invoice Tidak Ditemukan</h4>
-        <p class="text-muted">Periksa kembali link tagihan yang Anda terima.</p>
-        <a href="booking.html" class="btn btn-outline-primary mt-3">Kembali ke Booking</a>
-      </div>
-
-      <div id="invoiceContainer" class="invoice-card d-none">
-        <div class="invoice-header d-flex justify-content-between align-items-center">
-          <div>
-            <h4 class="fw-bold mb-0">INVOICE</h4>
-            <p class="mb-0 text-white-50" id="invId">INV-000000</p>
-          </div>
-          <div class="brand-logo" style="width: 50px; height: 50px; font-size: 20px; color: var(--bs-dark); background: white;">km</div>
-        </div>
-
-        <div class="p-4 p-md-5">
-          <div class="d-flex justify-content-between align-items-start mb-4">
-            <div>
-              <p class="text-muted small mb-1">Kepada Yth.</p>
-              <h5 class="fw-bold mb-1" id="invClient">Nama Klien</h5>
-              <p class="text-muted small mb-0"><i class="fa-solid fa-phone me-1"></i> <span id="invPhone">-</span></p>
-            </div>
-            <div id="invStatus" class="status-badge status-pending">Menunggu Pembayaran</div>
-          </div>
-
-          <h6 class="fw-bold text-muted border-bottom pb-2 mb-3">Rincian Layanan</h6>
-          
-          <div class="detail-row">
-            <span class="text-muted">Paket/Layanan</span>
-            <span class="fw-bold text-end" id="invLayanan">-</span>
-          </div>
-          <div class="detail-row">
-            <span class="text-muted">Tanggal Acara</span>
-            <span class="fw-semibold text-end" id="invTanggal">-</span>
-          </div>
-          
-          <div class="total-box mt-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="text-muted">Subtotal</span>
-              <span class="fw-semibold" id="invHarga">Rp 0</span>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="text-muted">Biaya Transport</span>
-              <span class="fw-semibold" id="invTransport">Rp 0</span>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="text-muted">Diskon</span>
-              <span class="text-danger fw-semibold" id="invDiskon">- Rp 0</span>
-            </div>
-            <hr style="border-color: rgba(0,0,0,0.1)">
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="fw-bold fs-5 text-dark">TOTAL TAGIHAN</span>
-              <span class="fw-bold fs-4 text-primary" id="invTotal">Rp 0</span>
-            </div>
-          </div>
-
-          <div id="paymentSection" class="mt-4 text-center">
-            <p class="text-muted small mb-3"><i class="fa-solid fa-shield-halved me-1"></i> Pembayaran aman didukung oleh Payment Gateway</p>
-            <button class="btn-pay w-100 fs-5" onclick="payNow()">
-              <i class="fa-solid fa-wallet me-2"></i> Bayar Sekarang
-            </button>
-          </div>
-
-        </div>
-      </div>
-
+  <div class="w-full max-w-xl my-auto">
+    
+    <!-- ERROR CONTAINER -->
+    <div id="errorContainer" class="hidden text-center p-8 bg-white/30 backdrop-blur-md border border-white/50 shadow-2xl rounded-3xl space-y-3">
+      <i class="fa-solid fa-file-circle-xmark text-rose-500 text-6xl"></i>
+      <h4 class="text-xl font-extrabold text-slate-900">Invoice Tidak Ditemukan</h4>
+      <p class="text-xs text-slate-500 font-medium">Periksa kembali link tagihan yang Anda terima.</p>
+      <a href="booking.html" class="inline-block mt-4 py-2.5 px-6 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-all">Kembali ke Booking</a>
     </div>
+
+    <!-- INVOICE CARD -->
+    <div id="invoiceContainer" class="hidden bg-white/30 backdrop-blur-md border border-white/50 shadow-2xl rounded-3xl overflow-hidden">
+      <!-- HEADER -->
+      <div class="bg-slate-900 text-white p-6 md:p-8 flex justify-between items-center">
+        <div>
+          <h4 class="text-2xl font-extrabold tracking-wider">INVOICE</h4>
+          <p class="text-xs text-slate-400 font-semibold mt-1" id="invId">INV-000000</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-white text-slate-900 font-bold text-xl flex items-center justify-center shadow-md">km</div>
+      </div>
+
+      <div class="p-6 md:p-8 space-y-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs text-slate-500 font-semibold mb-1">Kepada Yth.</p>
+            <h5 class="text-lg font-extrabold text-slate-900" id="invClient">Nama Klien</h5>
+            <p class="text-xs text-slate-500 font-medium mt-0.5"><i class="fa-solid fa-phone me-1"></i> <span id="invPhone">-</span></p>
+          </div>
+          <div id="invStatus" class="px-4 py-2 rounded-full font-bold text-xs shadow-sm bg-amber-100 text-amber-800">Menunggu Pembayaran</div>
+        </div>
+
+        <div>
+          <h6 class="font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-white/60 pb-2 mb-3">Rincian Layanan</h6>
+          
+          <div class="flex justify-between py-2 border-b border-dashed border-slate-200/60 text-xs">
+            <span class="text-slate-500 font-medium">Paket/Layanan</span>
+            <span class="font-bold text-slate-900 text-right" id="invLayanan">-</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-dashed border-slate-200/60 text-xs">
+            <span class="text-slate-500 font-medium">Tanggal Acara</span>
+            <span class="font-semibold text-slate-800 text-right" id="invTanggal">-</span>
+          </div>
+        </div>
+
+        <div class="bg-white/40 border border-white/60 rounded-2xl p-5 space-y-2 text-xs">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500">Subtotal</span>
+            <span class="font-semibold text-slate-800" id="invHarga">Rp 0</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500">Biaya Transport</span>
+            <span class="font-semibold text-slate-800" id="invTransport">Rp 0</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500">Diskon</span>
+            <span class="font-semibold text-rose-600" id="invDiskon">- Rp 0</span>
+          </div>
+          <hr class="border-white/60 my-2">
+          <div class="flex justify-between items-center text-sm pt-1">
+            <span class="font-extrabold text-slate-900">TOTAL TAGIHAN</span>
+            <span class="font-extrabold text-indigo-600 text-lg" id="invTotal">Rp 0</span>
+          </div>
+        </div>
+
+        <div id="paymentSection" class="text-center pt-2">
+          <p class="text-[11px] text-slate-500 font-medium mb-3 flex items-center justify-center gap-1">
+            <i class="fa-solid fa-shield-halved text-emerald-600"></i> Pembayaran aman didukung oleh Payment Gateway
+          </p>
+          <button class="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-base rounded-2xl shadow-xl shadow-emerald-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2" onclick="payNow()">
+            <i class="fa-solid fa-wallet"></i> Bayar Sekarang
+          </button>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.css"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <script>
@@ -172,7 +137,7 @@
 
       if (!id) {
         document.getElementById('fullPageLoader').style.display = 'none';
-        document.getElementById('errorContainer').classList.remove('d-none');
+        document.getElementById('errorContainer').classList.remove('hidden');
         return;
       }
 
@@ -191,7 +156,7 @@
           invoiceData = res.invoice;
           renderInvoice(res.invoice);
         } else {
-          document.getElementById('errorContainer').classList.remove('d-none');
+          document.getElementById('errorContainer').classList.remove('hidden');
         }
       })
       .catch(err => {
@@ -201,7 +166,7 @@
     });
 
     function renderInvoice(inv) {
-      document.getElementById('invoiceContainer').classList.remove('d-none');
+      document.getElementById('invoiceContainer').classList.remove('hidden');
       
       document.getElementById('invId').innerText = inv.id_trx;
       document.getElementById('invClient').innerText = inv.client;
@@ -220,29 +185,26 @@
       const paySection = document.getElementById('paymentSection');
       
       if (inv.is_lunas === true || String(inv.is_lunas).toLowerCase() === 'true') {
-        statusEl.className = 'status-badge status-lunas';
+        statusEl.className = 'px-4 py-2 rounded-full font-bold text-xs shadow-sm bg-emerald-100 text-emerald-800';
         statusEl.innerHTML = '<i class="fa-solid fa-check-circle me-1"></i> LUNAS';
         paySection.style.display = 'none';
       } else {
-        statusEl.className = 'status-badge status-pending';
+        statusEl.className = 'px-4 py-2 rounded-full font-bold text-xs shadow-sm bg-amber-100 text-amber-800';
         statusEl.innerHTML = '<i class="fa-solid fa-clock me-1"></i> BELUM LUNAS';
       }
     }
 
     function payNow() {
-      // INI ADALAH MOCKUP PAYMENT GATEWAY (SIMULASI)
-      // Nantinya akan diganti dengan pemanggilan Snap Midtrans atau Xendit Checkout URL
-      
       Swal.fire({
         title: 'Pilih Metode Pembayaran',
         html: `
-          <div class="d-grid gap-2 mt-3">
-            <button class="btn btn-outline-primary text-start p-3 fw-bold"><i class="fa-solid fa-building-columns me-2"></i> Virtual Account Bank</button>
-            <button class="btn btn-outline-success text-start p-3 fw-bold"><i class="fa-solid fa-qrcode me-2"></i> QRIS (Gopay/OVO/Dana)</button>
-            <button class="btn btn-outline-info text-start p-3 fw-bold"><i class="fa-solid fa-credit-card me-2"></i> Kartu Kredit</button>
+          <div class="flex flex-col gap-2.5 mt-4 text-xs font-bold">
+            <button class="w-full p-3.5 rounded-xl border border-slate-200 text-slate-800 hover:bg-indigo-50 hover:border-indigo-400 flex items-center justify-start gap-3 transition-all"><i class="fa-solid fa-building-columns text-indigo-600 text-base"></i> Virtual Account Bank</button>
+            <button class="w-full p-3.5 rounded-xl border border-slate-200 text-slate-800 hover:bg-emerald-50 hover:border-emerald-400 flex items-center justify-start gap-3 transition-all"><i class="fa-solid fa-qrcode text-emerald-600 text-base"></i> QRIS (Gopay/OVO/Dana)</button>
+            <button class="w-full p-3.5 rounded-xl border border-slate-200 text-slate-800 hover:bg-purple-50 hover:border-purple-400 flex items-center justify-start gap-3 transition-all"><i class="fa-solid fa-credit-card text-purple-600 text-base"></i> Kartu Kredit</button>
           </div>
-          <hr>
-          <p class="small text-muted mb-0">Simulasi Payment Gateway terintegrasi.</p>
+          <hr class="my-4">
+          <p class="text-[11px] text-slate-500">Simulasi Payment Gateway terintegrasi.</p>
         `,
         showConfirmButton: false,
         showCloseButton: true
