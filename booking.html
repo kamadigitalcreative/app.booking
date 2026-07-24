@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking - Kama Visual</title>
+  <title>Online Booking - BookHive</title>
 
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,17 +33,17 @@
   <!-- LOADING SPINNER -->
   <div id="fullPageLoader" class="fixed inset-0 z-[9999] bg-white/40 backdrop-blur-md flex flex-col justify-center items-center">
     <div class="spinner-border text-indigo-600 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
-    <h5 class="font-extrabold text-xl text-indigo-700">Memuat Layanan...</h5>
+    <h5 class="font-extrabold text-xl text-indigo-700">Memuat Portal Booking...</h5>
   </div>
 
-  <div class="w-full max-w-xl my-auto">
+  <div class="w-full max-w-2xl my-auto">
     <div class="bg-white/30 backdrop-blur-md border border-white/50 shadow-2xl rounded-3xl overflow-hidden">
       
       <!-- HEADER -->
       <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-center text-white">
-        <div class="w-16 h-16 rounded-2xl bg-white text-indigo-600 font-extrabold text-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">km</div>
-        <h3 class="text-2xl font-extrabold tracking-tight">Booking Layanan</h3>
-        <p class="text-xs text-white/80 mt-1 font-medium">Pilih paket dan tentukan jadwal pemotretan Anda.</p>
+        <div class="w-16 h-16 rounded-2xl bg-white text-indigo-600 font-extrabold text-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">BH</div>
+        <h3 class="text-2xl font-extrabold tracking-tight">Public Online Booking</h3>
+        <p class="text-xs text-white/80 mt-1 font-medium">Pilih paket, tentukan jam acara, dan pilih tim favorit Anda.</p>
       </div>
 
       <div class="p-6 md:p-8">
@@ -52,44 +52,88 @@
           <!-- SECTION 1: Personal Info -->
           <div class="space-y-4">
             <h6 class="font-bold text-xs uppercase tracking-wider text-indigo-900 flex items-center gap-2">
-              <i class="fa-solid fa-user text-indigo-600"></i> Informasi Data Diri
+              <i class="fa-solid fa-user text-indigo-600"></i> 1. Informasi Client
             </h6>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap *</label>
-              <input type="text" id="clientName" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required placeholder="Cth: Budi Santoso">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">No. WhatsApp *</label>
-              <input type="tel" id="clientPhone" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required placeholder="Cth: 08123456789">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap *</label>
+                <input type="text" id="clientName" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required placeholder="Cth: Budi Santoso">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">No. WhatsApp *</label>
+                <input type="tel" id="clientPhone" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required placeholder="Cth: 08123456789">
+              </div>
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Alamat / Lokasi Acara</label>
-              <textarea id="clientAddress" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" rows="2" placeholder="Detail alamat..."></textarea>
+              <textarea id="clientAddress" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" rows="2" placeholder="Detail lokasi acara..."></textarea>
             </div>
           </div>
 
-          <!-- SECTION 2: Packages -->
+          <!-- SECTION 2: Select Date & Time Range -->
           <div class="space-y-4 pt-2">
             <h6 class="font-bold text-xs uppercase tracking-wider text-indigo-900 flex items-center gap-2">
-              <i class="fa-solid fa-box-open text-indigo-600"></i> Pilih Paket Layanan
+              <i class="fa-regular fa-calendar-days text-indigo-600"></i> 2. Tanggal & Rentang Jam Acara
+            </h6>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Acara *</label>
+                <input type="date" id="bookingDate" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required onchange="fetchAvailableTalents()">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Jam Mulai *</label>
+                <input type="time" id="bookingStart" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required value="09:00" onchange="fetchAvailableTalents()">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Jam Selesai *</label>
+                <input type="time" id="bookingEnd" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required value="13:00" onchange="fetchAvailableTalents()">
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: Select Package -->
+          <div class="space-y-4 pt-2">
+            <h6 class="font-bold text-xs uppercase tracking-wider text-indigo-900 flex items-center gap-2">
+              <i class="fa-solid fa-box-open text-indigo-600"></i> 3. Pilih Paket Layanan
             </h6>
             <div id="packagesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <!-- Dipopulasi oleh JS -->
             </div>
           </div>
 
-          <!-- SECTION 3: Date & Details -->
+          <!-- SECTION 4: Select Available Talent (Dynamic Pricing) -->
           <div class="space-y-4 pt-2">
             <h6 class="font-bold text-xs uppercase tracking-wider text-indigo-900 flex items-center gap-2">
-              <i class="fa-regular fa-calendar-days text-indigo-600"></i> Jadwal & Catatan
+              <i class="fa-solid fa-user-check text-indigo-600"></i> 4. Pilih Talent (Fotografer / MUA Available)
             </h6>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Acara *</label>
-              <input type="date" id="bookingDate" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required>
+            <div id="talentsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="col-span-full p-4 rounded-2xl bg-white/40 border border-white/60 text-xs text-slate-500 font-medium text-center">
+                Pilih tanggal & jam acara terlebih dahulu untuk melihat talent yang tersedia.
+              </div>
             </div>
+          </div>
+
+          <!-- SECTION 5: Summary & Notes -->
+          <div class="space-y-4 pt-2">
+            <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 text-xs space-y-2">
+              <div class="flex justify-between font-medium text-slate-600">
+                <span>Harga Paket Base:</span>
+                <span id="displayBasePrice" class="font-bold">Rp 0</span>
+              </div>
+              <div class="flex justify-between font-medium text-slate-600">
+                <span>Biaya Talent Surcharge:</span>
+                <span id="displayTalentSurcharge" class="font-bold text-indigo-600">+ Rp 0</span>
+              </div>
+              <hr class="border-indigo-200 my-1">
+              <div class="flex justify-between text-sm font-extrabold text-indigo-900">
+                <span>Total Estimasi Booking:</span>
+                <span id="displayGrandTotal" class="text-base text-indigo-700">Rp 0</span>
+              </div>
+            </div>
+
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Khusus (Opsional)</label>
-              <textarea id="bookingNotes" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" rows="3" placeholder="Permintaan khusus..."></textarea>
+              <textarea id="bookingNotes" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" rows="2" placeholder="Permintaan khusus konsep / busana..."></textarea>
             </div>
           </div>
 
@@ -110,6 +154,12 @@
     
     let allProducts = [];
     let selectedProduct = null;
+    let availableTalents = [];
+    let selectedTalent = null;
+
+    function formatRp(num) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
+    }
 
     function gasApi(action, payloadData = {}) {
       let payload = { action: action, ...payloadData };
@@ -126,12 +176,14 @@
     document.addEventListener('DOMContentLoaded', () => {
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('bookingDate').setAttribute('min', today);
+      document.getElementById('bookingDate').value = today;
 
       gasApi('getPublicProducts').then(res => {
         document.getElementById('fullPageLoader').style.display = 'none';
         if (res.success) {
           allProducts = res.data;
           renderProducts();
+          fetchAvailableTalents();
         } else {
           Swal.fire('Oops', 'Gagal memuat layanan', 'error');
         }
@@ -152,14 +204,14 @@
 
       allProducts.forEach((prod, index) => {
         const div = document.createElement('div');
-        
-        let hargaFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(prod.harga || 0);
+        let prodName = prod.nama || prod.nama_produk || 'Paket';
+        let prodHarga = Number(prod.harga) || 0;
 
         div.innerHTML = `
-          <div class="package-card p-4 rounded-2xl bg-white/40 border border-white/60 backdrop-blur-sm cursor-pointer transition-all hover:bg-white/60 hover:shadow-lg hover:-translate-y-0.5" id="card-${index}" onclick="selectPackage(${index})">
-            <h6 class="font-extrabold text-sm text-slate-900 mb-1">${prod.nama_produk}</h6>
-            <div class="text-sm font-extrabold text-indigo-600 mb-1.5">${hargaFormatted}</div>
-            <p class="text-[11px] text-slate-500 leading-relaxed">${prod.deskripsi || ''}</p>
+          <div class="package-card p-4 rounded-2xl bg-white/40 border border-white/60 backdrop-blur-sm cursor-pointer transition-all hover:bg-white/60 hover:shadow-lg" id="prod-card-${index}" onclick="selectPackage(${index})">
+            <h6 class="font-extrabold text-sm text-slate-900 mb-1">${prodName}</h6>
+            <div class="text-sm font-extrabold text-indigo-600 mb-1.5">${formatRp(prodHarga)}</div>
+            <p class="text-[11px] text-slate-500 leading-relaxed">${prod.catatan || prod.jenis || ''}</p>
           </div>
         `;
         container.appendChild(div);
@@ -168,13 +220,91 @@
 
     function selectPackage(index) {
       document.querySelectorAll('.package-card').forEach(c => {
-        c.classList.remove('ring-2', 'ring-indigo-500', 'bg-indigo-50/50');
+        c.classList.remove('ring-2', 'ring-indigo-500', 'bg-indigo-50/60');
       });
-      const selectedCard = document.getElementById('card-' + index);
+      const selectedCard = document.getElementById('prod-card-' + index);
       if(selectedCard) {
-        selectedCard.classList.add('ring-2', 'ring-indigo-500', 'bg-indigo-50/50');
+        selectedCard.classList.add('ring-2', 'ring-indigo-500', 'bg-indigo-50/60');
       }
       selectedProduct = allProducts[index];
+      recalculateTotal();
+    }
+
+    function fetchAvailableTalents() {
+      const date = document.getElementById('bookingDate').value;
+      const sTime = document.getElementById('bookingStart').value;
+      const eTime = document.getElementById('bookingEnd').value;
+
+      if (!date) return;
+
+      const container = document.getElementById('talentsContainer');
+      container.innerHTML = '<div class="col-span-full p-4 text-center text-xs text-indigo-600 font-bold"><i class="fa-solid fa-spinner fa-spin me-2"></i> Memeriksa ketersediaan talent...</div>';
+
+      gasApi('getAvailableTalents', { tanggal: date, jamMulai: sTime, jamSelesai: eTime }).then(res => {
+        if (res.success) {
+          availableTalents = res.talents || [];
+          renderTalents();
+        } else {
+          container.innerHTML = '<div class="col-span-full p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-semibold">Gagal memuat ketersediaan talent.</div>';
+        }
+      }).catch(err => {
+        container.innerHTML = '<div class="col-span-full p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-semibold">Error jaringan.</div>';
+      });
+    }
+
+    function renderTalents() {
+      const container = document.getElementById('talentsContainer');
+      container.innerHTML = '';
+
+      if (availableTalents.length === 0) {
+        container.innerHTML = '<div class="col-span-full p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold text-center">Maaf, seluruh tim talent sudah terisi pada tanggal & jam ini. Silakan coba pilih jam lain.</div>';
+        selectedTalent = null;
+        recalculateTotal();
+        return;
+      }
+
+      availableTalents.forEach((t, index) => {
+        const div = document.createElement('div');
+        let surchargeText = t.talent_surcharge > 0 ? `+ ${formatRp(t.talent_surcharge)}` : 'Standard Rate';
+
+        div.innerHTML = `
+          <div class="talent-card p-4 rounded-2xl bg-white/40 border border-white/60 backdrop-blur-sm cursor-pointer transition-all hover:bg-white/60 hover:shadow-lg" id="talent-card-${index}" onclick="selectTalent(${index})">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-bold text-sm flex items-center justify-center shadow-md">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <div>
+                <h6 class="font-extrabold text-xs text-slate-900">${t.fullname}</h6>
+                <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">${t.role}</span>
+              </div>
+            </div>
+            <div class="mt-2 text-right text-xs font-extrabold text-emerald-600">${surchargeText}</div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function selectTalent(index) {
+      document.querySelectorAll('.talent-card').forEach(c => {
+        c.classList.remove('ring-2', 'ring-emerald-500', 'bg-emerald-50/60');
+      });
+      const selectedCard = document.getElementById('talent-card-' + index);
+      if(selectedCard) {
+        selectedCard.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-50/60');
+      }
+      selectedTalent = availableTalents[index];
+      recalculateTotal();
+    }
+
+    function recalculateTotal() {
+      let basePrice = selectedProduct ? (Number(selectedProduct.harga) || 0) : 0;
+      let surcharge = selectedTalent ? (Number(selectedTalent.talent_surcharge) || 0) : 0;
+      let grandTotal = basePrice + surcharge;
+
+      document.getElementById('displayBasePrice').innerText = formatRp(basePrice);
+      document.getElementById('displayTalentSurcharge').innerText = surcharge > 0 ? `+ ${formatRp(surcharge)}` : 'Rp 0';
+      document.getElementById('displayGrandTotal').innerText = formatRp(grandTotal);
     }
 
     function submitBooking(e) {
@@ -188,10 +318,18 @@
       const clientPhone = document.getElementById('clientPhone').value;
       const clientAddress = document.getElementById('clientAddress').value;
       const bookingDate = document.getElementById('bookingDate').value;
+      const bookingStart = document.getElementById('bookingStart').value;
+      const bookingEnd = document.getElementById('bookingEnd').value;
       const bookingNotes = document.getElementById('bookingNotes').value;
 
+      let prodName = selectedProduct.nama || selectedProduct.nama_produk || 'Paket';
+      let basePrice = Number(selectedProduct.harga) || 0;
+      let surcharge = selectedTalent ? (Number(selectedTalent.talent_surcharge) || 0) : 0;
+      let totalHarga = basePrice + surcharge;
+      let teamName = selectedTalent ? selectedTalent.fullname : 'Standard Team';
+
       const submitBtn = document.getElementById('btnSubmitForm');
-      submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i> Memproses...';
+      submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i> Memproses Booking...';
       submitBtn.disabled = true;
 
       const bookingData = {
@@ -199,14 +337,17 @@
         phone: clientPhone,
         alamat: clientAddress,
         tanggal: bookingDate,
+        jam_mulai: bookingStart,
+        jam_selesai: bookingEnd,
         catatan: bookingNotes,
-        layanan: selectedProduct.nama_produk,
-        harga: selectedProduct.harga,
+        layanan: prodName,
+        harga: totalHarga,
+        team: teamName,
         jumlah: 1,
         diskon: 0,
         dp: 0,
         transport: 0,
-        total: selectedProduct.harga,
+        total: totalHarga,
         is_lunas: false
       };
 
@@ -215,7 +356,7 @@
           Swal.fire({
             icon: 'success',
             title: 'Booking Berhasil!',
-            text: 'Mengarahkan ke halaman tagihan...',
+            text: 'Mengarahkan ke halaman rincian invoice...',
             timer: 2000,
             showConfirmButton: false
           }).then(() => {
