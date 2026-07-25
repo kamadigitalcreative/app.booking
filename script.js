@@ -202,6 +202,8 @@
         else if (activePage === 'pemasukan') showSectionLoading('tbody-pemasukan');
         else if (activePage === 'pengaturan') showSectionLoading('tbody-users');
         else if (activePage === 'pengeluaran') { showSectionLoading('tbody-pengeluaran-fee'); showSectionLoading('tbody-pengeluaran-ops'); }
+        else if (activePage === 'client') showSectionLoading('tbody-client');
+        else if (activePage === 'tim-schedule') showSectionLoading('talentCardsContainer');
       }
       gasRun('getAllData').then(res => {
         if (res.success) {
@@ -235,6 +237,9 @@
       if (activePage === 'dashboard') renderDashboard(); if (activePage === 'produk') renderProduk(); if (activePage === 'pemasukan') renderPemasukan();
       if (activePage === 'pengeluaran') renderPengeluaran(); if (activePage === 'kalender') renderKalender(); if (activePage === 'aruskas') renderArusKas();
       if (activePage === 'todo') renderTodo(); if (activePage === 'pengaturan') { loadSettingsUI(); renderUsers(); }
+      if (activePage === 'client') renderClient();
+      if (activePage === 'booking-link') renderBookingLink();
+      if (activePage === 'tim-schedule') renderTimSchedule();
     }
 
     // 5. RENDER Dashboard
@@ -1002,6 +1007,282 @@
       } else {
         alertBox.innerHTML = `<div class="p-2.5 bg-emerald-500/10 border border-emerald-300 text-emerald-700 rounded-xl text-xs font-bold flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> Tim Tersedia / Ready! Tidak ada bentrok jam.</div>`;
       }
+    };
+
+    // ==========================================
+    // 14. RENDER PAGE: DATABASE CLIENT (CRM)
+    // ==========================================
+    window.renderClient = function () {
+      const tb = document.getElementById('tbody-client');
+      const statsContainer = document.getElementById('clientStatsContainer');
+      if (!tb) return;
+
+      const searchVal = (document.getElementById('searchClientInput') ? document.getElementById('searchClientInput').value : '').toLowerCase().trim();
+      const filterStatus = document.getElementById('filterStatusClient') ? document.getElementById('filterStatusClient').value : 'all';
+
+      // Group dbPemasukan by client phone / name to form client CRM database
+      const clientMap = {};
+
+      dbPemasukan.forEach(p => {
+        const clientName = (p.client || 'Client Tanpa Nama').trim();
+        const clientPhone = (p.phone || '').trim();
+        const key = clientPhone ? clientPhone : clientName.toLowerCase();
+
+        if (!clientMap[key]) {
+          clientMap[key] = {
+            name: clientName,
+            phone: clientPhone || '-',
+            totalBookings: 0,
+            totalSpend: 0,
+            lastOrderDate: p.tanggal || '-',
+            lastPackage: p.layanan || '-',
+            history: []
+          };
+        }
+
+        clientMap[key].totalBookings += 1;
+        clientMap[key].totalSpend += parseFloat(p.total || 0);
+        clientMap[key].history.push(p);
+
+        if (p.tanggal && p.tanggal > clientMap[key].lastOrderDate) {
+          clientMap[key].lastOrderDate = p.tanggal;
+          clientMap[key].lastPackage = p.layanan;
+        }
+      });
+
+      let clients = Object.values(clientMap);
+
+      // Total stats calculations
+      const totalUniqueClients = clients.length;
+      const vipClients = clients.filter(c => c.totalBookings >= 3);
+      const totalCrmRevenue = clients.reduce((acc, c) => acc + c.totalSpend, 0);
+      const avgSpend = totalUniqueClients > 0 ? (totalCrmRevenue / totalUniqueClients) : 0;
+
+      if (statsContainer) {
+        statsContainer.innerHTML = `
+          <div class="p-4 rounded-2xl bg-white/40 border border-white/60 backdrop-blur-md shadow-md flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-cyan-500/20 text-cyan-600 flex items-center justify-center text-xl font-bold">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-slate-500 uppercase">Total Client CRM</div>
+              <div class="text-xl font-extrabold text-slate-900">${totalUniqueClients} Client</div>
+            </div>
+          </div>
+          <div class="p-4 rounded-2xl bg-white/40 border border-white/60 backdrop-blur-md shadow-md flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-600 flex items-center justify-center text-xl font-bold">
+              <i class="fa-solid fa-crown"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-slate-500 uppercase">Client VIP (3+ Job)</div>
+              <div class="text-xl font-extrabold text-amber-600">${vipClients.length} VIP</div>
+            </div>
+          </div>
+          <div class="p-4 rounded-2xl bg-white/40 border border-white/60 backdrop-blur-md shadow-md flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-600 flex items-center justify-center text-xl font-bold">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-slate-500 uppercase">Total Spent Client</div>
+              <div class="text-lg font-extrabold text-emerald-600">${formatRp(totalCrmRevenue)}</div>
+            </div>
+          </div>
+          <div class="p-4 rounded-2xl bg-white/40 border border-white/60 backdrop-blur-md shadow-md flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-600 flex items-center justify-center text-xl font-bold">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-slate-500 uppercase">Rata-rata Spend/Client</div>
+              <div class="text-lg font-extrabold text-purple-600">${formatRp(avgSpend)}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Filtering clients
+      if (searchVal) {
+        clients = clients.filter(c => c.name.toLowerCase().includes(searchVal) || c.phone.includes(searchVal));
+      }
+
+      if (filterStatus === 'VIP') {
+        clients = clients.filter(c => c.totalBookings >= 3);
+      } else if (filterStatus === 'Reguler') {
+        clients = clients.filter(c => c.totalBookings < 3);
+      }
+
+      if (clients.length === 0) {
+        tb.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-6 font-semibold">Belum ada data client tercatat. Data client akan terisi otomatis saat order dibuat.</td></tr>`;
+        return;
+      }
+
+      tb.innerHTML = clients.map((c, i) => {
+        const isVip = c.totalBookings >= 3;
+        const cleanPhone = c.phone.replace(/[^0-9]/g, '');
+        const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('0') ? '62' + cleanPhone.substring(1) : cleanPhone}` : '#';
+
+        return `
+          <tr class="hover:bg-white/30 transition-colors">
+            <td class="py-3 px-4 font-bold text-slate-400">${i + 1}</td>
+            <td class="py-3 px-4 font-bold text-slate-900">${c.name}</td>
+            <td class="py-3 px-4 font-semibold text-slate-700">${c.phone}</td>
+            <td class="py-3 px-4 text-center font-extrabold text-indigo-600">${c.totalBookings} Booking</td>
+            <td class="py-3 px-4 text-right font-extrabold text-emerald-600">${formatRp(c.totalSpend)}</td>
+            <td class="py-3 px-4 font-medium text-slate-600">${safeDate(c.lastOrderDate)}</td>
+            <td class="py-3 px-4 text-center">
+              ${isVip ? '<span class="px-3 py-1 bg-amber-500/20 text-amber-700 border border-amber-300 font-extrabold rounded-xl text-[11px]"><i class="fa-solid fa-crown me-1"></i> VIP Client</span>' : '<span class="px-3 py-1 bg-slate-200 text-slate-700 font-bold rounded-xl text-[11px]">⭐ Client Reguler</span>'}
+            </td>
+            <td class="py-3 px-4 text-center">
+              ${cleanPhone ? `
+                <a href="${waLink}" target="_blank" class="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs inline-flex items-center gap-1 shadow-sm transition-all me-1">
+                  <i class="fa-brands fa-whatsapp"></i> Chat WA
+                </a>
+              ` : '-'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    // ==========================================
+    // 15. RENDER PAGE: BOOKING ONLINE & LINK PUBLIK
+    // ==========================================
+    window.renderBookingLink = function () {
+      const publicUrlInput = document.getElementById('publicBookingUrlInput');
+      const qrImg = document.getElementById('qrCodeImage');
+      const waTemplate = document.getElementById('waInviteTemplate');
+
+      if (!publicUrlInput) return;
+
+      // Construct booking.html absolute URL
+      let baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+      let bookingUrl = baseUrl + 'booking.html';
+      publicUrlInput.value = bookingUrl;
+
+      // Update QR Code image
+      if (qrImg) {
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(bookingUrl)}`;
+      }
+
+      // Preset WA Invitation template
+      if (waTemplate && !waTemplate.value) {
+        let set = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
+        let brandName = set.brand || 'Kama Visual';
+        waTemplate.value = `Halo Kak {NAMA},\n\nTerima kasih telah menghubungi ${brandName}! ✨\n\nUntuk mempermudah pemilihan paket photoshoot, cek ketersediaan tanggal, serta menentukan slot jam acara, silakan isi Form Booking Online resmi kami di link berikut:\n\n🔗 ${bookingUrl}\n\nJika ada pertanyaan mengenai detail paket, jangan ragu untuk tanyakan ke kami ya Kak. Terima kasih! 🙏`;
+      }
+    };
+
+    window.copyPublicBookingUrl = function () {
+      const input = document.getElementById('publicBookingUrlInput');
+      if (input && input.value) {
+        copyToClipboard(input.value);
+      }
+    };
+
+    window.downloadQRCode = function () {
+      const qrImg = document.getElementById('qrCodeImage');
+      if (qrImg && qrImg.src) {
+        const a = document.createElement('a');
+        a.href = qrImg.src;
+        a.download = 'QR_Code_Booking_KamaVisual.png';
+        a.target = '_blank';
+        a.click();
+      }
+    };
+
+    window.sendWaInvite = function () {
+      const phoneInput = document.getElementById('waInvitePhone');
+      const nameInput = document.getElementById('waInviteName');
+      const templateInput = document.getElementById('waInviteTemplate');
+
+      if (!phoneInput || !phoneInput.value.trim()) {
+        return Swal.fire('Oops', 'Masukkan nomor WhatsApp client terlebih dahulu', 'warning');
+      }
+
+      let phone = phoneInput.value.trim().replace(/[^0-9]/g, '');
+      if (phone.startsWith('0')) phone = '62' + phone.substring(1);
+
+      let msg = templateInput ? templateInput.value : '';
+      if (nameInput && nameInput.value.trim()) {
+        msg = msg.replace(/\{NAMA\}/g, nameInput.value.trim());
+      } else {
+        msg = msg.replace(/\{NAMA\}/g, 'Kak');
+      }
+
+      const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, '_blank');
+    };
+
+    // ==========================================
+    // 16. RENDER PAGE: TIM & TALENT HUB
+    // ==========================================
+    window.renderTimSchedule = function () {
+      const container = document.getElementById('talentCardsContainer');
+      if (!container) return;
+
+      if (!dbUsers || dbUsers.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center text-slate-500 py-8 font-semibold">Belum ada data tim/talent. Silahkan tambah user baru.</div>`;
+        return;
+      }
+
+      container.innerHTML = dbUsers.map(u => {
+        // Count jobs handled by this talent in dbPemasukan
+        const handledJobs = dbPemasukan.filter(p => (p.team && String(p.team).toLowerCase().includes(u.fullname.toLowerCase())) || (p.team2 && String(p.team2).toLowerCase().includes(u.fullname.toLowerCase())));
+        const totalFeeCollected = dbPengeluaran.filter(peng => peng.kategori === 'Fee Team' && String(peng.detail).toLowerCase().includes(u.fullname.toLowerCase())).reduce((acc, x) => acc + parseFloat(x.nominal || 0), 0);
+
+        const isTalent = u.role === 'Fotografer' || u.role === 'MUA' || u.kategori === 'Photographer' || u.kategori === 'Videographer' || u.kategori === 'MUA';
+
+        return `
+          <div class="p-6 rounded-3xl bg-white/30 backdrop-blur-md border border-white/50 shadow-xl space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex justify-between items-start">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-extrabold text-lg flex items-center justify-center shadow-md">
+                    ${u.fullname ? u.fullname.charAt(0).toUpperCase() : 'T'}
+                  </div>
+                  <div>
+                    <h5 class="font-extrabold text-slate-900 text-base leading-tight">${u.fullname}</h5>
+                    <span class="text-xs font-bold text-indigo-600">${u.username}</span>
+                  </div>
+                </div>
+                <span class="badge ${u.role === 'Admin' ? 'bg-indigo-600 text-white' : u.role === 'Fotografer' ? 'bg-teal-600 text-white' : u.role === 'MUA' ? 'bg-pink-600 text-white' : 'bg-slate-700 text-white'} rounded-xl px-2.5 py-1 text-xs">
+                  ${u.role}
+                </span>
+              </div>
+
+              <div class="p-3.5 rounded-2xl bg-white/40 border border-white/60 space-y-2 text-xs">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-500 font-semibold">Total Job Ditangani:</span>
+                  <span class="font-extrabold text-slate-900">${handledJobs.length} Job</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-500 font-semibold">Total Fee Diterima:</span>
+                  <span class="font-extrabold text-emerald-600">${formatRp(totalFeeCollected)}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-500 font-semibold">Fee Default / Rate:</span>
+                  <span class="font-extrabold text-indigo-600">${formatRp(u.fee_default || 0)}</span>
+                </div>
+                ${isTalent ? `
+                  <div class="flex justify-between items-center">
+                    <span class="text-slate-500 font-semibold">Surcharge Request:</span>
+                    <span class="font-extrabold text-amber-600">${formatRp(u.talent_surcharge || 0)}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-slate-500 font-semibold">Beban Max Job / Hari:</span>
+                    <span class="font-bold text-slate-800">${u.max_job_per_day || 2} Job</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <div class="pt-2 flex gap-2">
+              <button onclick="editUser(${u.id})" class="flex-1 py-2 px-3 bg-white/60 hover:bg-white text-slate-800 font-bold text-xs rounded-xl border border-white/80 transition-all text-center">
+                <i class="fa-solid fa-pen me-1"></i> Edit Talent / Rate
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
     };
 
     document.addEventListener('DOMContentLoaded', () => { checkLoginState(); });
