@@ -127,10 +127,22 @@
       var u = document.getElementById('username').value.trim();
       var p = document.getElementById('password').value.trim();
       if (!u || !p) return Swal.fire('Oops', 'Isi username & password', 'warning');
+
+      const btnLogin = document.querySelector('#formLogin button[type="submit"]');
+      const originalBtnHtml = btnLogin ? btnLogin.innerHTML : 'Masuk';
+      if (btnLogin) {
+        btnLogin.disabled = true;
+        btnLogin.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin me-2"></i> Memproses Masuk...`;
+      }
+
       showFullPageLoading('Memuat Sistem & Sinkronisasi Data...');
 
       gasRun('loginUser', u, p).then(res => {
         hideFullPageLoading();
+        if (btnLogin) {
+          btnLogin.disabled = false;
+          btnLogin.innerHTML = originalBtnHtml;
+        }
         if (res.success) {
           currentUser = res.user;
 
@@ -152,6 +164,10 @@
         else { Swal.fire('Error', res.message || 'Username/Password salah', 'error'); }
       }).catch(err => {
         hideFullPageLoading();
+        if (btnLogin) {
+          btnLogin.disabled = false;
+          btnLogin.innerHTML = originalBtnHtml;
+        }
         Swal.fire('Error', "System Error: " + err.message, 'error');
       });
     };
@@ -1119,6 +1135,8 @@
         const isVip = c.totalBookings >= 3;
         const cleanPhone = c.phone.replace(/[^0-9]/g, '');
         const waLink = cleanPhone ? `https://wa.me/${cleanPhone.startsWith('0') ? '62' + cleanPhone.substring(1) : cleanPhone}` : '#';
+        const encPhone = encodeURIComponent(c.phone);
+        const encName = encodeURIComponent(c.name);
 
         return `
           <tr class="hover:bg-white/30 transition-colors">
@@ -1132,15 +1150,84 @@
               ${isVip ? '<span class="px-3 py-1 bg-amber-500/20 text-amber-700 border border-amber-300 font-extrabold rounded-xl text-[11px]"><i class="fa-solid fa-crown me-1"></i> VIP Client</span>' : '<span class="px-3 py-1 bg-slate-200 text-slate-700 font-bold rounded-xl text-[11px]">⭐ Client Reguler</span>'}
             </td>
             <td class="py-3 px-4 text-center">
+              <button onclick="showClientHistory('${encPhone}', '${encName}')" class="py-1.5 px-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs inline-flex items-center gap-1 shadow-sm transition-all me-1">
+                <i class="fa-solid fa-clock-rotate-left"></i> Histori
+              </button>
               ${cleanPhone ? `
                 <a href="${waLink}" target="_blank" class="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs inline-flex items-center gap-1 shadow-sm transition-all me-1">
                   <i class="fa-brands fa-whatsapp"></i> Chat WA
                 </a>
-              ` : '-'}
+              ` : ''}
             </td>
           </tr>
         `;
       }).join('');
+    };
+
+    window.showClientHistory = function (encPhone, encName) {
+      const phone = decodeURIComponent(encPhone);
+      const name = decodeURIComponent(encName);
+
+      const clientOrders = dbPemasukan.filter(p => {
+        if (phone && phone !== '-') return (p.phone || '').trim() === phone.trim();
+        return (p.client || '').toLowerCase().trim() === name.toLowerCase().trim();
+      });
+
+      document.getElementById('chClientName').innerText = name;
+      document.getElementById('chClientPhone').innerText = phone || '-';
+      document.getElementById('chTotalBookings').innerText = `${clientOrders.length} Booking`;
+      
+      const totalSpent = clientOrders.reduce((acc, x) => acc + parseFloat(x.total || 0), 0);
+      document.getElementById('chTotalSpent').innerText = formatRp(totalSpent);
+
+      const tb = document.getElementById('chTableBody');
+      if (!tb) return;
+
+      if (clientOrders.length === 0) {
+        tb.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada histori order.</td></tr>`;
+      } else {
+        tb.innerHTML = clientOrders.map(p => {
+          const isLunas = p.is_lunas === true || String(p.is_lunas) === 'true';
+          return `
+            <tr>
+              <td class="py-2.5 px-4 font-bold text-slate-800">#${p.id_trx || p.id}</td>
+              <td class="py-2.5 px-4 font-semibold text-slate-700">${safeDate(p.tanggal)} (${p.jam_mulai || ''} - ${p.jam_selesai || ''})</td>
+              <td class="py-2.5 px-4 font-bold text-indigo-700">${p.layanan || '-'}</td>
+              <td class="py-2.5 px-4 font-medium text-slate-600">${p.team || '-'}</td>
+              <td class="py-2.5 px-4 text-right font-extrabold text-emerald-600">${formatRp(p.total)}</td>
+              <td class="py-2.5 px-4 text-center">
+                ${isLunas ? '<span class="badge bg-emerald-600 text-white">✅ LUNAS</span>' : '<span class="badge bg-amber-500 text-white">⏳ BELUM LUNAS</span>'}
+              </td>
+              <td class="py-2.5 px-4 text-center">
+                <button onclick="openInvoicePreview(${p.id})" class="btn btn-sm btn-light border text-indigo-600 font-bold"><i class="fa-solid fa-file-invoice"></i> Invoice</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      new bootstrap.Modal(document.getElementById('modalClientHistory')).show();
+    };
+
+    window.changeWaTemplate = function () {
+      const type = document.getElementById('waTemplateType') ? document.getElementById('waTemplateType').value : 'invite';
+      const waTemplate = document.getElementById('waInviteTemplate');
+      if (!waTemplate) return;
+
+      let set = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
+      let brandName = set.brand || 'Kama Visual';
+      let baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+      let bookingUrl = baseUrl + 'booking.html';
+
+      if (type === 'invite') {
+        waTemplate.value = `Halo Kak {NAMA},\n\nTerima kasih telah menghubungi ${brandName}! ✨\n\nUntuk mempermudah pemilihan paket photoshoot, cek ketersediaan tanggal, serta menentukan slot jam acara, silakan isi Form Booking Online resmi kami di link berikut:\n\n🔗 ${bookingUrl}\n\nJika ada pertanyaan mengenai detail paket, jangan ragu untuk tanyakan ke kami ya Kak. Terima kasih! 🙏`;
+      } else if (type === 'reminder') {
+        waTemplate.value = `Halo Kak {NAMA},\n\nIni adalah pengingat dari ${brandName} bahwa besok adalah jadwal photoshoot/event Anda. 📸\n\nMohon untuk hadir tepat waktu sesuai lokasi & jam yang telah disepakati ya Kak. Sampai jumpa besok! ✨`;
+      } else if (type === 'confirmDp') {
+        waTemplate.value = `Halo Kak {NAMA},\n\nPembayaran Down Payment (DP) / Pelunasan Anda untuk sesi foto bersama ${brandName} telah kami terima dengan baik. Terima kasih atas kepercayaannya! 🌟\n\nJadwal Anda telah resmi terkunci di sistem kami. Sampai jumpa di hari H! 🎉`;
+      } else if (type === 'gallery') {
+        waTemplate.value = `Halo Kak {NAMA},\n\nHasil foto & dokumentasi dari ${brandName} sudah selesai diedit dan siap diunduh! 📁✨\n\nSilakan akses link galeri foto Kakak di bawah ini:\n[TEMPEL_LINK_DRIVE_DISINI]\n\nTerima kasih banyak telah memilih ${brandName}! Jangan lupa tag kami di sosial media ya Kak! ❤️`;
+      }
     };
 
     // ==========================================
