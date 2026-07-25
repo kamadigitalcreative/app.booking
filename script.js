@@ -94,8 +94,21 @@
       if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}/)) return val.substring(0, 10);
       try { return new Date(val).toISOString().substring(0, 10); } catch (e) { return '-'; }
     }
-    function showFullPageLoading(msg) { document.getElementById('loaderText').innerText = msg; document.getElementById('fullPageLoader').style.display = 'flex'; }
-    function hideFullPageLoading() { document.getElementById('fullPageLoader').style.display = 'none'; }
+    function showFullPageLoading(msg) {
+      const loader = document.getElementById('fullPageLoader');
+      if (loader) {
+        document.getElementById('loaderText').innerText = msg;
+        loader.classList.remove('d-none');
+        loader.style.display = 'flex';
+      }
+    }
+    function hideFullPageLoading() {
+      const loader = document.getElementById('fullPageLoader');
+      if (loader) {
+        loader.classList.add('d-none');
+        loader.style.display = 'none';
+      }
+    }
     function showSectionLoading(id) { const c = document.getElementById(id); if (c) c.innerHTML = `<div class="card border-0 shadow-sm mb-3"><div class="card-body placeholder-glow"><span class="placeholder col-7 rounded mb-2"></span><br><span class="placeholder col-4 rounded"></span></div></div>`.repeat(3); }
     function toggleSidebar() { document.querySelector('.sidebar').classList.toggle('active'); document.querySelector('.sidebar-overlay').classList.toggle('active'); }
     window.copyToClipboard = function (text) {
@@ -128,8 +141,7 @@
       var p = document.getElementById('password').value.trim();
       if (!u || !p) return Swal.fire('Oops', 'Isi username & password', 'warning');
 
-      const btnLogin = document.querySelector('#formLogin button[type="submit"]');
-      const originalBtnHtml = btnLogin ? btnLogin.innerHTML : 'Masuk';
+      const btnLogin = document.getElementById('btnLogin') || document.querySelector('#formLogin button[type="submit"]');
       if (btnLogin) {
         btnLogin.disabled = true;
         btnLogin.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin me-2"></i> Memproses Masuk...`;
@@ -141,7 +153,7 @@
         hideFullPageLoading();
         if (btnLogin) {
           btnLogin.disabled = false;
-          btnLogin.innerHTML = originalBtnHtml;
+          btnLogin.innerHTML = `Masuk <i class="fa-solid fa-right-to-bracket ml-1.5"></i>`;
         }
         if (res.success) {
           currentUser = res.user;
@@ -166,7 +178,7 @@
         hideFullPageLoading();
         if (btnLogin) {
           btnLogin.disabled = false;
-          btnLogin.innerHTML = originalBtnHtml;
+          btnLogin.innerHTML = `Masuk <i class="fa-solid fa-right-to-bracket ml-1.5"></i>`;
         }
         Swal.fire('Error', "System Error: " + err.message, 'error');
       });
@@ -191,11 +203,16 @@
     }
 
     function applyMenuAccess() {
+      if (!currentUser) return;
       const role = currentUser.role;
       const aksesArr = (currentUser.akses_menu || '').split(',').map(s => s.trim());
       document.querySelectorAll('.nav-item-custom[data-menu]').forEach(el => {
         const menu = el.getAttribute('data-menu');
-        el.style.display = (role === 'Admin' || aksesArr.includes(menu)) ? 'flex' : 'none';
+        if (role === 'Admin') {
+          el.style.display = 'flex';
+        } else {
+          el.style.display = (aksesArr.length === 0 || aksesArr.includes(menu)) ? 'flex' : 'none';
+        }
       });
     }
     function logout() { currentUser = null; isDataLoaded = false; checkLoginState(); }
@@ -249,6 +266,21 @@
       });
     }
 
+    window.loadAppBranding = function () {
+      let set = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
+      const appName = set.app_name || set.brand || 'Kama Visual';
+      const logoText = set.app_logo_text || 'KM';
+
+      document.querySelectorAll('.brand-app-name').forEach(el => el.innerText = appName);
+      document.querySelectorAll('.brand-app-logo').forEach(el => {
+        if (set.logo_app && set.logo_app.length > 20) {
+          el.innerHTML = `<img src="${set.logo_app}" alt="Logo" class="w-8 h-8 object-contain rounded-xl">`;
+        } else {
+          el.innerText = logoText;
+        }
+      });
+    };
+
     function routeRender() {
       if (activePage === 'dashboard') renderDashboard(); if (activePage === 'produk') renderProduk(); if (activePage === 'pemasukan') renderPemasukan();
       if (activePage === 'pengeluaran') renderPengeluaran(); if (activePage === 'kalender') renderKalender(); if (activePage === 'aruskas') renderArusKas();
@@ -258,10 +290,103 @@
       if (activePage === 'tim-schedule') renderTimSchedule();
     }
 
+    // PENGATURAN LOGIC
+    window.loadSettingsUI = function () {
+      let set = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
+      
+      if (document.getElementById('setBrand')) document.getElementById('setBrand').value = set.brand || 'BookHive';
+      if (document.getElementById('setTagline')) document.getElementById('setTagline').value = set.tagline || '';
+      if (document.getElementById('setPhone')) document.getElementById('setPhone').value = set.phone || '';
+      if (document.getElementById('setEmail')) document.getElementById('setEmail').value = set.email || '';
+      if (document.getElementById('setBank')) document.getElementById('setBank').value = set.bank || '';
+      if (document.getElementById('setAcc')) document.getElementById('setAcc').value = set.acc || '';
+      if (document.getElementById('setAccName')) document.getElementById('setAccName').value = set.acc_name || '';
+      if (document.getElementById('setNotes')) document.getElementById('setNotes').value = set.notes_inv || '';
+
+      if (document.getElementById('setAppName')) document.getElementById('setAppName').value = set.app_name || 'BookHive';
+      if (document.getElementById('setAppLogoText')) document.getElementById('setAppLogoText').value = set.app_logo_text || 'BH';
+
+      const invLogoPrev = document.getElementById('previewInvLogo');
+      if (invLogoPrev && set.logo_inv) {
+        invLogoPrev.src = set.logo_inv;
+        invLogoPrev.classList.remove('d-none');
+      }
+      const ttdPrev = document.getElementById('previewTtdInvoice');
+      if (ttdPrev && set.ttd_inv) {
+        ttdPrev.src = set.ttd_inv;
+        ttdPrev.classList.remove('d-none');
+      }
+      const appLogoPrev = document.getElementById('previewAppLogo');
+      if (appLogoPrev && set.logo_app) {
+        appLogoPrev.src = set.logo_app;
+        appLogoPrev.classList.remove('d-none');
+      }
+    };
+
+    window.saveSettings = function () {
+      let set = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
+      const payload = {
+        id: set.id || 1,
+        isEdit: 'true',
+        brand: document.getElementById('setBrand').value,
+        tagline: document.getElementById('setTagline').value,
+        phone: document.getElementById('setPhone').value,
+        email: document.getElementById('setEmail').value,
+        bank: document.getElementById('setBank').value,
+        acc: document.getElementById('setAcc').value,
+        acc_name: document.getElementById('setAccName').value,
+        notes_inv: document.getElementById('setNotes').value,
+        logo_inv: document.getElementById('setLogoInvoiceHidden').value || set.logo_inv || '',
+        ttd_inv: document.getElementById('setTtdInvoiceHidden').value || set.ttd_inv || '',
+        app_name: set.app_name || 'BookHive',
+        app_logo_text: set.app_logo_text || 'BH',
+        logo_app: set.logo_app || ''
+      };
+      handleOptimisticSave('Pengaturan', payload, dbPengaturan, null);
+    };
+
+    window.saveAppSetup = function () {
+      let set = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
+      const payload = {
+        id: set.id || 1,
+        isEdit: 'true',
+        brand: set.brand || 'BookHive',
+        tagline: set.tagline || '',
+        phone: set.phone || '',
+        email: set.email || '',
+        bank: set.bank || '',
+        acc: set.acc || '',
+        acc_name: set.acc_name || '',
+        notes_inv: set.notes_inv || '',
+        logo_inv: set.logo_inv || '',
+        ttd_inv: set.ttd_inv || '',
+        app_name: document.getElementById('setAppName').value,
+        app_logo_text: document.getElementById('setAppLogoText').value,
+        logo_app: document.getElementById('setLogoAppHidden').value || set.logo_app || ''
+      };
+      handleOptimisticSave('Pengaturan', payload, dbPengaturan, null);
+    };
+
+    window.handleImageUpload = function(inputEl, previewImgId, hiddenInputId) {
+      if (inputEl.files && inputEl.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const base64 = e.target.result;
+          const prev = document.getElementById(previewImgId);
+          if (prev) {
+            prev.src = base64;
+            prev.classList.remove('d-none');
+          }
+          const hidden = document.getElementById(hiddenInputId);
+          if (hidden) hidden.value = base64;
+        };
+        reader.readAsDataURL(inputEl.files[0]);
+      }
+    };
+
     // 5. RENDER Dashboard
     let dashChart = null;
     window.renderDashboard = function () {
-      const container = document.getElementById('dashboardContainer');
       const tahun = document.getElementById('dashTahun').value; const bulan = document.getElementById('dashBulan').value;
 
       let filteredPem = dbPemasukan.filter(p => { let tgl = String(p.tanggal).split(',')[0].trim(); return (tahun === 'all' || tgl.startsWith(tahun)) && (bulan === 'all' || tgl.substring(5, 7) === bulan); });
@@ -1228,6 +1353,40 @@
       } else if (type === 'gallery') {
         waTemplate.value = `Halo Kak {NAMA},\n\nHasil foto & dokumentasi dari ${brandName} sudah selesai diedit dan siap diunduh! 📁✨\n\nSilakan akses link galeri foto Kakak di bawah ini:\n[TEMPEL_LINK_DRIVE_DISINI]\n\nTerima kasih banyak telah memilih ${brandName}! Jangan lupa tag kami di sosial media ya Kak! ❤️`;
       }
+    };
+
+    window.openModalAddClient = function () {
+      if (document.getElementById('formAddClient')) document.getElementById('formAddClient').reset();
+      new bootstrap.Modal(document.getElementById('modalAddClient')).show();
+    };
+
+    window.saveManualClient = function () {
+      const name = document.getElementById('cliName').value.trim();
+      const phone = document.getElementById('cliPhone').value.trim();
+      const notes = document.getElementById('cliNotes').value.trim();
+
+      if (!name || !phone) return Swal.fire('Oops', 'Isi Nama dan Nomor HP Client', 'warning');
+
+      const payload = {
+        id: Date.now(),
+        isEdit: 'false',
+        id_trx: 'CLI-' + Date.now().toString().slice(-6),
+        tanggal: safeDate(new Date()),
+        client: name,
+        phone: phone,
+        team: '-',
+        layanan: 'Pendaftaran Client Baru (CRM)',
+        jumlah: 1,
+        harga: 0,
+        diskon: 0,
+        dp: 0,
+        transport: 0,
+        total: 0,
+        is_lunas: true,
+        catatan: notes || 'Client terdaftar manual di CRM'
+      };
+
+      handleOptimisticSave('Pemasukan', payload, dbPemasukan, 'modalAddClient');
     };
 
     // ==========================================
