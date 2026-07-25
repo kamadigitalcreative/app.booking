@@ -709,6 +709,9 @@
               <option value="VIP">👑 Client VIP (3+ Booking)</option>
               <option value="Reguler">⭐ Client Reguler (1-2 Booking)</option>
             </select>
+            <button onclick="openModalAddClient()" class="py-2 px-3.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 whitespace-nowrap">
+              <i class="fa-solid fa-user-plus"></i> Tambah Client Baru
+            </button>
           </div>
         </div>
 
@@ -1471,6 +1474,39 @@
               <tbody id="chTableBody" class="divide-y divide-white/40 bg-white/20"></tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TAMBAH CLIENT MANUAL -->
+  <div class="modal fade" id="modalAddClient" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-white/80 backdrop-blur-md border border-white/50 shadow-2xl rounded-3xl overflow-hidden">
+        <div class="modal-header bg-gradient-to-r from-cyan-600 to-blue-600 border-b-0 py-4 px-6">
+          <h5 class="modal-title font-bold text-white text-base flex items-center gap-2">
+            <i class="fa-solid fa-user-plus"></i> Tambah Data Client Baru (CRM)
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-6">
+          <form id="formAddClient" onsubmit="event.preventDefault(); saveManualClient();" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Nama Lengkap Client *</label>
+              <input type="text" id="cliName" class="w-full px-3.5 py-2.5 bg-white/60 border border-white/80 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-cyan-400" required placeholder="Cth: Anisa Rahmawati">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Nomor WhatsApp (Phone) *</label>
+              <input type="text" id="cliPhone" class="w-full px-3.5 py-2.5 bg-white/60 border border-white/80 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-cyan-400" required placeholder="Cth: 081234567890">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Catatan Khusus Client</label>
+              <textarea id="cliNotes" rows="2" class="w-full px-3.5 py-2.5 bg-white/60 border border-white/80 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Cth: Suka gaya foto warm, booking studio 2 jam"></textarea>
+            </div>
+            <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all">
+              Simpan Client Ke Database
+            </button>
+          </form>
         </div>
       </div>
     </div>
