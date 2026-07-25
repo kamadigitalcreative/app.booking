@@ -241,7 +241,7 @@
       gasRun('getAllData').then(res => {
         if (res.success) {
           dbProduk = res.data.produk || []; dbPemasukan = res.data.pemasukan || []; dbPengeluaran = res.data.pengeluaran || []; dbTodo = res.data.todo || []; dbUsers = res.data.users || []; dbPengaturan = res.data.pengaturan || []; dbTeamUnavailability = res.data.team_unavailability || [];
-          isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
+isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
         } else { Swal.fire('Error', res.message, 'error'); }
       }).catch(err => Swal.fire('Error', "Gagal mengambil data: " + err.message, 'error'));
     }
@@ -267,24 +267,33 @@
     }
 
     window.loadAppBranding = function () {
-      let set = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
-      const appName = set.app_name || set.brand || 'Kama Visual';
-      const logoText = set.app_logo_text || 'KM';
+      let set = (typeof dbPengaturan !== 'undefined' && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
+      let appName = set.app_name || 'Kama Visual';
+      let logoText = set.app_logo_text || 'KM';
 
-      document.querySelectorAll('.brand-app-name').forEach(el => el.innerText = appName);
-      document.querySelectorAll('.brand-app-logo').forEach(el => {
-        if (set.logo_app && set.logo_app.length > 20) {
-          el.innerHTML = `<img src="${set.logo_app}" alt="Logo" class="w-8 h-8 object-contain rounded-xl">`;
+      document.querySelectorAll('.appNameDisplay').forEach(el => { el.innerText = appName; });
+      document.querySelectorAll('.appLogoContainer').forEach(container => {
+        let txtEl = container.querySelector('.appLogoText');
+        let imgEl = container.querySelector('.appLogoImage');
+        if (set.logo_app && set.logo_app.trim() !== '') {
+          if (txtEl) txtEl.classList.add('d-none');
+          if (imgEl) { imgEl.src = set.logo_app; imgEl.classList.remove('d-none'); }
         } else {
-          el.innerText = logoText;
+          if (txtEl) { txtEl.innerText = logoText; txtEl.classList.remove('d-none'); }
+          if (imgEl) imgEl.classList.add('d-none');
         }
       });
     };
 
     function routeRender() {
-      if (activePage === 'dashboard') renderDashboard(); if (activePage === 'produk') renderProduk(); if (activePage === 'pemasukan') renderPemasukan();
-      if (activePage === 'pengeluaran') renderPengeluaran(); if (activePage === 'kalender') renderKalender(); if (activePage === 'aruskas') renderArusKas();
-      if (activePage === 'todo') renderTodo(); if (activePage === 'pengaturan') { loadSettingsUI(); renderUsers(); }
+      if (activePage === 'dashboard') renderDashboard();
+      if (activePage === 'produk') renderProduk();
+      if (activePage === 'pemasukan') renderPemasukan();
+      if (activePage === 'pengeluaran') renderPengeluaran();
+      if (activePage === 'kalender') renderKalender();
+      if (activePage === 'aruskas') renderArusKas();
+      if (activePage === 'todo') renderTodo();
+      if (activePage === 'pengaturan') { loadSettingsUI(); renderUsers(); }
       if (activePage === 'client') renderClient();
       if (activePage === 'booking-link') renderBookingLink();
       if (activePage === 'tim-schedule') renderTimSchedule();
@@ -328,16 +337,16 @@
       const payload = {
         id: set.id || 1,
         isEdit: 'true',
-        brand: document.getElementById('setBrand').value,
-        tagline: document.getElementById('setTagline').value,
-        phone: document.getElementById('setPhone').value,
-        email: document.getElementById('setEmail').value,
-        bank: document.getElementById('setBank').value,
-        acc: document.getElementById('setAcc').value,
-        acc_name: document.getElementById('setAccName').value,
-        notes_inv: document.getElementById('setNotes').value,
-        logo_inv: document.getElementById('setLogoInvoiceHidden').value || set.logo_inv || '',
-        ttd_inv: document.getElementById('setTtdInvoiceHidden').value || set.ttd_inv || '',
+        brand: document.getElementById('setBrand') ? document.getElementById('setBrand').value : '',
+        tagline: document.getElementById('setTagline') ? document.getElementById('setTagline').value : '',
+        phone: document.getElementById('setPhone') ? document.getElementById('setPhone').value : '',
+        email: document.getElementById('setEmail') ? document.getElementById('setEmail').value : '',
+        bank: document.getElementById('setBank') ? document.getElementById('setBank').value : '',
+        acc: document.getElementById('setAcc') ? document.getElementById('setAcc').value : '',
+        acc_name: document.getElementById('setAccName') ? document.getElementById('setAccName').value : '',
+        notes_inv: document.getElementById('setNotes') ? document.getElementById('setNotes').value : '',
+        logo_inv: document.getElementById('setLogoInvoiceHidden') ? document.getElementById('setLogoInvoiceHidden').value : (set.logo_inv || ''),
+        ttd_inv: document.getElementById('setTtdInvoiceHidden') ? document.getElementById('setTtdInvoiceHidden').value : (set.ttd_inv || ''),
         app_name: set.app_name || 'BookHive',
         app_logo_text: set.app_logo_text || 'BH',
         logo_app: set.logo_app || ''
@@ -360,9 +369,9 @@
         notes_inv: set.notes_inv || '',
         logo_inv: set.logo_inv || '',
         ttd_inv: set.ttd_inv || '',
-        app_name: document.getElementById('setAppName').value,
-        app_logo_text: document.getElementById('setAppLogoText').value,
-        logo_app: document.getElementById('setLogoAppHidden').value || set.logo_app || ''
+        app_name: document.getElementById('setAppName') ? document.getElementById('setAppName').value : 'BookHive',
+        app_logo_text: document.getElementById('setAppLogoText') ? document.getElementById('setAppLogoText').value : 'BH',
+        logo_app: document.getElementById('setLogoAppHidden') ? document.getElementById('setLogoAppHidden').value : (set.logo_app || '')
       };
       handleOptimisticSave('Pengaturan', payload, dbPengaturan, null);
     };
@@ -387,7 +396,11 @@
     // 5. RENDER Dashboard
     let dashChart = null;
     window.renderDashboard = function () {
-      const tahun = document.getElementById('dashTahun').value; const bulan = document.getElementById('dashBulan').value;
+      const container = document.getElementById('dashboardContainer');
+      if (!container) return;
+
+      const tahun = document.getElementById('dashTahun') ? document.getElementById('dashTahun').value : 'all';
+      const bulan = document.getElementById('dashBulan') ? document.getElementById('dashBulan').value : 'all';
 
       let filteredPem = dbPemasukan.filter(p => { let tgl = String(p.tanggal).split(',')[0].trim(); return (tahun === 'all' || tgl.startsWith(tahun)) && (bulan === 'all' || tgl.substring(5, 7) === bulan); });
       let filteredPeng = dbPengeluaran.filter(peng => {
@@ -422,7 +435,6 @@
         }
       });
 
-      // Tambahan: Cek Pengeluaran Operasional yang menyebutkan nama team di Catatan
       let allKnownMembers = new Set(Object.keys(teamStats));
       dbPemasukan.forEach(p => { if (p.team) p.team.split(/&|,| dan |\|/i).forEach(m => { let clean = m.trim(); if (clean) allKnownMembers.add(clean); }); });
 
@@ -450,17 +462,18 @@
         teamHtml = '<div class="row g-3">'; const colors = ['#0072ff', '#00c6ff', '#20c997', '#f6d365', '#ff6b6b', '#6f42c1', '#fd79a8', '#e84393'];
         sortedTeam.forEach((name, index) => {
           const count = teamStats[name].count; const eligible = teamStats[name].eligibleCount; const percent = maxTeamJobs > 0 ? (count / maxTeamJobs) * 100 : 0; const bonus = Math.floor(eligible / 2) * 25000; const color = colors[index % colors.length];
-          teamHtml += `<div class="col-md-6 col-lg-4 col-xl-3"><div class="p-3 border-0 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); position: relative; overflow: hidden; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'"><div style="position: absolute; left:0; top:0; bottom:0; width: 5px; background: ${color};"></div><div class="ms-2"><div class="d-flex justify-content-between align-items-start mb-2"><div class="fw-bold text-dark text-truncate pe-2 fs-6" title="${name}"><i class="fa-solid fa-circle-user me-2" style="color: ${color};"></i>${name}</div><div class="badge rounded-pill shadow-sm" style="background: ${color};">${count} Job</div></div><div class="progress mt-3 shadow-none" style="height: 6px; background-color: rgba(255,255,255,0.5);"><div class="progress-bar rounded-pill" style="width: ${percent}%; background: ${color};"></div></div><div class="small text-muted mt-2" style="font-size: 10px;">${eligible} Job Paket (Fee â‰¤ 800k)</div></div><div class="mt-3 ms-2 pt-3 d-flex justify-content-between align-items-center" style="border-top: 1px solid rgba(0,0,0,0.1);"><span class="small text-muted fw-medium"><i class="fa-solid fa-gift text-warning me-1"></i> Bonus</span><span class="fw-bold text-success small bg-success bg-opacity-10 px-2 py-1 rounded">${formatRp(bonus)}</span></div><button class="btn btn-sm btn-light border-primary text-primary w-100 mt-3 fw-bold shadow-sm" style="font-size:11px; border-radius: 8px;" onclick="showDetailTeam('${name}')"><i class="fa-solid fa-list me-1"></i> Rincian Kinerja</button></div></div>`;
+          teamHtml += `<div class="col-md-6 col-lg-4 col-xl-3"><div class="p-3 border-0 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); position: relative; overflow: hidden; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'"><div style="position: absolute; left:0; top:0; bottom:0; width: 5px; background: ${color};"></div><div class="ms-2"><div class="d-flex justify-content-between align-items-start mb-2"><div class="fw-bold text-dark text-truncate pe-2 fs-6" title="${name}"><i class="fa-solid fa-circle-user me-2" style="color: ${color};"></i>${name}</div><div class="badge rounded-pill shadow-sm" style="background: ${color};">${count} Job</div></div><div class="progress mt-3 shadow-none" style="height: 6px; background-color: rgba(255,255,255,0.5);"><div class="progress-bar rounded-pill" style="width: ${percent}%; background: ${color};"></div></div><div class="small text-muted mt-2" style="font-size: 10px;">${eligible} Job Paket (Fee ≤ 800k)</div></div><div class="mt-3 ms-2 pt-3 d-flex justify-content-between align-items-center" style="border-top: 1px solid rgba(0,0,0,0.1);"><span class="small text-muted fw-medium"><i class="fa-solid fa-gift text-warning me-1"></i> Bonus</span><span class="fw-bold text-success small bg-success bg-opacity-10 px-2 py-1 rounded">${formatRp(bonus)}</span></div><button class="btn btn-sm btn-light border-primary text-primary w-100 mt-3 fw-bold shadow-sm" style="font-size:11px; border-radius: 8px;" onclick="showDetailTeam('${name}')"><i class="fa-solid fa-list me-1"></i> Rincian Kinerja</button></div></div>`;
         }); teamHtml += '</div>';
       }
 
-      container.innerHTML = `<div class="row g-2 mb-4"><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #00c6ff !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Total Job</h6><h5 class="fw-bold mb-0 text-primary">${totalJob}</h5></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #20c997 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Pemasukan Total</h6><h6 class="fw-bold mb-0 text-success" style="font-size:13px;">${formatRp(totalPemasukan)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #dc3545 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Pengeluaran (All)</h6><h6 class="fw-bold mb-0 text-danger" style="font-size:13px;">${formatRp(totalPengeluaran)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #fd7e14 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Distribusi Fee Team</h6><h6 class="fw-bold mb-0" style="color:#fd7e14; font-size:13px;">${formatRp(totalFeeTeam)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #f6d365 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Piutang Client</h6><h6 class="fw-bold mb-0 text-warning" style="font-size:13px;">${formatRp(piutangClient)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #6f42c1 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Laba Bersih</h6><h6 class="fw-bold mb-0" style="color:#6f42c1; font-size:13px;">${formatRp(labaBersih)}</h6></div></div></div></div><div class="row g-4 mb-4"><div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-header border-0 pt-4 pb-0"><h6 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-list text-primary me-2"></i> Rekap Paket</h6></div><div class="card-body p-3"><div class="table-responsive"><table class="table table-sm table-custom mb-0 align-middle"><thead class="bg-light"><tr><th class="border-0 rounded-start">Nama Produk</th><th class="border-0 text-center">Terjual</th><th class="border-0 text-end rounded-end">Nominal</th></tr></thead><tbody>${tbodyHtml}</tbody></table></div></div></div></div><div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-header border-0 pt-4 pb-0"><h6 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-chart-pie text-primary me-2"></i> Sumber Penghasilan</h6></div><div class="card-body d-flex justify-content-center align-items-center"><canvas id="pieChart" style="max-height: 250px;"></canvas></div></div></div></div><div class="card border-0 shadow-sm mb-4 bg-transparent" style="background: transparent !important; box-shadow: none !important; border: none !important; backdrop-filter: none;"><div class="card-header bg-transparent border-0 px-0 pb-3"><h5 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-people-group text-primary me-2"></i> Kinerja Team & Bonus Bulan Ini</h5><p class="text-muted small mb-0 mt-1">Bonus dihitung kelipatan 2 job PAKET dengan fee tim â‰¤ Rp 800.000/job.</p></div><div class="card-body p-0">${teamHtml}</div></div>`;
+      container.innerHTML = `<div class="row g-2 mb-4"><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #00c6ff !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Total Job</h6><h5 class="fw-bold mb-0 text-primary">${totalJob}</h5></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #20c997 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Pemasukan Total</h6><h6 class="fw-bold mb-0 text-success" style="font-size:13px;">${formatRp(totalPemasukan)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #dc3545 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Pengeluaran (All)</h6><h6 class="fw-bold mb-0 text-danger" style="font-size:13px;">${formatRp(totalPengeluaran)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #fd7e14 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Distribusi Fee Team</h6><h6 class="fw-bold mb-0" style="color:#fd7e14; font-size:13px;">${formatRp(totalFeeTeam)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #f6d365 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Piutang Client</h6><h6 class="fw-bold mb-0 text-warning" style="font-size:13px;">${formatRp(piutangClient)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #6f42c1 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Laba Bersih</h6><h6 class="fw-bold mb-0" style="color:#6f42c1; font-size:13px;">${formatRp(labaBersih)}</h6></div></div></div></div><div class="row g-4 mb-4"><div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-header border-0 pt-4 pb-0"><h6 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-list text-primary me-2"></i> Rekap Paket</h6></div><div class="card-body p-3"><div class="table-responsive"><table class="table table-sm table-custom mb-0 align-middle"><thead class="bg-light"><tr><th class="border-0 rounded-start">Nama Produk</th><th class="border-0 text-center">Terjual</th><th class="border-0 text-end rounded-end">Nominal</th></tr></thead><tbody>${tbodyHtml}</tbody></table></div></div></div></div><div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-header border-0 pt-4 pb-0"><h6 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-chart-pie text-primary me-2"></i> Sumber Penghasilan</h6></div><div class="card-body d-flex justify-content-center align-items-center"><canvas id="pieChart" style="max-height: 250px;"></canvas></div></div></div></div><div class="card border-0 shadow-sm mb-4 bg-transparent" style="background: transparent !important; box-shadow: none !important; border: none !important; backdrop-filter: none;"><div class="card-header bg-transparent border-0 px-0 pb-3"><h5 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-people-group text-primary me-2"></i> Kinerja Team & Bonus Bulan Ini</h5><p class="text-muted small mb-0 mt-1">Bonus dihitung kelipatan 2 job PAKET dengan fee tim ≤ Rp 800.000/job.</p></div><div class="card-body p-0">${teamHtml}</div></div>`;
       if (dashChart) dashChart.destroy();
       const ctx = document.getElementById('pieChart'); if (ctx && Object.keys(salesByProd).length > 0) { dashChart = new Chart(ctx, { type: 'pie', data: { labels: Object.keys(salesByProd), datasets: [{ data: Object.values(salesByProd).map(v => v.nominal), backgroundColor: ['#0072ff', '#00c6ff', '#20c997', '#f6d365', '#fda085', '#6f42c1'] }] }, options: { responsive: true, plugins: { legend: { position: 'right' } } } }); }
     };
 
     window.showDetailTeam = function (name) {
-      const tahun = document.getElementById('dashTahun').value; const bulan = document.getElementById('dashBulan').value;
+      const tahun = document.getElementById('dashTahun') ? document.getElementById('dashTahun').value : 'all';
+      const bulan = document.getElementById('dashBulan') ? document.getElementById('dashBulan').value : 'all';
       let filteredPem = dbPemasukan.filter(p => { let tgl = String(p.tanggal).split(',')[0].trim(); return (tahun === 'all' || tgl.startsWith(tahun)) && (bulan === 'all' || tgl.substring(5, 7) === bulan); });
 
       let filteredPengOps = dbPengeluaran.filter(peng => {
@@ -471,8 +484,6 @@
       let combinedJobs = [];
       let totalFee = 0;
       let eligibleJobs = 0;
-
-      // 1. Kumpulkan Data Pemasukan (Pekerjaan Client)
       filteredPem.forEach(p => {
         if (!p.team) return;
 
