@@ -956,7 +956,7 @@
               <div class="lg:col-span-5">
                 <div class="bg-white/30 backdrop-blur-md border border-white/50 shadow-xl rounded-3xl p-6">
                   <form onsubmit="event.preventDefault(); saveAppSetup();" class="space-y-4">
-                    <h6 class="font-bold text-indigo-700 text-sm mb-3">Branding Aplikasi</h6>
+                    <h6 class="font-bold text-indigo-700 text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-paintbrush"></i> Branding Aplikasi</h6>
                     <div>
                       <label class="block text-xs font-bold text-slate-600 mb-1">Nama Aplikasi (Sidebar)</label>
                       <input type="text" id="setAppName" class="w-full px-4 py-2.5 bg-white/40 border border-white/60 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-400 focus:outline-none" value="BookHive">
@@ -973,8 +973,52 @@
                       <label class="block text-xs font-bold text-slate-600 mb-1">Teks Inisial</label>
                       <input type="text" id="setAppLogoText" class="w-full px-4 py-2.5 bg-white/40 border border-white/60 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-400 focus:outline-none" value="BH" maxlength="3">
                     </div>
-                    <button type="submit" class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
                       <i class="fa-solid fa-floppy-disk"></i> Simpan Branding
+                    </button>
+                  </form>
+
+                  <hr class="my-6 border-white/50">
+
+                  <!-- OWNER BONUS SETTINGS -->
+                  <form onsubmit="event.preventDefault(); saveAppSetup();" class="space-y-4">
+                    <h6 class="font-bold text-emerald-700 text-sm mb-1 flex items-center gap-2"><i class="fa-solid fa-gift"></i> Aturan Bonus Team (Owner Only)</h6>
+                    <p class="text-[11px] text-slate-500 mb-3">Atur formula perhitungan bonus bulanan untuk tim agar transparan & perusahaan tetap untung.</p>
+                    
+                    <div>
+                      <label class="block text-xs font-bold text-slate-600 mb-1">Mode Perhitungan Bonus</label>
+                      <select id="setBonusMode" class="w-full px-4 py-2.5 bg-white/40 border border-white/60 rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-emerald-400 focus:outline-none">
+                        <option value="kelipatan_job">🎁 Bonus Kelipatan Job Paket (Misal: per 2 Job)</option>
+                        <option value="per_job">💵 Bonus Per-Job Paket (Nominal Tetap)</option>
+                        <option value="persen_fee">📊 Persentase (%) dari Total Fee Team</option>
+                        <option value="off">🚫 Nonaktifkan Bonus (Tanpa Bonus)</option>
+                      </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                      <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Target Kelipatan Job</label>
+                        <input type="number" id="setBonusMinJob" class="w-full px-4 py-2.5 bg-white/40 border border-white/60 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-emerald-400 focus:outline-none" value="2" min="1" placeholder="2">
+                      </div>
+                      <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Nominal / Persen Bonus</label>
+                        <input type="number" id="setBonusNominal" class="w-full px-4 py-2.5 bg-white/40 border border-white/60 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-emerald-400 focus:outline-none" value="25000" min="0" placeholder="25000 / 5">
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-bold text-slate-600 mb-1">Syarat Fee Maksimal per Job (Rp)</label>
+                      <input type="number" id="setBonusMaxFee" class="w-full px-4 py-2.5 bg-white/40 border border-white/60 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-emerald-400 focus:outline-none" value="800000" placeholder="800000">
+                      <small class="text-[10px] text-slate-500">Hanya job dengan fee ≤ batas ini yang berhak dihitung bonus.</small>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-bold text-slate-600 mb-1">Catatan Aturan Bonus (Tampil di Dashboard)</label>
+                      <textarea id="setBonusNote" rows="2" class="w-full px-4 py-2.5 bg-white/40 border border-white/60 rounded-xl text-xs font-medium focus:ring-2 focus:ring-emerald-400 focus:outline-none" placeholder="Contoh: Bonus dihitung kelipatan 2 job PAKET dengan fee tim ≤ Rp 800.000/job."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                      <i class="fa-solid fa-floppy-disk"></i> Simpan Aturan Bonus
                     </button>
                   </form>
                 </div>
