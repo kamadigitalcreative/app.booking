@@ -297,6 +297,7 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       if (activePage === 'client') renderClient();
       if (activePage === 'booking-link') renderBookingLink();
       if (activePage === 'tim-schedule') renderTimSchedule();
+      if (activePage === 'unavailability') renderUnavailability();
     }
 
     // PENGATURAN LOGIC
