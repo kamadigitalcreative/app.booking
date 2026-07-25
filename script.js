@@ -316,6 +316,12 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       if (document.getElementById('setAppName')) document.getElementById('setAppName').value = set.app_name || 'BookHive';
       if (document.getElementById('setAppLogoText')) document.getElementById('setAppLogoText').value = set.app_logo_text || 'BH';
 
+      if (document.getElementById('setBonusMode')) document.getElementById('setBonusMode').value = set.bonus_mode || 'kelipatan_job';
+      if (document.getElementById('setBonusMinJob')) document.getElementById('setBonusMinJob').value = set.bonus_min_job !== undefined ? set.bonus_min_job : 2;
+      if (document.getElementById('setBonusNominal')) document.getElementById('setBonusNominal').value = set.bonus_nominal !== undefined ? set.bonus_nominal : 25000;
+      if (document.getElementById('setBonusMaxFee')) document.getElementById('setBonusMaxFee').value = set.bonus_max_fee !== undefined ? set.bonus_max_fee : 800000;
+      if (document.getElementById('setBonusNote')) document.getElementById('setBonusNote').value = set.bonus_note || 'Bonus dihitung kelipatan 2 job PAKET dengan fee tim ≤ Rp 800.000/job.';
+
       const invLogoPrev = document.getElementById('previewInvLogo');
       if (invLogoPrev && set.logo_inv) {
         invLogoPrev.src = set.logo_inv;
@@ -350,7 +356,12 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
         ttd_inv: document.getElementById('setTtdInvoiceHidden') ? document.getElementById('setTtdInvoiceHidden').value : (set.ttd_inv || ''),
         app_name: set.app_name || 'BookHive',
         app_logo_text: set.app_logo_text || 'BH',
-        logo_app: set.logo_app || ''
+        logo_app: set.logo_app || '',
+        bonus_mode: set.bonus_mode || 'kelipatan_job',
+        bonus_min_job: set.bonus_min_job !== undefined ? set.bonus_min_job : 2,
+        bonus_nominal: set.bonus_nominal !== undefined ? set.bonus_nominal : 25000,
+        bonus_max_fee: set.bonus_max_fee !== undefined ? set.bonus_max_fee : 800000,
+        bonus_note: set.bonus_note || ''
       };
       handleOptimisticSave('Pengaturan', payload, dbPengaturan, null);
     };
@@ -394,6 +405,18 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       }
     };
 
+    window.calcTeamBonus = function (stat, set) {
+      if (!set) set = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
+      const mode = set.bonus_mode || 'kelipatan_job';
+      const minJob = Number(set.bonus_min_job) > 0 ? Number(set.bonus_min_job) : 2;
+      const nominal = Number(set.bonus_nominal) >= 0 ? Number(set.bonus_nominal) : 25000;
+
+      if (mode === 'off') return 0;
+      if (mode === 'per_job') return (stat.eligibleCount || 0) * nominal;
+      if (mode === 'persen_fee') return Math.round((stat.totalFeeEligible || 0) * (nominal / 100));
+      return Math.floor((stat.eligibleCount || 0) / minJob) * nominal;
+    };
+
     // 5. RENDER Dashboard
     let dashChart = null;
     window.renderDashboard = function () {
@@ -419,6 +442,11 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       const piutangClient = filteredPem.filter(x => x.is_lunas !== true && String(x.is_lunas) !== 'true').reduce((sum, item) => sum + (Number(item.total) || 0) - (Number(item.dp) || 0), 0);
       const labaBersih = totalPemasukan - totalPengeluaran;
 
+      let setBonus = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
+      let bMaxFee = (setBonus.bonus_max_fee !== undefined && setBonus.bonus_max_fee !== '') ? Number(setBonus.bonus_max_fee) : 800000;
+      let bNote = setBonus.bonus_note || 'Bonus dihitung kelipatan 2 job PAKET dengan fee tim ≤ Rp 800.000/job.';
+      if (setBonus.bonus_mode === 'off') bNote = 'Bonus tim saat ini dinonaktifkan oleh Owner.';
+
       const salesByProd = {}; const teamStats = {}; let maxTeamJobs = 0;
       filteredPem.forEach(p => {
         if (!salesByProd[p.layanan]) salesByProd[p.layanan] = { qty: 0, nominal: 0 };
@@ -426,11 +454,16 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
         if (p.team) {
           const members = p.team.split(/&|,| dan |\|/i).map(s => s.trim()).filter(s => s !== '');
           members.forEach(m => {
-            if (!teamStats[m]) teamStats[m] = { count: 0, eligibleCount: 0 }; teamStats[m].count++;
+            if (!teamStats[m]) teamStats[m] = { count: 0, eligibleCount: 0, totalFeeEligible: 0 };
+            teamStats[m].count++;
             const feeRecord = dbPengeluaran.find(x => String(x.kategori).trim().toLowerCase() === 'fee team' && x.catatan === `PEM_ID:${p.id}|MEMBER:${m}`);
             let prodData = dbProduk.find(x => x.nama === p.layanan);
             let isPaket = (prodData && String(prodData.jenis).trim().toLowerCase() === 'paket');
-            if (feeRecord && Number(feeRecord.nominal) <= 800000 && isPaket) teamStats[m].eligibleCount++;
+            let feeNom = feeRecord ? Number(feeRecord.nominal) || 0 : 0;
+            if (feeRecord && feeNom <= bMaxFee && isPaket) {
+              teamStats[m].eligibleCount++;
+              teamStats[m].totalFeeEligible += feeNom;
+            }
             if (teamStats[m].count > maxTeamJobs) maxTeamJobs = teamStats[m].count;
           });
         }
@@ -444,7 +477,7 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
           allKnownMembers.forEach(m => {
             let regex = new RegExp("\\b" + m + "\\b", "i");
             if (regex.test(String(peng.catatan || ''))) {
-              if (!teamStats[m]) teamStats[m] = { count: 0, eligibleCount: 0 };
+              if (!teamStats[m]) teamStats[m] = { count: 0, eligibleCount: 0, totalFeeEligible: 0 };
               teamStats[m].count++;
               if (teamStats[m].count > maxTeamJobs) maxTeamJobs = teamStats[m].count;
             }
@@ -462,12 +495,12 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       else {
         teamHtml = '<div class="row g-3">'; const colors = ['#0072ff', '#00c6ff', '#20c997', '#f6d365', '#ff6b6b', '#6f42c1', '#fd79a8', '#e84393'];
         sortedTeam.forEach((name, index) => {
-          const count = teamStats[name].count; const eligible = teamStats[name].eligibleCount; const percent = maxTeamJobs > 0 ? (count / maxTeamJobs) * 100 : 0; const bonus = Math.floor(eligible / 2) * 25000; const color = colors[index % colors.length];
-          teamHtml += `<div class="col-md-6 col-lg-4 col-xl-3"><div class="p-3 border-0 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); position: relative; overflow: hidden; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'"><div style="position: absolute; left:0; top:0; bottom:0; width: 5px; background: ${color};"></div><div class="ms-2"><div class="d-flex justify-content-between align-items-start mb-2"><div class="fw-bold text-dark text-truncate pe-2 fs-6" title="${name}"><i class="fa-solid fa-circle-user me-2" style="color: ${color};"></i>${name}</div><div class="badge rounded-pill shadow-sm" style="background: ${color};">${count} Job</div></div><div class="progress mt-3 shadow-none" style="height: 6px; background-color: rgba(255,255,255,0.5);"><div class="progress-bar rounded-pill" style="width: ${percent}%; background: ${color};"></div></div><div class="small text-muted mt-2" style="font-size: 10px;">${eligible} Job Paket (Fee ≤ 800k)</div></div><div class="mt-3 ms-2 pt-3 d-flex justify-content-between align-items-center" style="border-top: 1px solid rgba(0,0,0,0.1);"><span class="small text-muted fw-medium"><i class="fa-solid fa-gift text-warning me-1"></i> Bonus</span><span class="fw-bold text-success small bg-success bg-opacity-10 px-2 py-1 rounded">${formatRp(bonus)}</span></div><button class="btn btn-sm btn-light border-primary text-primary w-100 mt-3 fw-bold shadow-sm" style="font-size:11px; border-radius: 8px;" onclick="showDetailTeam('${name}')"><i class="fa-solid fa-list me-1"></i> Rincian Kinerja</button></div></div>`;
+          const count = teamStats[name].count; const eligible = teamStats[name].eligibleCount; const percent = maxTeamJobs > 0 ? (count / maxTeamJobs) * 100 : 0; const bonus = calcTeamBonus(teamStats[name], setBonus); const color = colors[index % colors.length];
+          teamHtml += `<div class="col-md-6 col-lg-4 col-xl-3"><div class="p-3 border-0 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); position: relative; overflow: hidden; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'"><div style="position: absolute; left:0; top:0; bottom:0; width: 5px; background: ${color};"></div><div class="ms-2"><div class="d-flex justify-content-between align-items-start mb-2"><div class="fw-bold text-dark text-truncate pe-2 fs-6" title="${name}"><i class="fa-solid fa-circle-user me-2" style="color: ${color};"></i>${name}</div><div class="badge rounded-pill shadow-sm" style="background: ${color};">${count} Job</div></div><div class="progress mt-3 shadow-none" style="height: 6px; background-color: rgba(255,255,255,0.5);"><div class="progress-bar rounded-pill" style="width: ${percent}%; background: ${color};"></div></div><div class="small text-muted mt-2" style="font-size: 10px;">${eligible} Job Paket (Fee ≤ ${formatRp(bMaxFee)})</div></div><div class="mt-3 ms-2 pt-3 d-flex justify-content-between align-items-center" style="border-top: 1px solid rgba(0,0,0,0.1);"><span class="small text-muted fw-medium"><i class="fa-solid fa-gift text-warning me-1"></i> Bonus</span><span class="fw-bold text-success small bg-success bg-opacity-10 px-2 py-1 rounded">${formatRp(bonus)}</span></div><button class="btn btn-sm btn-light border-primary text-primary w-100 mt-3 fw-bold shadow-sm" style="font-size:11px; border-radius: 8px;" onclick="showDetailTeam('${name}')"><i class="fa-solid fa-list me-1"></i> Rincian Kinerja</button></div></div>`;
         }); teamHtml += '</div>';
       }
 
-      container.innerHTML = `<div class="row g-2 mb-4"><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #00c6ff !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Total Job</h6><h5 class="fw-bold mb-0 text-primary">${totalJob}</h5></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #20c997 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Pemasukan Total</h6><h6 class="fw-bold mb-0 text-success" style="font-size:13px;">${formatRp(totalPemasukan)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #dc3545 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Pengeluaran (All)</h6><h6 class="fw-bold mb-0 text-danger" style="font-size:13px;">${formatRp(totalPengeluaran)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #fd7e14 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Distribusi Fee Team</h6><h6 class="fw-bold mb-0" style="color:#fd7e14; font-size:13px;">${formatRp(totalFeeTeam)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #f6d365 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Piutang Client</h6><h6 class="fw-bold mb-0 text-warning" style="font-size:13px;">${formatRp(piutangClient)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #6f42c1 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Laba Bersih</h6><h6 class="fw-bold mb-0" style="color:#6f42c1; font-size:13px;">${formatRp(labaBersih)}</h6></div></div></div></div><div class="row g-4 mb-4"><div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-header border-0 pt-4 pb-0"><h6 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-list text-primary me-2"></i> Rekap Paket</h6></div><div class="card-body p-3"><div class="table-responsive"><table class="table table-sm table-custom mb-0 align-middle"><thead class="bg-light"><tr><th class="border-0 rounded-start">Nama Produk</th><th class="border-0 text-center">Terjual</th><th class="border-0 text-end rounded-end">Nominal</th></tr></thead><tbody>${tbodyHtml}</tbody></table></div></div></div></div><div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-header border-0 pt-4 pb-0"><h6 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-chart-pie text-primary me-2"></i> Sumber Penghasilan</h6></div><div class="card-body d-flex justify-content-center align-items-center"><canvas id="pieChart" style="max-height: 250px;"></canvas></div></div></div></div><div class="card border-0 shadow-sm mb-4 bg-transparent" style="background: transparent !important; box-shadow: none !important; border: none !important; backdrop-filter: none;"><div class="card-header bg-transparent border-0 px-0 pb-3"><h5 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-people-group text-primary me-2"></i> Kinerja Team & Bonus Bulan Ini</h5><p class="text-muted small mb-0 mt-1">Bonus dihitung kelipatan 2 job PAKET dengan fee tim ≤ Rp 800.000/job.</p></div><div class="card-body p-0">${teamHtml}</div></div>`;
+      container.innerHTML = `<div class="row g-2 mb-4"><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #00c6ff !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Total Job</h6><h5 class="fw-bold mb-0 text-primary">${totalJob}</h5></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #20c997 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Pemasukan Total</h6><h6 class="fw-bold mb-0 text-success" style="font-size:13px;">${formatRp(totalPemasukan)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #dc3545 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Pengeluaran (All)</h6><h6 class="fw-bold mb-0 text-danger" style="font-size:13px;">${formatRp(totalPengeluaran)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #fd7e14 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Distribusi Fee Team</h6><h6 class="fw-bold mb-0" style="color:#fd7e14; font-size:13px;">${formatRp(totalFeeTeam)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #f6d365 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Piutang Client</h6><h6 class="fw-bold mb-0 text-warning" style="font-size:13px;">${formatRp(piutangClient)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #6f42c1 !important;"><div class="card-body px-2 py-3"><h6 class="text-muted mb-1" style="font-size:11px;">Laba Bersih</h6><h6 class="fw-bold mb-0" style="color:#6f42c1; font-size:13px;">${formatRp(labaBersih)}</h6></div></div></div></div><div class="row g-4 mb-4"><div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-header border-0 pt-4 pb-0"><h6 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-list text-primary me-2"></i> Rekap Paket</h6></div><div class="card-body p-3"><div class="table-responsive"><table class="table table-sm table-custom mb-0 align-middle"><thead class="bg-light"><tr><th class="border-0 rounded-start">Nama Produk</th><th class="border-0 text-center">Terjual</th><th class="border-0 text-end rounded-end">Nominal</th></tr></thead><tbody>${tbodyHtml}</tbody></table></div></div></div></div><div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-header border-0 pt-4 pb-0"><h6 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-chart-pie text-primary me-2"></i> Sumber Penghasilan</h6></div><div class="card-body d-flex justify-content-center align-items-center"><canvas id="pieChart" style="max-height: 250px;"></canvas></div></div></div></div><div class="card border-0 shadow-sm mb-4 bg-transparent" style="background: transparent !important; box-shadow: none !important; border: none !important; backdrop-filter: none;"><div class="card-header bg-transparent border-0 px-0 pb-3"><h5 class="fw-bold text-gradient mb-0"><i class="fa-solid fa-people-group text-primary me-2"></i> Kinerja Team & Bonus Bulan Ini</h5><p class="text-muted small mb-0 mt-1">${bNote}</p></div><div class="card-body p-0">${teamHtml}</div></div>`;
       if (dashChart) dashChart.destroy();
       const ctx = document.getElementById('pieChart'); if (ctx && Object.keys(salesByProd).length > 0) { dashChart = new Chart(ctx, { type: 'pie', data: { labels: Object.keys(salesByProd), datasets: [{ data: Object.values(salesByProd).map(v => v.nominal), backgroundColor: ['#0072ff', '#00c6ff', '#20c997', '#f6d365', '#fda085', '#6f42c1'] }] }, options: { responsive: true, plugins: { legend: { position: 'right' } } } }); }
     };
@@ -482,9 +515,14 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
         return (tahun === 'all' || efD.startsWith(tahun)) && (bulan === 'all' || efD.substring(5, 7) === bulan);
       });
 
+      let setBonus = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
+      let bMaxFee = (setBonus.bonus_max_fee !== undefined && setBonus.bonus_max_fee !== '') ? Number(setBonus.bonus_max_fee) : 800000;
+
       let combinedJobs = [];
       let totalFee = 0;
       let eligibleJobs = 0;
+      let totalFeeEligible = 0;
+
       filteredPem.forEach(p => {
         if (!p.team) return;
 
@@ -525,7 +563,10 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
             isLunas = (String(feeRecord.status_bayar).trim().toLowerCase() === 'lunas');
             let prodData = dbProduk.find(x => x.nama === p.layanan);
             let isPaket = (prodData && String(prodData.jenis).trim().toLowerCase() === 'paket');
-            if (feeNominal <= 800000 && isPaket) eligibleJobs++;
+            if (feeNominal <= bMaxFee && isPaket) {
+              eligibleJobs++;
+              totalFeeEligible += feeNominal;
+            }
           }
 
           combinedJobs.push({
@@ -589,10 +630,12 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
 
       if (html === '') html = '<tr><td colspan="5" class="text-center text-muted py-4">Tidak ada data pekerjaan untuk periode ini.</td></tr>';
 
+      let calcBonus = calcTeamBonus({ eligibleCount: eligibleJobs, totalFeeEligible: totalFeeEligible }, setBonus);
+
       document.getElementById('detailTeamName').innerText = `Rincian Kinerja: ${name}`;
       document.getElementById('detailTeamBody').innerHTML = html;
       document.getElementById('detailTeamTotalFee').innerText = formatRp(totalFee);
-      document.getElementById('detailTeamBonus').innerText = formatRp(Math.floor(eligibleJobs / 2) * 25000);
+      document.getElementById('detailTeamBonus').innerText = formatRp(calcBonus);
 
       new bootstrap.Modal(document.getElementById('modalDetailTeam')).show();
     };
