@@ -48,7 +48,7 @@
   <!-- FULL PAGE LOADER -->
   <div id="fullPageLoader" class="d-none fixed inset-0 z-[9999] bg-white/40 backdrop-blur-md flex flex-col justify-center items-center">
     <div class="spinner-border text-indigo-600 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
-    <h5 class="font-extrabold text-2xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent appNameDisplay">BookHive</h5>
+    <h5 class="font-extrabold text-2xl text-slate-900 tracking-tight appNameDisplay">Book<span class="text-[#ECA935]">Hive</span></h5>
     <p class="mt-2 text-sm font-semibold text-slate-600" id="loaderText">Memuat Sistem...</p>
   </div>
 
@@ -65,11 +65,21 @@
 
       <div class="text-center mb-8">
         <div class="appLogoContainer flex justify-center items-center mx-auto mb-4">
-          <div class="brand-logo w-20 h-20 text-3xl font-extrabold rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 appLogoText">BH</div>
+          <div class="brand-logo flex items-center justify-center appLogoText">
+            <svg viewBox="0 0 100 100" class="w-20 h-20 rounded-2xl shadow-xl shadow-amber-500/20" xmlns="http://www.w3.org/2000/svg">
+              <rect width="100" height="100" rx="22" fill="#ECA935"/>
+              <path d="M 19.5 24 C 19.5 18.5 24 14 29.5 14 H 57 C 71 14 80 21 80 32.5 C 80 41 74 47.5 64 50.5 C 76 53.5 83 61.5 83 74.5 C 83 87 72.5 96 57 96 H 29.5 C 24 96 19.5 91.5 19.5 86 Z" fill="#FFFFFF"/>
+              <rect x="26" y="30" width="39" height="44" rx="10" fill="#ECA935"/>
+              <rect x="33" y="24" width="4.5" height="12" rx="2.25" fill="#FFFFFF"/>
+              <rect x="43.25" y="24" width="4.5" height="12" rx="2.25" fill="#FFFFFF"/>
+              <rect x="53.5" y="24" width="4.5" height="12" rx="2.25" fill="#FFFFFF"/>
+              <path d="M 35 52 L 43 60 L 57 44" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
           <img class="appLogoImage d-none max-h-20 object-contain mx-auto" src="" alt="App Logo">
         </div>
-        <h3 class="text-2xl font-bold text-slate-900 tracking-tight" id="authTitle">BookHive</h3>
-        <p class="text-sm font-medium text-slate-500 mt-1" id="authSubtitle">Management & Team Portal</p>
+        <h3 class="text-3xl font-extrabold tracking-tight text-slate-900" id="authTitle">Book<span class="text-[#ECA935]">Hive</span></h3>
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mt-1.5" id="authSubtitle">SIMPLY BOOK. STAY ORGANIZED</p>
       </div>
 
       <!-- LOGIN FORM -->
@@ -161,8 +171,8 @@
 
       if (type === 'login') {
         document.getElementById('formLogin').classList.remove('d-none');
-        title.innerText = "BookHive";
-        subtitle.innerText = "Management & Team Portal";
+        title.innerHTML = 'Book<span class="text-[#ECA935]">Hive</span>';
+        subtitle.innerText = "SIMPLY BOOK. STAY ORGANIZED";
       } else if (type === 'register') {
         document.getElementById('formRegister').classList.remove('d-none');
         title.innerText = "Daftar Akun Tim";
@@ -216,12 +226,22 @@
     <aside class="sidebar p-6 flex flex-col">
       <div class="flex items-center gap-3 mb-8">
         <div class="appLogoContainer flex items-center justify-center">
-          <div class="brand-logo w-10 h-10 text-lg font-extrabold rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-md appLogoText">BH</div>
+          <div class="brand-logo flex items-center justify-center appLogoText">
+            <svg viewBox="0 0 100 100" class="w-10 h-10 rounded-xl shadow-md shadow-amber-500/10" xmlns="http://www.w3.org/2000/svg">
+              <rect width="100" height="100" rx="22" fill="#ECA935"/>
+              <path d="M 19.5 24 C 19.5 18.5 24 14 29.5 14 H 57 C 71 14 80 21 80 32.5 C 80 41 74 47.5 64 50.5 C 76 53.5 83 61.5 83 74.5 C 83 87 72.5 96 57 96 H 29.5 C 24 96 19.5 91.5 19.5 86 Z" fill="#FFFFFF"/>
+              <rect x="26" y="30" width="39" height="44" rx="10" fill="#ECA935"/>
+              <rect x="33" y="24" width="4.5" height="12" rx="2.25" fill="#FFFFFF"/>
+              <rect x="43.25" y="24" width="4.5" height="12" rx="2.25" fill="#FFFFFF"/>
+              <rect x="53.5" y="24" width="4.5" height="12" rx="2.25" fill="#FFFFFF"/>
+              <path d="M 35 52 L 43 60 L 57 44" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
           <img class="appLogoImage d-none max-h-10 object-contain" src="" alt="App Logo">
         </div>
         <div>
-          <h5 class="font-extrabold text-slate-900 text-base leading-tight tracking-wide appNameDisplay">BookHive</h5>
-          <small class="text-xs text-slate-500 font-medium">Management System</small>
+          <h5 class="font-extrabold text-slate-900 text-base leading-tight tracking-wide appNameDisplay">Book<span class="text-[#ECA935]">Hive</span></h5>
+          <small class="text-[10px] font-bold text-slate-500 tracking-[0.15em] uppercase">SIMPLY BOOK</small>
         </div>
       </div>
 
@@ -328,10 +348,20 @@
       <div class="flex lg:hidden justify-between items-center mb-6 bg-white/30 backdrop-blur-md border border-white/50 p-4 rounded-2xl shadow-xl">
         <div class="flex items-center gap-2.5">
           <div class="appLogoContainer flex items-center justify-center">
-            <div class="brand-logo w-8 h-8 text-xs font-bold rounded-lg bg-indigo-600 text-white flex items-center justify-center appLogoText">BH</div>
+            <div class="brand-logo flex items-center justify-center appLogoText">
+              <svg viewBox="0 0 100 100" class="w-8 h-8 rounded-lg shadow-sm" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" rx="22" fill="#ECA935"/>
+                <path d="M 19.5 24 C 19.5 18.5 24 14 29.5 14 H 57 C 71 14 80 21 80 32.5 C 80 41 74 47.5 64 50.5 C 76 53.5 83 61.5 83 74.5 C 83 87 72.5 96 57 96 H 29.5 C 24 96 19.5 91.5 19.5 86 Z" fill="#FFFFFF"/>
+                <rect x="26" y="30" width="39" height="44" rx="10" fill="#ECA935"/>
+                <rect x="33" y="24" width="4.5" height="12" rx="2.25" fill="#FFFFFF"/>
+                <rect x="43.25" y="24" width="4.5" height="12" rx="2.25" fill="#FFFFFF"/>
+                <rect x="53.5" y="24" width="4.5" height="12" rx="2.25" fill="#FFFFFF"/>
+                <path d="M 35 52 L 43 60 L 57 44" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </div>
             <img class="appLogoImage d-none max-h-8 object-contain" src="" alt="App Logo">
           </div>
-          <h6 class="font-bold text-slate-900 text-sm appNameDisplay">BookHive</h6>
+          <h6 class="font-bold text-slate-900 text-sm appNameDisplay">Book<span class="text-[#ECA935]">Hive</span></h6>
         </div>
         <button class="p-2 bg-white/50 border border-white/60 rounded-xl text-slate-700 hover:bg-white" onclick="toggleSidebar()">
           <i class="fa-solid fa-bars text-lg"></i>
