@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* ==========================================
-   GLASSMORPHISM LITE & CORE LAYOUT STYLES
+   BLACK, GOLD & WHITE ELEGANT THEME
    ========================================== */
 
 /* Universal Display Helpers */
@@ -12,19 +12,19 @@
 /* Base Body Background */
 body {
   font-family: 'Inter', sans-serif;
-  color: #1e293b;
-  background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 50%, #fce7f3 100%);
+  color: #f8fafc;
+  background: linear-gradient(135deg, #090d16 0%, #111827 50%, #0f172a 100%);
   background-attachment: fixed;
   min-height: 100vh;
 }
 
 /* Glass card utility defaults */
 .glass-card {
-  background: rgba(255, 255, 255, 0.35) !important;
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  background: rgba(17, 24, 39, 0.75) !important;
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(236, 169, 53, 0.22) !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), 0 0 15px rgba(236, 169, 53, 0.05) !important;
   border-radius: 1.5rem !important;
 }
 
@@ -37,10 +37,10 @@ body {
 
 .sidebar {
   width: 260px;
-  background: rgba(255, 255, 255, 0.35) !important;
-  backdrop-filter: blur(24px) saturate(150%);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
-  border-right: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(11, 15, 23, 0.92) !important;
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-right: 1px solid rgba(236, 169, 53, 0.2);
   position: fixed;
   top: 0;
   bottom: 0;
@@ -49,7 +49,7 @@ body {
   overflow-y: auto;
   z-index: 1040;
   transition: transform 0.3s ease, left 0.3s ease;
-  box-shadow: 4px 0 25px rgba(31, 38, 135, 0.08);
+  box-shadow: 6px 0 30px rgba(0, 0, 0, 0.4);
 }
 
 .main-content {
@@ -68,7 +68,7 @@ body {
   .sidebar.active {
     left: 0 !important;
     transform: none !important;
-    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.4);
   }
   .main-content {
     margin-left: 0 !important;
@@ -79,45 +79,51 @@ body {
     display: block !important;
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.5);
+    background: rgba(9, 13, 22, 0.7);
     z-index: 1030;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
   }
 }
 
 /* Nav Item States */
 .nav-item-custom {
   transition: all 0.2s ease;
+  color: #94a3b8;
+}
+.nav-item-custom:hover {
+  color: #f8fafc;
+  background: rgba(236, 169, 53, 0.08);
 }
 .nav-item-custom.active {
-  background: rgba(255, 255, 255, 0.6) !important;
-  border-left: 4px solid #4f46e5 !important;
-  color: #4f46e5 !important;
+  background: rgba(236, 169, 53, 0.16) !important;
+  border-left: 4px solid #ECA935 !important;
+  color: #ECA935 !important;
   font-weight: 700 !important;
-  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(236, 169, 53, 0.15) !important;
 }
 
-/* FullCalendar styling for Glassmorphism Lite */
+/* FullCalendar styling for Dark & Gold Glassmorphism */
 .fc {
   font-family: 'Inter', sans-serif !important;
+  color: #f8fafc !important;
 }
 .fc-theme-standard td, .fc-theme-standard th {
-  border-color: rgba(255, 255, 255, 0.4) !important;
+  border-color: rgba(236, 169, 53, 0.15) !important;
 }
 .fc-col-header-cell {
-  background: rgba(255, 255, 255, 0.4) !important;
+  background: rgba(236, 169, 53, 0.12) !important;
   padding: 10px 0 !important;
   font-weight: 700 !important;
   font-size: 0.75rem !important;
-  color: #475569 !important;
+  color: #ECA935 !important;
   text-transform: uppercase;
 }
 .fc-daygrid-day {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(15, 23, 42, 0.4) !important;
   transition: all 0.2s ease;
 }
 .fc-daygrid-day:hover {
-  background: rgba(255, 255, 255, 0.5) !important;
+  background: rgba(236, 169, 53, 0.1) !important;
 }
 .fc-event {
   border-radius: 8px !important;
@@ -125,20 +131,37 @@ body {
   font-size: 0.75rem !important;
   font-weight: 700 !important;
   border: none !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
 }
 .fc-button-primary {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  background: linear-gradient(135deg, #ECA935 0%, #D49120 100%) !important;
+  color: #0F172A !important;
   border: none !important;
   border-radius: 10px !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   font-size: 0.75rem !important;
   padding: 6px 14px !important;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2) !important;
+  box-shadow: 0 4px 14px rgba(236, 169, 53, 0.25) !important;
 }
 .fc-button-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3) !important;
+  box-shadow: 0 6px 18px rgba(236, 169, 53, 0.35) !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(236, 169, 53, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(236, 169, 53, 0.6);
 }
 
 /* Watermark styles for Invoice */
@@ -164,7 +187,7 @@ body {
 
 /* Loading placeholders */
 .placeholder-glow .placeholder {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.3) 25%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.3) 75%);
+  background: linear-gradient(90deg, rgba(236, 169, 53, 0.1) 25%, rgba(236, 169, 53, 0.3) 50%, rgba(236, 169, 53, 0.1) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
