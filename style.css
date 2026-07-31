@@ -150,24 +150,45 @@ input:focus, select:focus, textarea:focus {
 
 /* Table styling for dark theme */
 table, .table {
+  --bs-table-bg: transparent !important;
+  --bs-table-accent-bg: transparent !important;
+  --bs-table-color: #f8fafc !important;
   color: #f8fafc !important;
+  background-color: transparent !important;
 }
+
+.table > :not(caption) > * > * {
+  background-color: transparent !important;
+  color: #f8fafc !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
 thead, .table thead, tr.bg-light, tr.bg-white\/40, .bg-light {
+  background-color: rgba(30, 41, 59, 0.95) !important;
   background: rgba(30, 41, 59, 0.95) !important;
 }
+
+.table thead > tr > th,
+thead > tr > th,
 th, .table th {
+  background-color: rgba(30, 41, 59, 0.95) !important;
   color: #f59e0b !important;
   font-weight: 800 !important;
   font-size: 0.75rem !important;
   text-transform: uppercase !important;
   border-bottom: 1px solid rgba(245, 158, 11, 0.3) !important;
 }
+
+.table tbody > tr > td,
+tbody > tr > td,
 td, .table td {
   color: #e2e8f0 !important;
+  background-color: transparent !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
-tbody tr:hover, .table tbody tr:hover {
-  background: rgba(245, 158, 11, 0.08) !important;
+
+tbody tr:hover, .table tbody tr:hover, tbody tr:hover > td {
+  background-color: rgba(245, 158, 11, 0.08) !important;
 }
 
 /* Modals */
