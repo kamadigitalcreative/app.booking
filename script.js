@@ -51,32 +51,34 @@
     function loadAppBranding() {
       // Ambil data pengaturan jika sudah dimuat, jika belum pakai standar
       let set = (typeof dbPengaturan !== 'undefined' && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
-      let appName = set.app_name || 'Kama Visual';
-      let logoText = set.app_logo_text || 'km';
+      let appName = set.app_name || 'BookHive';
       let logoImg = set.logo_app || '';
 
       // 1. Ubah semua teks nama aplikasi
       document.querySelectorAll('.appNameDisplay').forEach(el => {
-        el.innerText = appName;
+        if (appName.toLowerCase() === 'bookhive') {
+          el.innerHTML = 'Book<span class="text-[#ECA935]">Hive</span>';
+        } else {
+          el.innerText = appName;
+        }
       });
 
-      // 2. Atur tampilan Logo (apakah pakai gambar atau teks inisial)
+      // 2. Atur tampilan Logo (apakah pakai gambar atau teks inisial/SVG)
       document.querySelectorAll('.appLogoContainer').forEach(container => {
         let txtEl = container.querySelector('.appLogoText');
         let imgEl = container.querySelector('.appLogoImage');
 
         if (logoImg && logoImg.trim() !== '') {
-          // Jika ada gambar logo, tampilkan gambar, sembunyikan teks
+          // Jika ada gambar logo, tampilkan gambar, sembunyikan SVG/teks
           if (txtEl) txtEl.classList.add('d-none');
           if (imgEl) {
             imgEl.src = logoImg;
             imgEl.classList.remove('d-none');
           }
         } else {
-          // Jika tidak ada gambar, tampilkan teks inisial, sembunyikan gambar
+          // Jika tidak ada gambar logo custom, tampilkan SVG/teks logo default
           if (imgEl) imgEl.classList.add('d-none');
           if (txtEl) {
-            txtEl.innerText = logoText;
             txtEl.classList.remove('d-none');
           }
         }
@@ -268,10 +270,15 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
 
     window.loadAppBranding = function () {
       let set = (typeof dbPengaturan !== 'undefined' && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
-      let appName = set.app_name || 'Kama Visual';
-      let logoText = set.app_logo_text || 'KM';
+      let appName = set.app_name || 'BookHive';
 
-      document.querySelectorAll('.appNameDisplay').forEach(el => { el.innerText = appName; });
+      document.querySelectorAll('.appNameDisplay').forEach(el => {
+        if (appName.toLowerCase() === 'bookhive') {
+          el.innerHTML = 'Book<span class="text-[#ECA935]">Hive</span>';
+        } else {
+          el.innerText = appName;
+        }
+      });
       document.querySelectorAll('.appLogoContainer').forEach(container => {
         let txtEl = container.querySelector('.appLogoText');
         let imgEl = container.querySelector('.appLogoImage');
@@ -279,7 +286,7 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
           if (txtEl) txtEl.classList.add('d-none');
           if (imgEl) { imgEl.src = set.logo_app; imgEl.classList.remove('d-none'); }
         } else {
-          if (txtEl) { txtEl.innerText = logoText; txtEl.classList.remove('d-none'); }
+          if (txtEl) { txtEl.classList.remove('d-none'); }
           if (imgEl) imgEl.classList.add('d-none');
         }
       });
