@@ -174,6 +174,18 @@
           }
 
           checkLoginState();
+
+          let vendorName = (currentUser && (currentUser.fullname || currentUser.username)) ? (currentUser.fullname || currentUser.username) : 'Kama Visual';
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil Masuk!',
+            text: `Selamat Datang "${vendorName}"`,
+            timer: 2500,
+            showConfirmButton: false,
+            background: '#0F172A',
+            color: '#FFFFFF',
+            iconColor: '#ECA935'
+          });
         }
         else { Swal.fire('Error', res.message || 'Username/Password salah', 'error'); }
       }).catch(err => {
