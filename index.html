@@ -48,8 +48,8 @@
   <!-- FULL PAGE LOADER -->
   <div id="fullPageLoader" class="d-none fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex flex-col justify-center items-center">
     <div class="spinner-border text-amber-500 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
-    <h5 class="font-extrabold text-2xl text-white tracking-tight appNameDisplay">Book<span class="text-[#ECA935]">Hive</span></h5>
-    <p class="mt-2 text-sm font-semibold text-slate-400" id="loaderText">Memuat Sistem...</p>
+    <h5 class="font-extrabold text-2xl text-white tracking-tight appNameDisplay">Simply Book</h5>
+    <p class="mt-2 text-xs font-bold text-amber-400/90 uppercase tracking-[0.2em] appVendorDisplay" id="loaderText">KAMA VISUAL</p>
   </div>
 
   <!-- LOGIN & AUTH PAGE -->
@@ -78,8 +78,8 @@
           </div>
           <img class="appLogoImage d-none max-h-20 object-contain mx-auto" src="" alt="App Logo">
         </div>
-        <h3 class="text-3xl font-extrabold tracking-tight text-white" id="authTitle">Book<span class="text-[#ECA935]">Hive</span></h3>
-        <p class="text-xs font-bold text-amber-400/90 uppercase tracking-[0.2em] mt-1.5" id="authSubtitle">SIMPLY BOOK. STAY ORGANIZED</p>
+        <h3 class="text-3xl font-extrabold tracking-tight text-white appNameDisplay" id="authTitle">Simply Book</h3>
+        <p class="text-xs font-bold text-amber-400/90 uppercase tracking-[0.2em] mt-1.5 appVendorDisplay" id="authSubtitle">KAMA VISUAL</p>
       </div>
 
       <!-- LOGIN FORM -->
@@ -171,8 +171,8 @@
 
       if (type === 'login') {
         document.getElementById('formLogin').classList.remove('d-none');
-        title.innerHTML = 'Book<span class="text-[#ECA935]">Hive</span>';
-        subtitle.innerText = "SIMPLY BOOK. STAY ORGANIZED";
+        title.innerText = "Simply Book";
+        subtitle.innerText = "KAMA VISUAL";
       } else if (type === 'register') {
         document.getElementById('formRegister').classList.remove('d-none');
         title.innerText = "Daftar Akun Tim";
@@ -247,8 +247,8 @@
           <img class="appLogoImage d-none max-h-10 object-contain" src="" alt="App Logo">
         </div>
         <div>
-          <h5 class="font-extrabold text-slate-900 text-base leading-tight tracking-wide appNameDisplay">Book<span class="text-[#ECA935]">Hive</span></h5>
-          <small class="text-[10px] font-bold text-slate-500 tracking-[0.15em] uppercase">SIMPLY BOOK</small>
+          <h5 class="font-extrabold text-slate-100 text-base leading-tight tracking-wide appNameDisplay">Simply Book</h5>
+          <small class="text-[10px] font-bold text-amber-400/90 tracking-[0.15em] uppercase appVendorDisplay">KAMA VISUAL</small>
         </div>
       </div>
 
@@ -919,8 +919,8 @@
                   </h6>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-xs font-bold text-slate-600 mb-1">Nama Brand / Usaha</label>
-                      <input type="text" id="setBrand" class="w-full px-4 py-2.5 bg-white/40 border border-white/60 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-400 focus:outline-none" value="BookHive">
+                      <label class="block text-xs font-bold text-slate-600 mb-1">Nama Brand / Usaha (Vendor)</label>
+                      <input type="text" id="setBrand" class="w-full px-4 py-2.5 bg-white/40 border border-white/60 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-400 focus:outline-none" value="Kama Visual">
                     </div>
                     <div>
                       <label class="block text-xs font-bold text-slate-600 mb-1">Tagline</label>
@@ -996,7 +996,7 @@
                     <h6 class="font-bold text-indigo-700 text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-paintbrush"></i> Branding Aplikasi</h6>
                     <div>
                       <label class="block text-xs font-bold text-slate-600 mb-1">Nama Aplikasi (Sidebar)</label>
-                      <input type="text" id="setAppName" class="w-full px-4 py-2.5 bg-white/40 border border-white/60 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-400 focus:outline-none" value="BookHive">
+                      <input type="text" id="setAppName" class="w-full px-4 py-2.5 bg-white/40 border border-white/60 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-400 focus:outline-none" value="Simply Book">
                     </div>
                     <div>
                       <label class="block text-xs font-bold text-slate-600 mb-1">Logo Aplikasi (Upload)</label>
