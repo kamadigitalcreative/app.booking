@@ -51,23 +51,19 @@
     function loadAppBranding() {
       // Ambil data pengaturan jika sudah dimuat, jika belum pakai standar
       let set = (typeof dbPengaturan !== 'undefined' && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
-      let appName = set.app_name || 'BookHive';
-      let vendorName = (typeof currentUser !== 'undefined' && currentUser && (currentUser.fullname || currentUser.username))
-        ? (currentUser.fullname || currentUser.username)
-        : (set.brand || 'Kama Visual');
       let logoImg = set.logo_app || '';
 
-      // 1. Ubah semua teks nama aplikasi (Nama Aplikasi -> BookHive)
+      // 1. Ubah semua teks nama aplikasi (Nama Aplikasi -> Selalu BookHive)
       document.querySelectorAll('.appNameDisplay').forEach(el => {
-        if (appName.toLowerCase() === 'bookhive') {
-          el.innerHTML = 'Book<span class="text-[#ECA935]">Hive</span>';
-        } else {
-          el.innerText = appName;
-        }
+        el.innerHTML = 'Book<span class="text-[#ECA935]">Hive</span>';
       });
 
       // 2. Ubah semua teks nama vendor (Subtitle di bawah BookHive -> Nama Vendor yang Login)
-      document.querySelectorAll('.vendorNameDisplay').forEach(el => {
+      let vendorName = (typeof currentUser !== 'undefined' && currentUser && (currentUser.fullname || currentUser.username))
+        ? (currentUser.fullname || currentUser.username)
+        : (set.brand && set.brand.toLowerCase() !== 'bookhive' ? set.brand : 'Kama Visual');
+
+      document.querySelectorAll('.vendorNameDisplay, .appVendorDisplay').forEach(el => {
         el.innerText = vendorName.toUpperCase();
       });
 
