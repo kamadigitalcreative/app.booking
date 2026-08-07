@@ -51,16 +51,20 @@
     function loadAppBranding() {
       // Ambil data pengaturan jika sudah dimuat, jika belum pakai standar
       let set = (typeof dbPengaturan !== 'undefined' && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
-      let appName = set.app_name || 'Simply Book';
-      let vendorName = set.brand || 'Kama Visual';
+      let appName = set.app_name || 'BookHive';
+      let vendorName = set.brand || 'Simply Book';
       let logoImg = set.logo_app || '';
 
       // 1. Ubah semua teks nama aplikasi (Nama Aplikasi)
       document.querySelectorAll('.appNameDisplay').forEach(el => {
-        el.innerText = appName;
+        if (appName.toLowerCase() === 'bookhive') {
+          el.innerHTML = 'Book<span class="text-[#ECA935]">Hive</span>';
+        } else {
+          el.innerText = appName;
+        }
       });
 
-      // 2. Ubah semua teks nama vendor (Nama Vendor)
+      // 2. Ubah semua teks nama vendor / slogan (Subtitle)
       document.querySelectorAll('.appVendorDisplay').forEach(el => {
         el.innerText = vendorName.toUpperCase();
       });
@@ -118,7 +122,15 @@
     window.copyToClipboard = function (text) {
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text).then(() => {
-          Swal.fire({ icon: 'success', title: 'Dicopy!', text: 'Link disalin', timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
+          Swal.fire({
+            icon: 'success',
+            title: '📋 Link Disalin!',
+            html: 'Link Form Booking Publik berhasil tersimpan ke clipboard Anda.',
+            timer: 2000,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false
+          });
         }).catch(err => window.fallbackCopyTextToClipboard(text));
       } else {
         window.fallbackCopyTextToClipboard(text);
@@ -133,7 +145,7 @@
       textArea.focus(); textArea.select();
       try {
         var successful = document.execCommand('copy');
-        if (successful) Swal.fire({ icon: 'success', title: 'Dicopy!', text: 'Link disalin', timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
+        if (successful) Swal.fire({ icon: 'success', title: '📋 Link Disalin!', html: 'Link Form Booking Publik berhasil tersimpan ke clipboard Anda.', timer: 2000, toast: true, position: 'top-end', showConfirmButton: false });
         else Swal.fire('Oops', 'Gagal copy link (Ditolak oleh browser)', 'error');
       } catch (err) { Swal.fire('Oops', 'Browser tidak mendukung copy otomatis', 'error'); }
       activeContainer.removeChild(textArea);
@@ -301,7 +313,7 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
     window.loadSettingsUI = function () {
       let set = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
       
-      if (document.getElementById('setBrand')) document.getElementById('setBrand').value = set.brand || 'Kama Visual';
+      if (document.getElementById('setBrand')) document.getElementById('setBrand').value = set.brand || 'Simply Book';
       if (document.getElementById('setTagline')) document.getElementById('setTagline').value = set.tagline || '';
       if (document.getElementById('setPhone')) document.getElementById('setPhone').value = set.phone || '';
       if (document.getElementById('setEmail')) document.getElementById('setEmail').value = set.email || '';
@@ -310,8 +322,8 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       if (document.getElementById('setAccName')) document.getElementById('setAccName').value = set.acc_name || '';
       if (document.getElementById('setNotes')) document.getElementById('setNotes').value = set.notes_inv || '';
 
-      if (document.getElementById('setAppName')) document.getElementById('setAppName').value = set.app_name || 'Simply Book';
-      if (document.getElementById('setAppLogoText')) document.getElementById('setAppLogoText').value = set.app_logo_text || 'SB';
+      if (document.getElementById('setAppName')) document.getElementById('setAppName').value = set.app_name || 'BookHive';
+      if (document.getElementById('setAppLogoText')) document.getElementById('setAppLogoText').value = set.app_logo_text || 'BH';
 
       if (document.getElementById('setBonusMode')) document.getElementById('setBonusMode').value = set.bonus_mode || 'kelipatan_job';
       if (document.getElementById('setBonusMinJob')) document.getElementById('setBonusMinJob').value = set.bonus_min_job !== undefined ? set.bonus_min_job : 2;
@@ -341,7 +353,7 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       const payload = {
         id: set.id || 1,
         isEdit: 'true',
-        brand: document.getElementById('setBrand') ? document.getElementById('setBrand').value : (set.brand || 'Kama Visual'),
+        brand: document.getElementById('setBrand') ? document.getElementById('setBrand').value : (set.brand || 'Simply Book'),
         tagline: document.getElementById('setTagline') ? document.getElementById('setTagline').value : '',
         phone: document.getElementById('setPhone') ? document.getElementById('setPhone').value : '',
         email: document.getElementById('setEmail') ? document.getElementById('setEmail').value : '',
@@ -351,8 +363,8 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
         notes_inv: document.getElementById('setNotes') ? document.getElementById('setNotes').value : '',
         logo_inv: document.getElementById('setLogoInvoiceHidden') ? document.getElementById('setLogoInvoiceHidden').value : (set.logo_inv || ''),
         ttd_inv: document.getElementById('setTtdInvoiceHidden') ? document.getElementById('setTtdInvoiceHidden').value : (set.ttd_inv || ''),
-        app_name: set.app_name || 'Simply Book',
-        app_logo_text: set.app_logo_text || 'SB',
+        app_name: set.app_name || 'BookHive',
+        app_logo_text: set.app_logo_text || 'BH',
         logo_app: set.logo_app || '',
         bonus_mode: set.bonus_mode || 'kelipatan_job',
         bonus_min_job: set.bonus_min_job !== undefined ? set.bonus_min_job : 2,
@@ -368,7 +380,7 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       const payload = {
         id: set.id || 1,
         isEdit: 'true',
-        brand: set.brand || 'Kama Visual',
+        brand: set.brand || 'Simply Book',
         tagline: set.tagline || '',
         phone: set.phone || '',
         email: set.email || '',
@@ -996,31 +1008,141 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       Swal.fire({ icon: 'info', title: 'Membuka WhatsApp...', text: 'JPG Invoice sedang didownload. Silakan paste/attach gambar tersebut di ruang obrolan WhatsApp.', showConfirmButton: true, confirmButtonText: 'Buka WA Sekarang' }).then(() => { window.open(waLink, '_blank'); });
     };
 
+    // Helper function for user-friendly table labels
+    function getTableLabel(tableName) {
+      switch (tableName) {
+        case 'Produk': return 'Data Produk & Layanan';
+        case 'Pemasukan': return 'Data Order & Pemasukan';
+        case 'Pengeluaran': return 'Data Pengeluaran';
+        case 'Users': return 'Data User & Talent';
+        case 'Pengaturan': return 'Pengaturan Sistem & Branding';
+        case 'Team_Unavailability': return 'Jadwal Block / Off Day';
+        case 'Todo': return 'Task & Peralatan';
+        default: return 'Data Sistem';
+      }
+    }
+
     // 11. CORE ENGINE (SAVE & DELETE)
     function handleOptimisticSave(tableName, payload, dbArray, modalId) {
       let tempId = (payload.isEdit === 'true' || payload.isEdit === true) ? payload.id : Date.now();
       payload.id = tempId; // Ensure frontend and backend use same ID
       let tempItem = { ...payload, _isSyncing: true };
       let backup = JSON.parse(JSON.stringify(dbArray));
-      if (payload.isEdit === 'true' || payload.isEdit === true) { let idx = dbArray.findIndex(x => x.id == tempId); if (idx !== -1) Object.assign(dbArray[idx], tempItem); } else { dbArray.unshift(tempItem); }
+      let isEditMode = (payload.isEdit === 'true' || payload.isEdit === true);
+
+      if (isEditMode) { let idx = dbArray.findIndex(x => x.id == tempId); if (idx !== -1) Object.assign(dbArray[idx], tempItem); } else { dbArray.unshift(tempItem); }
       updateDynamicYears(); routeRender(); if (modalId) { let mod = bootstrap.Modal.getInstance(document.getElementById(modalId)); if (mod) mod.hide(); }
-      Swal.fire({ icon: 'info', title: 'Menyimpan...', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+      
+      const label = getTableLabel(tableName);
+      
+      Swal.fire({
+        icon: 'info',
+        title: '💾 Menyimpan Data',
+        html: `Sedang memproses perubahan <b>${label}</b>...`,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 1800
+      });
+
       gasRun('saveData', tableName, payload).then(res => {
         if (res.success) {
           let savedItem = dbArray.find(x => x.id == tempId);
           if (savedItem) delete savedItem._isSyncing;
           routeRender();
-        } else { dbArray.splice(0, dbArray.length, ...backup); updateDynamicYears(); routeRender(); Swal.fire('Error', res.message || 'Gagal menyimpan', 'error'); }
-      }).catch(err => { dbArray.splice(0, dbArray.length, ...backup); updateDynamicYears(); routeRender(); Swal.fire('Error', err.message, 'error'); });
+          
+          Swal.fire({
+            icon: 'success',
+            title: '✅ Berhasil Disimpan!',
+            html: `<b>${label}</b> telah sukses diperbarui di cloud database.`,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2500
+          });
+        } else {
+          dbArray.splice(0, dbArray.length, ...backup);
+          updateDynamicYears();
+          routeRender();
+          Swal.fire({
+            icon: 'error',
+            title: '❌ Gagal Menyimpan',
+            html: `Gagal menyimpan <b>${label}</b>:<br><span style="color:#f87171;">${res.message || 'Respons server tidak valid'}</span>`,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 4500
+          });
+        }
+      }).catch(err => {
+        dbArray.splice(0, dbArray.length, ...backup);
+        updateDynamicYears();
+        routeRender();
+        Swal.fire({
+          icon: 'error',
+          title: '❌ Network / Server Error',
+          html: `Gagal memperbarui <b>${label}</b>:<br><span style="color:#f87171;">${err.message}</span>`,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 4500
+        });
+      });
     }
 
     window.delData = function (tableName, id) {
-      Swal.fire({ title: 'Hapus data?', text: 'Data tidak bisa dikembalikan!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Hapus' }).then(res => {
+      const label = getTableLabel(tableName);
+      Swal.fire({
+        title: 'Konfirmasi Hapus Data',
+        html: `Apakah Anda yakin ingin menghapus item dari <b>${label}</b>?<br><small style="color:#fbbf24;">Tindakan ini tidak dapat dibatalkan.</small>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#475569',
+        confirmButtonText: '<i class="fa-solid fa-trash me-1"></i> Ya, Hapus Data',
+        cancelButtonText: 'Batal'
+      }).then(res => {
         if (!res.isConfirmed) return;
         let dbArray; if (tableName === 'Produk') dbArray = dbProduk; else if (tableName === 'Pemasukan') dbArray = dbPemasukan; else if (tableName === 'Pengeluaran') dbArray = dbPengeluaran; else if (tableName === 'Users') dbArray = dbUsers; else if (tableName === 'Team_Unavailability') dbArray = dbTeamUnavailability; else dbArray = dbTodo;
         let backup = JSON.parse(JSON.stringify(dbArray)); let idx = dbArray.findIndex(x => x.id == id); if (idx !== -1) dbArray.splice(idx, 1);
         updateDynamicYears(); routeRender();
-        gasRun('deleteData', tableName, id).then(r => { if (!r.success) { dbArray.splice(0, dbArray.length, ...backup); updateDynamicYears(); routeRender(); Swal.fire('Error', r.message, 'error'); } });
+        
+        Swal.fire({
+          icon: 'info',
+          title: '🗑️ Menghapus Data...',
+          html: `Sedang memproses penghapusan dari <b>${label}</b>...`,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 1500
+        });
+
+        gasRun('deleteData', tableName, id).then(r => {
+          if (r.success) {
+            Swal.fire({
+              icon: 'success',
+              title: '🗑️ Data Terhapus',
+              html: `Item dari <b>${label}</b> telah berhasil dihapus.`,
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 2500
+            });
+          } else {
+            dbArray.splice(0, dbArray.length, ...backup);
+            updateDynamicYears();
+            routeRender();
+            Swal.fire({
+              icon: 'error',
+              title: '❌ Gagal Menghapus',
+              html: `Gagal menghapus item <b>${label}</b>: ${r.message}`,
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 4000
+            });
+          }
+        });
       });
     };
 
