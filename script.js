@@ -452,26 +452,54 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       const totalFeeTeam = filteredPeng.filter(x => String(x.kategori).trim().toLowerCase() === 'fee team' && String(x.status_bayar).trim().toLowerCase() !== 'belum dibayar').reduce((sum, item) => sum + (Number(item.nominal) || 0), 0);
       const piutangClient = filteredPem.filter(x => x.is_lunas !== true && String(x.is_lunas) !== 'true').reduce((sum, item) => sum + (Number(item.total) || 0) - (Number(item.dp) || 0), 0);
       const labaBersih = totalPemasukan - totalPengeluaran;
-
       let setBonus = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
       let bMaxFee = (setBonus.bonus_max_fee !== undefined && setBonus.bonus_max_fee !== '') ? Number(setBonus.bonus_max_fee) : 800000;
-      let bNote = setBonus.bonus_note || 'Bonus dihitung kelipatan 2 job PAKET dengan fee tim ≤ Rp 800.000/job.';
-      if (setBonus.bonus_mode === 'off') bNote = 'Bonus tim saat ini dinonaktifkan oleh Owner.';
+      let bMode = setBonus.bonus_mode || 'kelipatan_job';
+      let bMinJob = Number(setBonus.bonus_min_job) > 0 ? Number(setBonus.bonus_min_job) : 2;
+      let bNominal = Number(setBonus.bonus_nominal) >= 0 ? Number(setBonus.bonus_nominal) : 25000;
+
+      let bNote = setBonus.bonus_note;
+      if (!bNote || bNote.trim() === '') {
+        if (bMode === 'off') {
+          bNote = 'Bonus tim saat ini dinonaktifkan oleh Owner.';
+        } else if (bMode === 'per_job') {
+          bNote = `Bonus dihitung Rp ${formatRp(bNominal)} per job PAKET dengan fee tim ≤ ${formatRp(bMaxFee)}/job.`;
+        } else if (bMode === 'persen_fee') {
+          bNote = `Bonus dihitung ${bNominal}% dari total fee tim (fee ≤ ${formatRp(bMaxFee)}/job).`;
+        } else {
+          bNote = `Bonus dihitung kelipatan ${bMinJob} job PAKET dengan fee tim ≤ ${formatRp(bMaxFee)}/job. Nominal: ${formatRp(bNominal)} per ${bMinJob} job.`;
+        }
+      }
 
       const salesByProd = {}; const teamStats = {}; let maxTeamJobs = 0;
+
+      // Register all team members from dbUsers
+      if (dbUsers && dbUsers.length > 0) {
+        dbUsers.forEach(u => {
+          if (u.fullname && (u.role === 'Fotografer' || u.role === 'MUA' || u.role === 'Staff' || u.role === 'Videografer')) {
+            let name = u.fullname.trim();
+            if (!teamStats[name]) teamStats[name] = { count: 0, eligibleCount: 0, totalFeeEligible: 0 };
+          }
+        });
+      }
+
       filteredPem.forEach(p => {
         if (!salesByProd[p.layanan]) salesByProd[p.layanan] = { qty: 0, nominal: 0 };
         salesByProd[p.layanan].qty += Number(p.jumlah) || 1; salesByProd[p.layanan].nominal += Number(p.total) || 0;
-        if (p.team) {
-          const members = p.team.split(/&|,| dan |\|/i).map(s => s.trim()).filter(s => s !== '');
+        
+        let teamCombined = [p.team, p.team2].filter(x => x && String(x).trim() !== '').join(' & ');
+        if (teamCombined) {
+          const members = Array.from(new Set(teamCombined.split(/&|,| dan |\|/i).map(s => s.trim()).filter(s => s !== '')));
           members.forEach(m => {
             if (!teamStats[m]) teamStats[m] = { count: 0, eligibleCount: 0, totalFeeEligible: 0 };
             teamStats[m].count++;
-            const feeRecord = dbPengeluaran.find(x => String(x.kategori).trim().toLowerCase() === 'fee team' && x.catatan === `PEM_ID:${p.id}|MEMBER:${m}`);
+            
+            const feeRecord = dbPengeluaran.find(x => String(x.kategori).trim().toLowerCase() === 'fee team' && (x.catatan === `PEM_ID:${p.id}|MEMBER:${m}` || String(x.catatan || '').toLowerCase().includes(m.toLowerCase())));
             let prodData = dbProduk.find(x => x.nama === p.layanan);
-            let isPaket = (prodData && String(prodData.jenis).trim().toLowerCase() === 'paket');
+            let isPaket = (!prodData || String(prodData.jenis || 'paket').trim().toLowerCase() === 'paket');
             let feeNom = feeRecord ? Number(feeRecord.nominal) || 0 : 0;
-            if (feeRecord && feeNom <= bMaxFee && isPaket) {
+
+            if (isPaket && (bMaxFee === 0 || feeNom <= bMaxFee)) {
               teamStats[m].eligibleCount++;
               teamStats[m].totalFeeEligible += feeNom;
             }
@@ -481,7 +509,10 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       });
 
       let allKnownMembers = new Set(Object.keys(teamStats));
-      dbPemasukan.forEach(p => { if (p.team) p.team.split(/&|,| dan |\|/i).forEach(m => { let clean = m.trim(); if (clean) allKnownMembers.add(clean); }); });
+      dbPemasukan.forEach(p => { 
+        let teamCombined = [p.team, p.team2].filter(x => x && String(x).trim() !== '').join(' & ');
+        if (teamCombined) teamCombined.split(/&|,| dan |\|/i).forEach(m => { let clean = m.trim(); if (clean) allKnownMembers.add(clean); }); 
+      });
 
       filteredPeng.forEach(peng => {
         if (String(peng.kategori).trim().toLowerCase() !== 'fee team') {
@@ -535,23 +566,23 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       let totalFeeEligible = 0;
 
       filteredPem.forEach(p => {
-        if (!p.team) return;
+        let teamCombined = [p.team, p.team2].filter(x => x && String(x).trim() !== '').join(' & ');
+        if (!teamCombined) return;
 
-        let teamArr = String(p.team).split('|');
+        let teamArr = teamCombined.split('|');
         let tglArr = String(p.tanggal).split(',');
 
         let isMemberInProject = false;
         let workedDatesHtml = [];
         let firstSortDate = '';
 
-        // Cek nama tim per harinya (D1 dan D2)
         teamArr.forEach((tm, idx) => {
           let dayMembers = tm.split(/&|,| dan /i).map(s => s.trim()).filter(s => s !== '');
           if (dayMembers.includes(name)) {
             isMemberInProject = true;
             if (tglArr[idx]) {
               let cleanDate = tglArr[idx].trim();
-              if (!firstSortDate) firstSortDate = cleanDate; // Tanggal pertama kerja untuk sorting
+              if (!firstSortDate) firstSortDate = cleanDate;
 
               if (tglArr.length > 1) {
                 workedDatesHtml.push(`<div class="mb-1"><span class="badge bg-light text-dark border"><i class="fa-regular fa-calendar me-1"></i>D${idx + 1}: ${safeDate(cleanDate)}</span></div>`);
@@ -563,7 +594,7 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
         });
 
         if (isMemberInProject) {
-          const feeRecord = dbPengeluaran.find(x => x.kategori === 'Fee Team' && x.catatan === `PEM_ID:${p.id}|MEMBER:${name}`);
+          const feeRecord = dbPengeluaran.find(x => String(x.kategori).trim().toLowerCase() === 'fee team' && (x.catatan === `PEM_ID:${p.id}|MEMBER:${name}` || String(x.catatan || '').toLowerCase().includes(name.toLowerCase())));
           let feeNominal = 0;
           let isLunas = false;
           let isRecorded = false;
@@ -573,7 +604,7 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
             feeNominal = Number(feeRecord.nominal) || 0;
             isLunas = (String(feeRecord.status_bayar).trim().toLowerCase() === 'lunas');
             let prodData = dbProduk.find(x => x.nama === p.layanan);
-            let isPaket = (prodData && String(prodData.jenis).trim().toLowerCase() === 'paket');
+            let isPaket = (!prodData || String(prodData.jenis || 'paket').trim().toLowerCase() === 'paket');
             if (feeNominal <= bMaxFee && isPaket) {
               eligibleJobs++;
               totalFeeEligible += feeNominal;
