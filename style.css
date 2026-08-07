@@ -306,3 +306,89 @@ tbody tr:hover, .table tbody tr:hover, tbody tr:hover > td {
   opacity: 0.5;
   pointer-events: none;
 }
+
+/* =======================================================
+   SWEETALERT2 & TOAST NOTIFICATION STYLING (TOP RIGHT)
+   ======================================================= */
+.swal2-container {
+  z-index: 99999 !important;
+}
+
+/* Force notifications/toasts to Top-Right Corner */
+.swal2-container.swal2-top-end,
+.swal2-container.swal2-top-right,
+.swal2-container.swal2-bottom-end,
+.swal2-container.swal2-bottom-right {
+  top: 1.25rem !important;
+  right: 1.25rem !important;
+  bottom: auto !important;
+  left: auto !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+}
+
+/* SweetAlert2 Popup & Toast Box Styling */
+.swal2-popup {
+  background: #0f172a !important; /* Dark Slate 900 */
+  color: #f8fafc !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important; /* Gold border */
+  border-radius: 1rem !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.swal2-title {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+}
+
+.swal2-html-container,
+.swal2-content {
+  color: #cbd5e1 !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+}
+
+.swal2-toast {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+  padding: 0.75rem 1.25rem !important;
+  border-radius: 0.875rem !important;
+}
+
+.swal2-toast .swal2-title {
+  color: #ffffff !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  margin: 0 0 0 0.5rem !important;
+}
+
+.swal2-toast .swal2-html-container {
+  color: #e2e8f0 !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+}
+
+.swal2-icon {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.swal2-confirm {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3) !important;
+}
+
+.swal2-cancel {
+  background: #334155 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-radius: 0.75rem !important;
+}
+
