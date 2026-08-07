@@ -52,10 +52,12 @@
       // Ambil data pengaturan jika sudah dimuat, jika belum pakai standar
       let set = (typeof dbPengaturan !== 'undefined' && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
       let appName = set.app_name || 'BookHive';
-      let vendorName = set.brand || 'Simply Book';
+      let vendorName = (typeof currentUser !== 'undefined' && currentUser && (currentUser.fullname || currentUser.username))
+        ? (currentUser.fullname || currentUser.username)
+        : (set.brand || 'Kama Visual');
       let logoImg = set.logo_app || '';
 
-      // 1. Ubah semua teks nama aplikasi (Nama Aplikasi)
+      // 1. Ubah semua teks nama aplikasi (Nama Aplikasi -> BookHive)
       document.querySelectorAll('.appNameDisplay').forEach(el => {
         if (appName.toLowerCase() === 'bookhive') {
           el.innerHTML = 'Book<span class="text-[#ECA935]">Hive</span>';
@@ -64,8 +66,8 @@
         }
       });
 
-      // 2. Ubah semua teks nama vendor / slogan (Subtitle)
-      document.querySelectorAll('.appVendorDisplay').forEach(el => {
+      // 2. Ubah semua teks nama vendor (Subtitle di bawah BookHive -> Nama Vendor yang Login)
+      document.querySelectorAll('.vendorNameDisplay').forEach(el => {
         el.innerText = vendorName.toUpperCase();
       });
 
@@ -216,8 +218,12 @@
       if (currentUser) {
         document.getElementById('loginPage').classList.add('d-none');
         document.getElementById('mainApp').classList.remove('d-none');
-        document.getElementById('displayUser').innerText = currentUser.fullname;
-        document.getElementById('displayRole').innerText = currentUser.role;
+        const vendorName = currentUser.fullname || currentUser.username || 'Vendor';
+        if (document.getElementById('displayUser')) document.getElementById('displayUser').innerText = vendorName;
+        if (document.getElementById('displayRole')) document.getElementById('displayRole').innerText = currentUser.role;
+        document.querySelectorAll('.vendorNameDisplay').forEach(el => {
+          el.innerText = vendorName;
+        });
         loadAppBranding(); applyMenuAccess();
         let firstMenu = 'dashboard';
         const allowedMenus = currentUser.akses_menu ? currentUser.akses_menu.split(',') : [];
