@@ -137,11 +137,12 @@ function handleGetPublicInvoice(invoiceId) {
   var all = getAllData();
   if (!all.success) return all;
 
+  var settings = (all.data.pengaturan && all.data.pengaturan.length > 0) ? all.data.pengaturan[0] : {};
   var pemasukan = all.data.pemasukan || [];
   for (var i = 0; i < pemasukan.length; i++) {
     var row = pemasukan[i];
     if (String(row.id_trx).trim() === String(invoiceId).trim() || String(row.id).trim() === String(invoiceId).trim()) {
-      return { success: true, invoice: row };
+      return { success: true, invoice: row, settings: settings };
     }
   }
 

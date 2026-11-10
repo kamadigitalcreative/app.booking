@@ -93,23 +93,44 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
     }
 
     function loadAppBranding() {
-      // Ambil data pengaturan jika sudah dimuat, jika belum pakai standar
-      let set = (typeof dbPengaturan !== 'undefined' && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
-      let logoImg = set.logo_app || '';
+      // 1. Ambil data dari memory atau cache localStorage
+      let cached = {};
+      try { cached = JSON.parse(localStorage.getItem('bookhive_app_settings') || '{}'); } catch(e){}
 
-      // 1. Ubah semua teks nama aplikasi (Nama Aplikasi -> Selalu BookHive)
+      let set = (typeof dbPengaturan !== 'undefined' && dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : cached;
+      if (set && Object.keys(set).length > 0) {
+        try { localStorage.setItem('bookhive_app_settings', JSON.stringify(set)); } catch(e){}
+      }
+
+      let appName = (set.app_name && set.app_name.trim() !== '') ? set.app_name.trim() : 'BookHive';
+      let logoImg = set.logo_app || '';
+      let brandName = (set.brand && set.brand.trim() !== '') ? set.brand.trim() : 'Kama Visual';
+
+      // 1. Ubah semua teks nama aplikasi secara dinamis
       document.querySelectorAll('.appNameDisplay').forEach(el => {
         el.classList.remove('text-slate-100', 'text-white');
-        el.innerHTML = 'Book<span style="color: #ECA935;">Hive</span>';
+        if (appName.toLowerCase() === 'bookhive') {
+          el.innerHTML = 'Book<span style="color: #ECA935;">Hive</span>';
+        } else {
+          let words = appName.split(' ');
+          if (words.length > 1) {
+            let last = words.pop();
+            el.innerHTML = `${words.join(' ')} <span style="color: #ECA935;">${last}</span>`;
+          } else {
+            el.innerHTML = `<span style="color: #ECA935;">${appName}</span>`;
+          }
+        }
       });
 
-      // 2. Ubah semua teks nama vendor (Subtitle di bawah BookHive -> Nama Vendor yang Login)
+      // 2. Ubah semua teks nama vendor (Subtitle di bawah logo / Login / Sidebar)
       let vendorName = (typeof currentUser !== 'undefined' && currentUser && (currentUser.fullname || currentUser.username))
         ? (currentUser.fullname || currentUser.username)
-        : (set.brand && set.brand.toLowerCase() !== 'bookhive' ? set.brand : 'Kama Visual');
+        : brandName;
 
       document.querySelectorAll('.vendorNameDisplay, .appVendorDisplay').forEach(el => {
         el.classList.remove('text-amber-400', 'text-amber-400/90');
+        // Jangan timpa teks loader jika loader sedang aktif
+        if (el.id === 'loaderText' && el.getAttribute('data-is-loader') === 'true') return;
         el.innerText = vendorName.toUpperCase();
       });
 
@@ -119,20 +140,21 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
         let imgEl = container.querySelector('.appLogoImage');
 
         if (logoImg && logoImg.trim() !== '') {
-          // Jika ada gambar logo, tampilkan gambar, sembunyikan SVG/teks
           if (txtEl) txtEl.classList.add('d-none');
           if (imgEl) {
             imgEl.src = logoImg;
             imgEl.classList.remove('d-none');
           }
         } else {
-          // Jika tidak ada gambar logo custom, tampilkan SVG/teks logo default
           if (imgEl) imgEl.classList.add('d-none');
           if (txtEl) {
             txtEl.classList.remove('d-none');
           }
         }
       });
+
+      // 4. Update Judul Browser Tab
+      document.title = `${appName} - ${vendorName}`;
     }
 
     // 3. UTILS
@@ -343,7 +365,10 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
       gasRun('getAllData').then(res => {
         if (res.success) {
           dbProduk = res.data.produk || []; dbPemasukan = res.data.pemasukan || []; dbPengeluaran = res.data.pengeluaran || []; dbTodo = res.data.todo || []; dbUsers = res.data.users || []; dbPengaturan = res.data.pengaturan || []; dbTeamUnavailability = res.data.team_unavailability || [];
-isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
+          if (dbPengaturan && dbPengaturan.length > 0) {
+            try { localStorage.setItem('bookhive_app_settings', JSON.stringify(dbPengaturan[0])); } catch(e){}
+          }
+          isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
         } else { Swal.fire('Error', res.message, 'error'); }
       }).catch(err => Swal.fire('Error', "Gagal mengambil data: " + err.message, 'error'));
     }
@@ -427,7 +452,7 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       const payload = {
         id: set.id || 1,
         isEdit: 'true',
-        brand: document.getElementById('setBrand') ? document.getElementById('setBrand').value : (set.brand || 'Simply Book'),
+        brand: document.getElementById('setBrand') ? document.getElementById('setBrand').value.trim() : (set.brand || 'Simply Book'),
         tagline: document.getElementById('setTagline') ? document.getElementById('setTagline').value : '',
         phone: document.getElementById('setPhone') ? document.getElementById('setPhone').value : '',
         email: document.getElementById('setEmail') ? document.getElementById('setEmail').value : '',
@@ -446,11 +471,21 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
         bonus_max_fee: set.bonus_max_fee !== undefined ? set.bonus_max_fee : 800000,
         bonus_note: set.bonus_note || ''
       };
+
+      if (!dbPengaturan || dbPengaturan.length === 0) dbPengaturan = [payload];
+      else Object.assign(dbPengaturan[0], payload);
+      try { localStorage.setItem('bookhive_app_settings', JSON.stringify(dbPengaturan[0])); } catch(e){}
+      loadAppBranding();
+
       handleOptimisticSave('Pengaturan', payload, dbPengaturan, null);
     };
 
     window.saveAppSetup = function () {
       let set = (dbPengaturan && dbPengaturan.length > 0) ? dbPengaturan[0] : {};
+      const newAppName = document.getElementById('setAppName') ? document.getElementById('setAppName').value.trim() : (set.app_name || 'BookHive');
+      const newLogoText = document.getElementById('setAppLogoText') ? document.getElementById('setAppLogoText').value.trim() : (set.app_logo_text || 'BH');
+      const newLogoApp = document.getElementById('setLogoAppHidden') ? document.getElementById('setLogoAppHidden').value : (set.logo_app || '');
+
       const payload = {
         id: set.id || 1,
         isEdit: 'true',
@@ -464,10 +499,21 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
         notes_inv: set.notes_inv || '',
         logo_inv: set.logo_inv || '',
         ttd_inv: set.ttd_inv || '',
-        app_name: document.getElementById('setAppName') ? document.getElementById('setAppName').value : 'BookHive',
-        app_logo_text: document.getElementById('setAppLogoText') ? document.getElementById('setAppLogoText').value : 'BH',
-        logo_app: document.getElementById('setLogoAppHidden') ? document.getElementById('setLogoAppHidden').value : (set.logo_app || '')
+        app_name: newAppName,
+        app_logo_text: newLogoText,
+        logo_app: newLogoApp,
+        bonus_mode: set.bonus_mode || 'kelipatan_job',
+        bonus_min_job: set.bonus_min_job !== undefined ? set.bonus_min_job : 2,
+        bonus_nominal: set.bonus_nominal !== undefined ? set.bonus_nominal : 25000,
+        bonus_max_fee: set.bonus_max_fee !== undefined ? set.bonus_max_fee : 800000,
+        bonus_note: set.bonus_note || ''
       };
+
+      if (!dbPengaturan || dbPengaturan.length === 0) dbPengaturan = [payload];
+      else Object.assign(dbPengaturan[0], payload);
+      try { localStorage.setItem('bookhive_app_settings', JSON.stringify(dbPengaturan[0])); } catch(e){}
+      loadAppBranding();
+
       handleOptimisticSave('Pengaturan', payload, dbPengaturan, null);
     };
 
@@ -1974,5 +2020,16 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
 
     document.addEventListener('DOMContentLoaded', () => { 
       initTheme(); 
+      loadAppBranding();
       checkLoginState(); 
+      // Silently fetch latest settings in background to refresh login page branding
+      if (!currentUser) {
+        gasRun('getAllData').then(res => {
+          if (res.success && res.data.pengaturan && res.data.pengaturan.length > 0) {
+            dbPengaturan = res.data.pengaturan;
+            try { localStorage.setItem('bookhive_app_settings', JSON.stringify(dbPengaturan[0])); } catch(e){}
+            loadAppBranding();
+          }
+        }).catch(() => {});
+      }
     });

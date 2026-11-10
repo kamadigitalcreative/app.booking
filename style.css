@@ -832,3 +832,28 @@ tbody tr:hover, .table tbody tr:hover, tbody tr:hover > td {
   color: var(--badge-text);
   border: 1px solid var(--badge-border);
 }
+
+/* Fullpage Loader High-Contrast Override */
+#fullPageLoader {
+  background: rgba(10, 15, 29, 0.88) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+#fullPageLoader .appNameDisplay,
+#fullPageLoader .appNameDisplay * {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+}
+
+#fullPageLoader .appNameDisplay span {
+  color: #ECA935 !important;
+}
+
+#fullPageLoader #loaderText,
+#fullPageLoader .vendorNameDisplay {
+  color: #fbbf24 !important; /* Vivid amber */
+  font-weight: 800 !important;
+  letter-spacing: 0.22em !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8) !important;
+  opacity: 1 !important;
+}

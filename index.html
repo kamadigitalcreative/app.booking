@@ -41,16 +41,16 @@
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=2.3">
+  <link rel="stylesheet" href="style.css?v=2.4">
 </head>
 
 <body class="min-h-screen font-sans antialiased">
 
   <!-- FULL PAGE LOADER -->
-  <div id="fullPageLoader" class="d-none fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex flex-col justify-center items-center">
+  <div id="fullPageLoader" class="d-none fixed inset-0 z-[9999] bg-slate-950/85 backdrop-blur-md flex flex-col justify-center items-center">
     <div class="spinner-border text-amber-500 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
     <h5 class="font-extrabold text-2xl tracking-tight text-white appNameDisplay">Book<span style="color: #ECA935;">Hive</span></h5>
-    <p class="mt-2 text-xs font-bold text-amber-400 uppercase tracking-[0.2em] vendorNameDisplay" id="loaderText">MEMUAT SISTEM & SINKRONISASI DATA</p>
+    <p class="mt-2 text-xs font-extrabold text-amber-400 uppercase tracking-[0.22em]" id="loaderText" data-is-loader="true">MEMUAT SISTEM & SINKRONISASI DATA...</p>
   </div>
 
   <!-- LOGIN & AUTH PAGE -->
@@ -229,6 +229,21 @@
       }).then(() => {
         showAuthForm('login');
       });
+    }
+
+    function toggleSidebarMenu(menuId, btn) {
+      const menu = document.getElementById(menuId);
+      if (!menu) return;
+      const chevron = btn ? btn.querySelector('.chevron-icon') : null;
+      const isHidden = menu.classList.contains('d-none');
+      
+      if (isHidden) {
+        menu.classList.remove('d-none');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      } else {
+        menu.classList.add('d-none');
+        if (chevron) chevron.style.transform = 'rotate(-90deg)';
+      }
     }
   </script>
 
@@ -1925,7 +1940,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <script src="script.js?v=2.1"></script>
+  <script src="script.js?v=2.4"></script>
 </body>
 
 </html>

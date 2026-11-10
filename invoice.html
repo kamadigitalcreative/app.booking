@@ -27,7 +27,7 @@
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2.3">
+  <link rel="stylesheet" href="style.css?v=2.4">
 </head>
 <body class="min-h-screen font-sans antialiased flex flex-col justify-center items-center p-4 py-8">
 
@@ -60,10 +60,11 @@
       <!-- HEADER -->
       <div class="bg-indigo-600 dark:bg-indigo-700 text-white p-6 md:p-8 flex justify-between items-center">
         <div>
-          <h4 class="text-2xl font-extrabold tracking-wider">INVOICE</h4>
-          <p class="text-xs text-indigo-100 font-semibold mt-1" id="invId">INV-000000</p>
+          <h4 class="text-2xl font-extrabold tracking-wider" id="invBrandHeader">INVOICE</h4>
+          <p class="text-xs text-indigo-100 font-semibold mt-0.5" id="invBrandTagline"></p>
+          <p class="text-xs text-indigo-200 font-semibold mt-1" id="invId">INV-000000</p>
         </div>
-        <div class="w-12 h-12 rounded-2xl bg-white text-indigo-600 font-extrabold text-lg flex items-center justify-center shadow-md">BH</div>
+        <div id="invLogoBox" class="w-14 h-14 rounded-2xl bg-white text-indigo-600 font-extrabold text-lg flex items-center justify-center shadow-md overflow-hidden p-1">BH</div>
       </div>
 
       <div class="p-6 md:p-8 space-y-6">
@@ -107,6 +108,15 @@
             <span class="font-extrabold" style="color: var(--text-main);">TOTAL TAGIHAN</span>
             <span class="font-extrabold text-indigo-600 dark:text-indigo-400 text-lg" id="invTotal">Rp 0</span>
           </div>
+        </div>
+
+        <!-- BANK TRANSFER INFO -->
+        <div id="invBankContainer" class="hidden rounded-2xl p-4 space-y-1.5 text-xs border" style="background: var(--bg-card-subtle); border-color: var(--border-color);">
+          <div class="font-bold flex items-center gap-1.5" style="color: var(--text-main);">
+            <i class="fa-solid fa-building-columns text-indigo-600"></i> Rekening Pembayaran:
+          </div>
+          <div class="font-extrabold text-sm" style="color: var(--text-main);" id="invBankDetail">-</div>
+          <p class="text-[11px] text-slate-500 font-medium" id="invNotesText"></p>
         </div>
 
         <div id="paymentSection" class="text-center pt-2">
@@ -189,7 +199,7 @@
         
         if (res.success && res.invoice) {
           invoiceData = res.invoice;
-          renderInvoice(res.invoice);
+          renderInvoice(res.invoice, res.settings || {});
         } else {
           document.getElementById('errorContainer').classList.remove('hidden');
         }
@@ -200,9 +210,39 @@
       });
     });
 
-    function renderInvoice(inv) {
+    function renderInvoice(inv, settings = {}) {
       document.getElementById('invoiceContainer').classList.remove('hidden');
       
+      // Branding from settings
+      const brand = settings.brand || settings.app_name || 'INVOICE';
+      if (document.getElementById('invBrandHeader')) {
+        document.getElementById('invBrandHeader').innerText = brand;
+      }
+      if (document.getElementById('invBrandTagline')) {
+        document.getElementById('invBrandTagline').innerText = settings.tagline || '';
+      }
+      if (document.getElementById('invLogoBox')) {
+        const logoBox = document.getElementById('invLogoBox');
+        if (settings.logo_inv && settings.logo_inv.length > 20) {
+          logoBox.innerHTML = `<img src="${settings.logo_inv}" alt="Logo" class="max-h-full max-w-full object-contain">`;
+        } else if (settings.app_logo_text) {
+          logoBox.innerText = settings.app_logo_text;
+        } else {
+          logoBox.innerText = 'BH';
+        }
+      }
+
+      // Bank Details
+      if (settings.bank && settings.acc) {
+        document.getElementById('invBankContainer').classList.remove('hidden');
+        document.getElementById('invBankDetail').innerText = `${settings.bank} • ${settings.acc} a.n ${settings.acc_name || ''}`;
+        if (settings.notes_inv) {
+          document.getElementById('invNotesText').innerText = settings.notes_inv;
+        }
+      }
+
+      document.title = `Invoice ${inv.id_trx || ''} - ${brand}`;
+
       document.getElementById('invId').innerText = inv.id_trx;
       document.getElementById('invClient').innerText = inv.client;
       document.getElementById('invPhone').innerText = inv.phone;
