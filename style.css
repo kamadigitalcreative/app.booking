@@ -275,14 +275,63 @@ h1, h2, h3, h4, h5, h6,
   }
 }
 
+/* Branding in sidebar & header */
+.appNameDisplay {
+  color: var(--text-main) !important;
+  font-weight: 800;
+}
+
+.appNameDisplay span {
+  color: #ECA935 !important;
+}
+
+.vendorNameDisplay {
+  color: var(--text-sub) !important;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+/* Sidebar Section Titles */
+.sidebar-section-title {
+  font-size: 0.6875rem !important; /* 11px */
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--text-muted) !important;
+  padding: 0.5rem 0.75rem 0.25rem !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-section-title i {
+  color: var(--text-muted) !important;
+  font-size: 0.75rem;
+  width: 1rem;
+  text-align: center;
+}
+
 /* Nav Item styling */
 .nav-item-custom {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
   transition: all 0.18s ease-in-out;
   color: var(--nav-item-color) !important;
   font-weight: 500;
+  font-size: 0.8125rem !important;
   border-radius: 0.625rem !important;
   padding: 0.55rem 0.75rem !important;
   text-decoration: none !important;
+  border-left: 3px solid transparent !important;
+}
+
+.nav-item-custom i {
+  width: 1.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-sub) !important;
+  transition: color 0.18s ease-in-out;
 }
 
 .nav-item-custom:hover {
@@ -290,11 +339,50 @@ h1, h2, h3, h4, h5, h6,
   background: var(--nav-item-hover-bg) !important;
 }
 
+.nav-item-custom:hover i {
+  color: var(--primary-accent) !important;
+}
+
 .nav-item-custom.active {
   background: var(--nav-item-active-bg) !important;
   color: var(--nav-item-active-color) !important;
   font-weight: 700 !important;
   border-left: 3px solid var(--nav-item-active-border) !important;
+}
+
+.nav-item-custom.active i {
+  color: var(--primary-accent) !important;
+}
+
+/* Dashboard & Page Filter Pills */
+.dash-filter-pill {
+  background: var(--bg-card-subtle) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  box-shadow: var(--card-shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.dash-filter-pill select {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-main) !important;
+  padding: 0.2rem 0.4rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+.dash-filter-pill select:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.dash-filter-pill select option {
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
 }
 
 /* ==========================================================================

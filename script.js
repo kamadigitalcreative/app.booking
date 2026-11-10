@@ -14,6 +14,11 @@ window.toggleTheme = function() {
 
 window.applyTheme = function(theme) {
   document.documentElement.setAttribute('data-theme', theme);
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
   localStorage.setItem('bookhive_theme', theme);
 
   document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
@@ -25,7 +30,7 @@ window.applyTheme = function(theme) {
   });
 
   document.querySelectorAll('.theme-toggle-label').forEach(el => {
-    el.innerText = theme === 'dark' ? 'Mode Malam' : 'Mode Terang';
+    el.innerText = theme === 'dark' ? 'Mode Terang' : 'Mode Malam';
   });
 
   if (dashChart) {
@@ -94,7 +99,8 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
 
       // 1. Ubah semua teks nama aplikasi (Nama Aplikasi -> Selalu BookHive)
       document.querySelectorAll('.appNameDisplay').forEach(el => {
-        el.innerHTML = 'Book<span class="text-[#ECA935]">Hive</span>';
+        el.classList.remove('text-slate-100', 'text-white');
+        el.innerHTML = 'Book<span style="color: #ECA935;">Hive</span>';
       });
 
       // 2. Ubah semua teks nama vendor (Subtitle di bawah BookHive -> Nama Vendor yang Login)
@@ -103,6 +109,7 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
         : (set.brand && set.brand.toLowerCase() !== 'bookhive' ? set.brand : 'Kama Visual');
 
       document.querySelectorAll('.vendorNameDisplay, .appVendorDisplay').forEach(el => {
+        el.classList.remove('text-amber-400', 'text-amber-400/90');
         el.innerText = vendorName.toUpperCase();
       });
 

@@ -43,7 +43,7 @@
       <!-- Top Action: Theme Toggle Button -->
       <button type="button" class="theme-toggle-btn absolute top-5 right-5 z-20 shadow-sm" onclick="toggleTheme()" title="Ubah Mode Tampilan">
         <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
-        <span class="theme-toggle-label text-xs">Mode Terang</span>
+        <span class="theme-toggle-label text-xs">Mode Malam</span>
       </button>
 
       <!-- HEADER -->
@@ -185,12 +185,17 @@
     }
     function applyTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
       localStorage.setItem('bookhive_theme', theme);
       document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
         icon.className = theme === 'dark' ? 'fa-solid fa-sun text-amber-400 theme-toggle-icon' : 'fa-solid fa-moon text-indigo-600 theme-toggle-icon';
       });
       document.querySelectorAll('.theme-toggle-label').forEach(el => {
-        el.innerText = theme === 'dark' ? 'Mode Malam' : 'Mode Terang';
+        el.innerText = theme === 'dark' ? 'Mode Terang' : 'Mode Malam';
       });
     }
 

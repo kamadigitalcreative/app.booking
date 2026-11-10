@@ -15,6 +15,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: ['class', '[data-theme="dark"]'],
       theme: {
         extend: {
           fontFamily: {
@@ -40,7 +41,7 @@
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=2.1">
+  <link rel="stylesheet" href="style.css?v=2.2">
 </head>
 
 <body class="min-h-screen font-sans antialiased">
@@ -251,8 +252,8 @@
           <img class="appLogoImage d-none max-h-10 object-contain" src="" alt="App Logo">
         </div>
         <div>
-          <h5 class="font-extrabold text-slate-100 text-base leading-tight tracking-wide appNameDisplay">Book<span class="text-[#ECA935]">Hive</span></h5>
-          <small class="text-[10px] font-bold text-amber-400/90 tracking-[0.15em] uppercase vendorNameDisplay">KAMA VISUAL</small>
+          <h5 class="font-extrabold text-base leading-tight tracking-wide appNameDisplay" style="color: var(--text-main);">Book<span style="color: #ECA935;">Hive</span></h5>
+          <small class="text-[10px] font-bold tracking-[0.15em] uppercase vendorNameDisplay" style="color: var(--text-sub);">KAMA VISUAL</small>
         </div>
       </div>
 
@@ -260,72 +261,72 @@
         
         <!-- KATEGORI 1: OVERVIEW & RINGKASAN -->
         <div class="space-y-1">
-          <div class="text-[10px] font-extrabold text-amber-400 px-3 tracking-wider uppercase flex items-center gap-1.5">
-            <i class="fa-solid fa-gauge-high text-amber-400"></i> Overview & Ringkasan
+          <div class="sidebar-section-title">
+            <i class="fa-solid fa-gauge-high"></i> Overview & Ringkasan
           </div>
-          <a href="#" class="nav-item-custom active flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="dashboard" onclick="showPage('dashboard', this)">
-            <i class="fa-solid fa-chart-pie w-4 text-center text-amber-400 text-sm"></i> Dashboard Utama
+          <a href="#" class="nav-item-custom active" data-menu="dashboard" onclick="showPage('dashboard', this)">
+            <i class="fa-solid fa-chart-pie"></i> <span>Dashboard Utama</span>
           </a>
-          <a href="#" class="nav-item-custom flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="kalender" onclick="showPage('kalender', this)">
-            <i class="fa-regular fa-calendar-days w-4 text-center text-amber-400 text-sm"></i> Kalender Photoshoot
+          <a href="#" class="nav-item-custom" data-menu="kalender" onclick="showPage('kalender', this)">
+            <i class="fa-regular fa-calendar-days"></i> <span>Kalender Photoshoot</span>
           </a>
         </div>
 
         <!-- KATEGORI 2: CLIENT & BOOKING OTOMATIS -->
         <div class="space-y-1">
-          <div class="text-[10px] font-extrabold text-amber-400 px-3 tracking-wider uppercase flex items-center gap-1.5">
-            <i class="fa-solid fa-address-book text-amber-400"></i> Client & Booking
+          <div class="sidebar-section-title">
+            <i class="fa-solid fa-address-book"></i> Client & Booking
           </div>
-          <a href="#" class="nav-item-custom flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="client" onclick="showPage('client', this)">
-            <i class="fa-solid fa-users-viewfinder w-4 text-center text-cyan-400 text-sm"></i> Database Client (CRM)
+          <a href="#" class="nav-item-custom" data-menu="client" onclick="showPage('client', this)">
+            <i class="fa-solid fa-users-viewfinder"></i> <span>Database Client (CRM)</span>
           </a>
-          <a href="#" class="nav-item-custom flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="pemasukan" onclick="showPage('pemasukan', this)">
-            <i class="fa-solid fa-file-invoice-dollar w-4 text-center text-emerald-400 text-sm"></i> Order & Pemasukan
+          <a href="#" class="nav-item-custom" data-menu="pemasukan" onclick="showPage('pemasukan', this)">
+            <i class="fa-solid fa-file-invoice-dollar"></i> <span>Order & Pemasukan</span>
           </a>
-          <a href="#" class="nav-item-custom flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="booking-link" onclick="showPage('booking-link', this)">
-            <i class="fa-solid fa-link w-4 text-center text-blue-400 text-sm"></i> Booking Online & Link Publik
+          <a href="#" class="nav-item-custom" data-menu="booking-link" onclick="showPage('booking-link', this)">
+            <i class="fa-solid fa-link"></i> <span>Booking Online & Link</span>
           </a>
         </div>
 
         <!-- KATEGORI 3: TIM & TALENT HUB -->
         <div class="space-y-1">
-          <div class="text-[10px] font-extrabold text-amber-400 px-3 tracking-wider uppercase flex items-center gap-1.5">
-            <i class="fa-solid fa-user-gear text-amber-400"></i> Tim & Jadwal Talent
+          <div class="sidebar-section-title">
+            <i class="fa-solid fa-user-gear"></i> Tim & Jadwal Talent
           </div>
-          <a href="#" class="nav-item-custom flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="tim-schedule" onclick="showPage('tim-schedule', this)">
-            <i class="fa-solid fa-user-astronaut w-4 text-center text-amber-400 text-sm"></i> Tim & Talent Hub
+          <a href="#" class="nav-item-custom" data-menu="tim-schedule" onclick="showPage('tim-schedule', this)">
+            <i class="fa-solid fa-user-astronaut"></i> <span>Tim & Talent Hub</span>
           </a>
-          <a href="#" class="nav-item-custom flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="unavailability" onclick="showPage('unavailability', this)">
-            <i class="fa-solid fa-calendar-minus w-4 text-center text-rose-400 text-sm"></i> Slot Libur / Block Day
+          <a href="#" class="nav-item-custom" data-menu="unavailability" onclick="showPage('unavailability', this)">
+            <i class="fa-solid fa-calendar-minus"></i> <span>Slot Libur / Block Day</span>
           </a>
         </div>
 
         <!-- KATEGORI 4: KEUANGAN & KATALOG -->
         <div class="space-y-1">
-          <div class="text-[10px] font-extrabold text-amber-400 px-3 tracking-wider uppercase flex items-center gap-1.5">
-            <i class="fa-solid fa-vault text-amber-400"></i> Keuangan & Produk
+          <div class="sidebar-section-title">
+            <i class="fa-solid fa-vault"></i> Keuangan & Produk
           </div>
-          <a href="#" class="nav-item-custom flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="produk" onclick="showPage('produk', this)">
-            <i class="fa-solid fa-box-open w-4 text-center text-amber-400 text-sm"></i> Katalog Produk & Jasa
+          <a href="#" class="nav-item-custom" data-menu="produk" onclick="showPage('produk', this)">
+            <i class="fa-solid fa-box-open"></i> <span>Katalog Produk & Jasa</span>
           </a>
-          <a href="#" class="nav-item-custom flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="pengeluaran" onclick="showPage('pengeluaran', this)">
-            <i class="fa-solid fa-arrow-right-from-bracket w-4 text-center text-rose-400 text-sm"></i> Pengeluaran & Fee Tim
+          <a href="#" class="nav-item-custom" data-menu="pengeluaran" onclick="showPage('pengeluaran', this)">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Pengeluaran & Fee Tim</span>
           </a>
-          <a href="#" class="nav-item-custom flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="aruskas" onclick="showPage('aruskas', this)">
-            <i class="fa-solid fa-money-bill-trend-up w-4 text-center text-teal-400 text-sm"></i> Arus Kas (Cash Flow)
+          <a href="#" class="nav-item-custom" data-menu="aruskas" onclick="showPage('aruskas', this)">
+            <i class="fa-solid fa-money-bill-trend-up"></i> <span>Arus Kas (Cash Flow)</span>
           </a>
         </div>
 
         <!-- KATEGORI 5: WORKFLOW & SISTEM -->
         <div class="space-y-1">
-          <div class="text-[10px] font-extrabold text-amber-400 px-3 tracking-wider uppercase flex items-center gap-1.5">
-            <i class="fa-solid fa-sliders text-amber-400"></i> Internal & Sistem
+          <div class="sidebar-section-title">
+            <i class="fa-solid fa-sliders"></i> Internal & Sistem
           </div>
-          <a href="#" class="nav-item-custom flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="todo" onclick="showPage('todo', this)">
-            <i class="fa-solid fa-list-check w-4 text-center text-orange-400 text-sm"></i> To-do & Target Alat
+          <a href="#" class="nav-item-custom" data-menu="todo" onclick="showPage('todo', this)">
+            <i class="fa-solid fa-list-check"></i> <span>To-do & Target Alat</span>
           </a>
-          <a href="#" class="nav-item-custom flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold text-xs transition-all text-slate-200 hover:bg-slate-800/80 hover:text-white" data-menu="pengaturan" onclick="showPage('pengaturan', this)">
-            <i class="fa-solid fa-gear w-4 text-center text-slate-400 text-sm"></i> Pengaturan Sistem
+          <a href="#" class="nav-item-custom" data-menu="pengaturan" onclick="showPage('pengaturan', this)">
+            <i class="fa-solid fa-gear"></i> <span>Pengaturan Sistem</span>
           </a>
         </div>
 
@@ -401,14 +402,14 @@
           <div class="flex items-center gap-3">
             <button type="button" class="theme-toggle-btn hidden md:inline-flex" onclick="toggleTheme()" title="Ubah Mode Tampilan">
               <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
-              <span class="theme-toggle-label text-xs">Mode Terang</span>
+              <span class="theme-toggle-label text-xs">Mode Malam</span>
             </button>
-            <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2">
-              <select class="bg-transparent font-extrabold text-xs focus:outline-none cursor-pointer text-indigo-600 dark:text-indigo-400" id="dashTahun" onchange="renderDashboard()">
+            <div class="dash-filter-pill flex items-center gap-2 rounded-2xl px-4 py-2">
+              <select class="bg-transparent font-extrabold text-xs focus:outline-none cursor-pointer" id="dashTahun" onchange="renderDashboard()">
                 <option value="2026" selected>Tahun: 2026</option>
               </select>
               <span class="text-slate-400">|</span>
-              <select class="bg-transparent font-extrabold text-xs focus:outline-none cursor-pointer text-indigo-600 dark:text-indigo-400" id="dashBulan" onchange="renderDashboard()">
+              <select class="bg-transparent font-extrabold text-xs focus:outline-none cursor-pointer" id="dashBulan" onchange="renderDashboard()">
                 <option value="all">Semua Bulan</option>
                 <option value="01">Jan</option>
                 <option value="02">Feb</option>
@@ -446,7 +447,7 @@
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
               <thead>
-                <tr class="bg-slate-800/90 border-b border-amber-500/30 text-amber-400 font-extrabold uppercase tracking-wider">
+                <tr class="border-b">
                   <th class="py-3.5 px-4">No</th>
                   <th class="py-3.5 px-4">Nama Produk / Jasa</th>
                   <th class="py-3.5 px-4">Harga</th>
@@ -505,7 +506,7 @@
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
               <thead>
-                <tr class="bg-slate-800/90 border-b border-amber-500/30 text-amber-400 font-extrabold uppercase tracking-wider">
+                <tr class="border-b">
                   <th class="py-3.5 px-4 hidden md:table-cell">No</th>
                   <th class="py-3.5 px-4 hidden md:table-cell">ID TRX</th>
                   <th class="py-3.5 px-4 hidden md:table-cell">Tanggal</th>
@@ -577,7 +578,7 @@
               <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
                   <thead>
-                    <tr class="bg-slate-800/90 border-b border-amber-500/30 text-amber-400 font-extrabold uppercase tracking-wider">
+                    <tr class="border-b">
                       <th class="py-3.5 px-4">No</th>
                       <th class="py-3.5 px-4">Tgl Kerja</th>
                       <th class="py-3.5 px-4">Nama Anggota</th>
@@ -598,7 +599,7 @@
               <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
                   <thead>
-                    <tr class="bg-slate-800/90 border-b border-amber-500/30 text-amber-400 font-extrabold uppercase tracking-wider">
+                    <tr class="border-b">
                       <th class="py-3.5 px-4 hidden md:table-cell">No</th>
                       <th class="py-3.5 px-4 hidden md:table-cell">Tanggal</th>
                       <th class="py-3.5 px-4">Detail Pengeluaran</th>
@@ -669,7 +670,7 @@
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
               <thead>
-                <tr class="bg-slate-800/90 border-b border-amber-500/30 text-amber-400 font-extrabold uppercase tracking-wider">
+                <tr class="border-b">
                   <th class="py-3.5 px-4">No</th>
                   <th class="py-3.5 px-4">Nama Tim</th>
                   <th class="py-3.5 px-4">Tanggal</th>
@@ -691,12 +692,12 @@
             <h4 class="text-xl font-extrabold text-slate-900 tracking-tight">Arus Kas</h4>
             <p class="text-xs font-medium text-slate-500 mt-1">Rekapitulasi arus dana masuk & keluar</p>
           </div>
-          <div class="flex items-center gap-2 bg-white/40 border border-white/60 rounded-2xl px-4 py-2 backdrop-blur-sm">
-            <select id="akTahun" class="bg-transparent font-bold text-indigo-700 text-xs focus:outline-none cursor-pointer" onchange="renderArusKas()">
+          <div class="dash-filter-pill flex items-center gap-2 rounded-2xl px-4 py-2">
+            <select id="akTahun" class="bg-transparent font-bold text-xs focus:outline-none cursor-pointer" onchange="renderArusKas()">
               <option value="2026" selected>Tahun: 2026</option>
             </select>
-            <span class="text-slate-300">|</span>
-            <select id="akBulan" class="bg-transparent font-bold text-indigo-700 text-xs focus:outline-none cursor-pointer" onchange="renderArusKas()">
+            <span class="text-slate-400">|</span>
+            <select id="akBulan" class="bg-transparent font-bold text-xs focus:outline-none cursor-pointer" onchange="renderArusKas()">
               <option value="all">Semua Bulan</option>
               <option value="01">Jan</option>
               <option value="02">Feb</option>
@@ -733,7 +734,7 @@
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
               <thead>
-                <tr class="bg-slate-800/90 border-b border-amber-500/30 text-amber-400 font-extrabold uppercase tracking-wider">
+                <tr class="border-b">
                   <th class="py-3.5 px-4">No</th>
                   <th class="py-3.5 px-4">Task / Pembelian</th>
                   <th class="py-3.5 px-4">Kategori</th>
@@ -786,7 +787,7 @@
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
               <thead>
-                <tr class="bg-slate-800/90 border-b border-amber-500/30 text-amber-400 font-extrabold uppercase tracking-wider">
+                <tr class="border-b">
                   <th class="py-3.5 px-4">No</th>
                   <th class="py-3.5 px-4">Nama Client</th>
                   <th class="py-3.5 px-4">No. WhatsApp</th>
