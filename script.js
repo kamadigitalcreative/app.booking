@@ -293,10 +293,36 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
     }
     function logout() { currentUser = null; isDataLoaded = false; checkLoginState(); }
 
+    window.toggleSidebarMenu = function (menuId, btn) {
+      const menu = document.getElementById(menuId);
+      if (!menu) return;
+      const chevron = btn.querySelector('.chevron-icon');
+      const isHidden = menu.classList.contains('d-none');
+      
+      if (isHidden) {
+        menu.classList.remove('d-none');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      } else {
+        menu.classList.add('d-none');
+        if (chevron) chevron.style.transform = 'rotate(-90deg)';
+      }
+    };
+
     window.showPage = function (pageName, navEl) {
       activePage = pageName;
       document.querySelectorAll('.nav-item-custom').forEach(n => n.classList.remove('active'));
-      if (navEl) navEl.classList.add('active'); else { const el = document.querySelector(`.nav-item-custom[data-menu="${pageName}"]`); if (el) el.classList.add('active'); }
+      const activeEl = navEl || document.querySelector(`.nav-item-custom[data-menu="${pageName}"]`);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        const parentSub = activeEl.closest('.sidebar-submenu');
+        if (parentSub && parentSub.classList.contains('d-none')) {
+          parentSub.classList.remove('d-none');
+          const pBtn = parentSub.previousElementSibling;
+          if (pBtn && pBtn.querySelector('.chevron-icon')) {
+            pBtn.querySelector('.chevron-icon').style.transform = 'rotate(0deg)';
+          }
+        }
+      }
       document.querySelectorAll('[id^="page"]').forEach(p => p.classList.add('d-none'));
       const target = document.getElementById('page-' + pageName); if (target) target.classList.remove('d-none');
       if (window.innerWidth < 992) toggleSidebar();
@@ -1174,7 +1200,7 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       let pengRows = Object.keys(groupPeng).map(k => `<tr><td class="ps-4 text-muted"><i class="fa-solid fa-minus text-danger me-2"></i> ${k}</td><td class="text-end text-danger">${formatRp(groupPeng[k])}</td></tr>`).join('');
       if (!pengRows) pengRows = `<tr><td colspan="2" class="text-center text-muted fst-italic">Tidak ada pengeluaran</td></tr>`;
 
-      document.getElementById('arusKasContainer').innerHTML = `<div class="card border-0 shadow-sm overflow-hidden mb-4"><div class="card-body p-0"><table class="table mb-0 table-custom"><tr style="background: rgba(32, 201, 151, 0.1);"><th class="fs-6 py-3 px-4 rounded-0 border-0 text-success"><i class="fa-solid fa-wallet me-2"></i> RINCIAN PEMASUKAN</th><th class="text-end border-0"></th></tr>${pemRows}<tr class="bg-light"><td class="fw-bold px-4 py-3">Total Pemasukan Operasional</td><td class="text-end fw-bold text-success fs-5 py-3">${formatRp(totalPem)}</td></tr><tr style="background: rgba(220, 53, 69, 0.1);"><th class="fs-6 py-3 px-4 rounded-0 border-0 text-danger"><i class="fa-solid fa-money-bill-transfer me-2"></i> RINCIAN PENGELUARAN</th><th class="text-end border-0"></th></tr>${pengRows}<tr class="bg-light"><td class="fw-bold px-4 py-3">Total Pengeluaran Operasional</td><td class="text-end fw-bold text-danger fs-5 py-3">${formatRp(totalPeng)}</td></tr><tr style="background: linear-gradient(135deg, rgba(0, 198, 255, 0.1), rgba(0, 114, 255, 0.1));"><th class="fs-4 py-4 px-4 border-0 text-primary">LABA BERSIH (NET PROFIT)</th><th class="text-end fs-3 fw-bold border-0 py-4 px-4 text-primary">${formatRp(labaBersih)}</th></tr></table></div></div>`;
+      document.getElementById('arusKasContainer').innerHTML = `<div class="card glass-card border shadow-sm overflow-hidden mb-4"><div class="card-body p-0"><table class="table mb-0 table-custom"><tr style="background: rgba(16, 185, 129, 0.12);"><th class="fs-6 py-3 px-4 rounded-0 border-0 text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-wallet me-2"></i> RINCIAN PEMASUKAN</th><th class="text-end border-0"></th></tr>${pemRows}<tr style="background: var(--bg-card-subtle);"><td class="fw-bold px-4 py-3" style="color: var(--text-main);">Total Pemasukan Operasional</td><td class="text-end fw-bold text-emerald-600 dark:text-emerald-400 fs-5 py-3">${formatRp(totalPem)}</td></tr><tr style="background: rgba(239, 68, 68, 0.12);"><th class="fs-6 py-3 px-4 rounded-0 border-0 text-rose-600 dark:text-rose-400"><i class="fa-solid fa-money-bill-transfer me-2"></i> RINCIAN PENGELUARAN</th><th class="text-end border-0"></th></tr>${pengRows}<tr style="background: var(--bg-card-subtle);"><td class="fw-bold px-4 py-3" style="color: var(--text-main);">Total Pengeluaran Operasional</td><td class="text-end fw-bold text-rose-600 dark:text-rose-400 fs-5 py-3">${formatRp(totalPeng)}</td></tr><tr style="background: var(--bg-card-subtle); border-top: 2px solid var(--border-color);"><th class="fs-5 py-3 px-4 border-0 text-indigo-600 dark:text-indigo-400">LABA BERSIH (NET PROFIT)</th><th class="text-end fs-4 fw-bold border-0 py-3 px-4 text-indigo-600 dark:text-indigo-400">${formatRp(labaBersih)}</th></tr></table></div></div>`;
     };
 
     // 9. TODO LIST

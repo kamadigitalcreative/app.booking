@@ -41,28 +41,28 @@
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=2.2">
+  <link rel="stylesheet" href="style.css?v=2.3">
 </head>
 
 <body class="min-h-screen font-sans antialiased">
 
   <!-- FULL PAGE LOADER -->
-  <div id="fullPageLoader" class="d-none fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-md flex flex-col justify-center items-center">
-    <div class="spinner-border text-indigo-600 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
-    <h5 class="font-extrabold text-2xl tracking-tight appNameDisplay" style="color: var(--text-main);">Book<span class="text-indigo-600">Hive</span></h5>
-    <p class="mt-2 text-xs font-bold text-indigo-500 uppercase tracking-[0.2em] vendorNameDisplay" id="loaderText">KAMA VISUAL</p>
+  <div id="fullPageLoader" class="d-none fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex flex-col justify-center items-center">
+    <div class="spinner-border text-amber-500 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
+    <h5 class="font-extrabold text-2xl tracking-tight text-white appNameDisplay">Book<span style="color: #ECA935;">Hive</span></h5>
+    <p class="mt-2 text-xs font-bold text-amber-400 uppercase tracking-[0.2em] vendorNameDisplay" id="loaderText">MEMUAT SISTEM & SINKRONISASI DATA</p>
   </div>
 
   <!-- LOGIN & AUTH PAGE -->
   <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-md card glass-card p-8 relative overflow-hidden shadow-xl border">
+    <div class="w-full max-w-md card glass-card p-8 relative overflow-hidden shadow-2xl border">
       <!-- Top Actions: Theme Toggle & Language -->
       <div class="flex justify-between items-center mb-6">
         <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Ubah Mode Tampilan">
           <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
-          <span class="theme-toggle-label text-xs">Mode Terang</span>
+          <span class="theme-toggle-label text-xs">Mode Malam</span>
         </button>
-        <select class="px-3 py-1.5 text-xs font-semibold rounded-xl focus:outline-none">
+        <select class="px-3 py-1.5 text-xs font-semibold rounded-xl focus:outline-none" style="background: var(--bg-card-subtle); color: var(--text-main); border: 1px solid var(--border-color);">
           <option>ID</option>
           <option>EN</option>
         </select>
@@ -83,80 +83,80 @@
           </div>
           <img class="appLogoImage d-none max-h-20 object-contain mx-auto" src="" alt="App Logo">
         </div>
-        <h3 class="text-3xl font-extrabold tracking-tight text-white appNameDisplay" id="authTitle">Book<span class="text-[#ECA935]">Hive</span></h3>
-        <p class="text-xs font-bold text-amber-400/90 uppercase tracking-[0.2em] mt-1.5 vendorNameDisplay" id="authSubtitle">KAMA VISUAL</p>
+        <h3 class="text-3xl font-extrabold tracking-tight appNameDisplay" id="authTitle" style="color: var(--text-main);">Book<span style="color: #ECA935;">Hive</span></h3>
+        <p class="text-xs font-bold uppercase tracking-[0.2em] mt-1.5 vendorNameDisplay" id="authSubtitle" style="color: var(--text-sub);">KAMA VISUAL</p>
       </div>
 
       <!-- LOGIN FORM -->
       <form id="formLogin" onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
         <div>
-          <input type="text" id="username" class="w-full px-4 py-3 bg-slate-800/80 border border-slate-700/80 backdrop-blur-sm rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 focus:bg-slate-800 transition-all font-medium text-sm" required placeholder="Username">
+          <input type="text" id="username" class="auth-input" required placeholder="Username">
         </div>
         <div class="relative">
-          <input type="password" id="password" class="w-full px-4 py-3 bg-slate-800/80 border border-slate-700/80 backdrop-blur-sm rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 focus:bg-slate-800 transition-all font-medium text-sm" required placeholder="Password">
-          <i class="fa-regular fa-eye absolute right-4 top-3.5 text-slate-400 cursor-pointer hover:text-amber-400 transition-colors" onclick="togglePassword('password', this)"></i>
+          <input type="password" id="password" class="auth-input" required placeholder="Password">
+          <i class="fa-regular fa-eye absolute right-4 top-3.5 cursor-pointer transition-colors" style="color: var(--text-sub);" onclick="togglePassword('password', this)"></i>
         </div>
         <div class="flex items-center justify-between text-xs pt-1">
-          <label class="flex items-center gap-2 cursor-pointer font-medium text-slate-300">
-            <input class="w-4 h-4 rounded border-slate-700 text-amber-500 focus:ring-amber-400 bg-slate-800" type="checkbox" id="rememberMe" checked>
+          <label class="flex items-center gap-2 cursor-pointer font-medium" style="color: var(--text-body);">
+            <input class="w-4 h-4 rounded text-amber-500 focus:ring-amber-400" type="checkbox" id="rememberMe" checked>
             <span>Ingat Saya</span>
           </label>
-          <a href="javascript:void(0)" class="font-semibold text-amber-400 hover:text-amber-300 transition-colors" onclick="showAuthForm('forgot')">Lupa Password?</a>
+          <a href="javascript:void(0)" class="font-bold text-amber-500 hover:text-amber-600 transition-colors" onclick="showAuthForm('forgot')">Lupa Password?</a>
         </div>
         <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-slate-950 font-extrabold text-sm rounded-xl shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all">
           Masuk <i class="fa-solid fa-right-to-bracket ml-1.5"></i>
         </button>
-        <div class="text-center pt-3 text-xs text-slate-400">
+        <div class="text-center pt-3 text-xs" style="color: var(--text-sub);">
           <span>Belum punya akun?</span>
-          <a href="javascript:void(0)" class="font-bold text-amber-400 hover:text-amber-300 ml-1 transition-colors" onclick="showAuthForm('register')">Daftar disini</a>
+          <a href="javascript:void(0)" class="font-bold text-amber-500 hover:text-amber-600 ml-1 transition-colors" onclick="showAuthForm('register')">Daftar disini</a>
         </div>
       </form>
 
       <!-- REGISTER FORM -->
       <form id="formRegister" class="d-none space-y-4" onsubmit="event.preventDefault(); handleRegister();">
         <div>
-          <input type="text" id="regFullName" class="w-full px-4 py-3 bg-slate-800/80 border border-slate-700/80 backdrop-blur-sm rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 focus:bg-slate-800 transition-all font-medium text-sm" required placeholder="Nama Lengkap / Studio">
+          <input type="text" id="regFullName" class="auth-input" required placeholder="Nama Lengkap / Studio">
         </div>
         <div>
-          <input type="email" id="regEmail" class="w-full px-4 py-3 bg-slate-800/80 border border-slate-700/80 backdrop-blur-sm rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 focus:bg-slate-800 transition-all font-medium text-sm" required placeholder="Alamat Email">
+          <input type="email" id="regEmail" class="auth-input" required placeholder="Alamat Email">
         </div>
         <div>
-          <input type="text" id="regPhone" class="w-full px-4 py-3 bg-slate-800/80 border border-slate-700/80 backdrop-blur-sm rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 focus:bg-slate-800 transition-all font-medium text-sm" required placeholder="Nomor Handphone (WA)">
+          <input type="text" id="regPhone" class="auth-input" required placeholder="Nomor Handphone (WA)">
         </div>
         <div>
-          <select id="regPackage" class="w-full px-4 py-3 bg-slate-800/80 border border-slate-700/80 backdrop-blur-sm rounded-xl text-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 focus:bg-slate-800 transition-all font-medium text-sm" required>
-            <option value="" disabled selected class="bg-slate-900 text-slate-400">Pilih Role Pengguna</option>
-            <option value="Admin" class="bg-slate-900 text-white">Owner / Admin</option>
-            <option value="Fotografer" class="bg-slate-900 text-white">Fotografer / Talent</option>
-            <option value="MUA" class="bg-slate-900 text-white">MUA / Makeup Artist</option>
+          <select id="regPackage" class="auth-input" required>
+            <option value="" disabled selected>Pilih Role Pengguna</option>
+            <option value="Admin">Owner / Admin</option>
+            <option value="Fotografer">Fotografer / Talent</option>
+            <option value="MUA">MUA / Makeup Artist</option>
           </select>
         </div>
         <div>
-          <input type="text" id="regUsername" class="w-full px-4 py-3 bg-slate-800/80 border border-slate-700/80 backdrop-blur-sm rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 focus:bg-slate-800 transition-all font-medium text-sm" required placeholder="Username">
+          <input type="text" id="regUsername" class="auth-input" required placeholder="Username">
         </div>
         <div class="relative">
-          <input type="password" id="regPassword" class="w-full px-4 py-3 bg-slate-800/80 border border-slate-700/80 backdrop-blur-sm rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 focus:bg-slate-800 transition-all font-medium text-sm" required placeholder="Password">
-          <i class="fa-regular fa-eye absolute right-4 top-3.5 text-slate-400 cursor-pointer hover:text-amber-400 transition-colors" onclick="togglePassword('regPassword', this)"></i>
+          <input type="password" id="regPassword" class="auth-input" required placeholder="Password">
+          <i class="fa-regular fa-eye absolute right-4 top-3.5 cursor-pointer transition-colors" style="color: var(--text-sub);" onclick="togglePassword('regPassword', this)"></i>
         </div>
         <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-slate-950 font-extrabold text-sm rounded-xl shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all">
           Daftar Sekarang
         </button>
-        <div class="text-center pt-3 text-xs text-slate-400">
+        <div class="text-center pt-3 text-xs" style="color: var(--text-sub);">
           <span>Sudah punya akun?</span>
-          <a href="javascript:void(0)" class="font-bold text-amber-400 hover:text-amber-300 ml-1 transition-colors" onclick="showAuthForm('login')">Sign In</a>
+          <a href="javascript:void(0)" class="font-bold text-amber-500 hover:text-amber-600 ml-1 transition-colors" onclick="showAuthForm('login')">Sign In</a>
         </div>
       </form>
 
       <!-- FORGOT PASSWORD FORM -->
       <form id="formForgot" class="d-none space-y-4" onsubmit="event.preventDefault(); handleForgotPassword();">
         <div>
-          <input type="email" id="forgotEmail" class="w-full px-4 py-3 bg-slate-800/80 border border-slate-700/80 backdrop-blur-sm rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 focus:bg-slate-800 transition-all font-medium text-sm" required placeholder="Masukkan Alamat Email">
+          <input type="email" id="forgotEmail" class="auth-input" required placeholder="Masukkan Alamat Email">
         </div>
         <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-slate-950 font-extrabold text-sm rounded-xl shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all">
           Reset Password
         </button>
         <div class="text-center pt-3 text-xs">
-          <a href="javascript:void(0)" class="font-bold text-amber-400 hover:text-amber-300 transition-colors inline-flex items-center gap-1.5" onclick="showAuthForm('login')">
+          <a href="javascript:void(0)" class="font-bold text-amber-500 hover:text-amber-600 transition-colors inline-flex items-center gap-1.5" onclick="showAuthForm('login')">
             <i class="fa-solid fa-arrow-left"></i> Kembali ke Login
           </a>
         </div>
@@ -235,8 +235,8 @@
   <!-- MAIN APP WRAPPER -->
   <div id="mainApp" class="app-container d-none">
     <!-- SIDEBAR -->
-    <aside class="sidebar p-6 flex flex-col">
-      <div class="flex items-center gap-3 mb-8">
+    <aside class="sidebar p-3.5 flex flex-col">
+      <div class="flex items-center gap-3 mb-6 px-1.5">
         <div class="appLogoContainer flex items-center justify-center">
           <div class="brand-logo flex items-center justify-center appLogoText">
             <svg viewBox="0 0 100 100" class="w-10 h-10 rounded-xl shadow-md shadow-amber-500/10" xmlns="http://www.w3.org/2000/svg">
@@ -257,86 +257,116 @@
         </div>
       </div>
 
-      <nav class="flex-1 space-y-4 overflow-y-auto pr-1" id="sidebarMenu">
+      <nav class="flex-1 space-y-3 overflow-y-auto pr-1" id="sidebarMenu">
         
         <!-- KATEGORI 1: OVERVIEW & RINGKASAN -->
-        <div class="space-y-1">
-          <div class="sidebar-section-title">
-            <i class="fa-solid fa-gauge-high"></i> Overview & Ringkasan
+        <div class="sidebar-group">
+          <button type="button" class="sidebar-section-btn" onclick="toggleSidebarMenu('menu-overview', this)">
+            <span class="flex items-center gap-2 truncate">
+              <i class="fa-solid fa-gauge-high text-indigo-500 text-xs"></i>
+              <span class="sidebar-section-text">OVERVIEW & RINGKASAN</span>
+            </span>
+            <i class="fa-solid fa-chevron-down chevron-icon"></i>
+          </button>
+          <div id="menu-overview" class="sidebar-submenu space-y-1 mt-1">
+            <a href="#" class="nav-item-custom active" data-menu="dashboard" onclick="showPage('dashboard', this)">
+              <i class="fa-solid fa-chart-pie text-indigo-500"></i> <span>Dashboard Utama</span>
+            </a>
+            <a href="#" class="nav-item-custom" data-menu="kalender" onclick="showPage('kalender', this)">
+              <i class="fa-regular fa-calendar-days text-sky-500"></i> <span>Kalender Photoshoot</span>
+            </a>
           </div>
-          <a href="#" class="nav-item-custom active" data-menu="dashboard" onclick="showPage('dashboard', this)">
-            <i class="fa-solid fa-chart-pie"></i> <span>Dashboard Utama</span>
-          </a>
-          <a href="#" class="nav-item-custom" data-menu="kalender" onclick="showPage('kalender', this)">
-            <i class="fa-regular fa-calendar-days"></i> <span>Kalender Photoshoot</span>
-          </a>
         </div>
 
-        <!-- KATEGORI 2: CLIENT & BOOKING OTOMATIS -->
-        <div class="space-y-1">
-          <div class="sidebar-section-title">
-            <i class="fa-solid fa-address-book"></i> Client & Booking
+        <!-- KATEGORI 2: CLIENT & BOOKING -->
+        <div class="sidebar-group">
+          <button type="button" class="sidebar-section-btn" onclick="toggleSidebarMenu('menu-client', this)">
+            <span class="flex items-center gap-2 truncate">
+              <i class="fa-solid fa-address-book text-cyan-500 text-xs"></i>
+              <span class="sidebar-section-text">CLIENT & BOOKING</span>
+            </span>
+            <i class="fa-solid fa-chevron-down chevron-icon"></i>
+          </button>
+          <div id="menu-client" class="sidebar-submenu space-y-1 mt-1">
+            <a href="#" class="nav-item-custom" data-menu="client" onclick="showPage('client', this)">
+              <i class="fa-solid fa-users-viewfinder text-cyan-500"></i> <span>Database Client (CRM)</span>
+            </a>
+            <a href="#" class="nav-item-custom" data-menu="pemasukan" onclick="showPage('pemasukan', this)">
+              <i class="fa-solid fa-file-invoice-dollar text-emerald-500"></i> <span>Order & Pemasukan</span>
+            </a>
+            <a href="#" class="nav-item-custom" data-menu="booking-link" onclick="showPage('booking-link', this)">
+              <i class="fa-solid fa-link text-violet-500"></i> <span>Booking Online & Link</span>
+            </a>
           </div>
-          <a href="#" class="nav-item-custom" data-menu="client" onclick="showPage('client', this)">
-            <i class="fa-solid fa-users-viewfinder"></i> <span>Database Client (CRM)</span>
-          </a>
-          <a href="#" class="nav-item-custom" data-menu="pemasukan" onclick="showPage('pemasukan', this)">
-            <i class="fa-solid fa-file-invoice-dollar"></i> <span>Order & Pemasukan</span>
-          </a>
-          <a href="#" class="nav-item-custom" data-menu="booking-link" onclick="showPage('booking-link', this)">
-            <i class="fa-solid fa-link"></i> <span>Booking Online & Link</span>
-          </a>
         </div>
 
-        <!-- KATEGORI 3: TIM & TALENT HUB -->
-        <div class="space-y-1">
-          <div class="sidebar-section-title">
-            <i class="fa-solid fa-user-gear"></i> Tim & Jadwal Talent
+        <!-- KATEGORI 3: TIM & JADWAL TALENT -->
+        <div class="sidebar-group">
+          <button type="button" class="sidebar-section-btn" onclick="toggleSidebarMenu('menu-tim', this)">
+            <span class="flex items-center gap-2 truncate">
+              <i class="fa-solid fa-user-gear text-amber-500 text-xs"></i>
+              <span class="sidebar-section-text">TIM & JADWAL TALENT</span>
+            </span>
+            <i class="fa-solid fa-chevron-down chevron-icon"></i>
+          </button>
+          <div id="menu-tim" class="sidebar-submenu space-y-1 mt-1">
+            <a href="#" class="nav-item-custom" data-menu="tim-schedule" onclick="showPage('tim-schedule', this)">
+              <i class="fa-solid fa-user-astronaut text-amber-500"></i> <span>Tim & Talent Hub</span>
+            </a>
+            <a href="#" class="nav-item-custom" data-menu="unavailability" onclick="showPage('unavailability', this)">
+              <i class="fa-solid fa-calendar-minus text-rose-500"></i> <span>Slot Libur / Block Day</span>
+            </a>
           </div>
-          <a href="#" class="nav-item-custom" data-menu="tim-schedule" onclick="showPage('tim-schedule', this)">
-            <i class="fa-solid fa-user-astronaut"></i> <span>Tim & Talent Hub</span>
-          </a>
-          <a href="#" class="nav-item-custom" data-menu="unavailability" onclick="showPage('unavailability', this)">
-            <i class="fa-solid fa-calendar-minus"></i> <span>Slot Libur / Block Day</span>
-          </a>
         </div>
 
         <!-- KATEGORI 4: KEUANGAN & KATALOG -->
-        <div class="space-y-1">
-          <div class="sidebar-section-title">
-            <i class="fa-solid fa-vault"></i> Keuangan & Produk
+        <div class="sidebar-group">
+          <button type="button" class="sidebar-section-btn" onclick="toggleSidebarMenu('menu-keuangan', this)">
+            <span class="flex items-center gap-2 truncate">
+              <i class="fa-solid fa-vault text-emerald-500 text-xs"></i>
+              <span class="sidebar-section-text">KEUANGAN & KATALOG</span>
+            </span>
+            <i class="fa-solid fa-chevron-down chevron-icon"></i>
+          </button>
+          <div id="menu-keuangan" class="sidebar-submenu space-y-1 mt-1">
+            <a href="#" class="nav-item-custom" data-menu="produk" onclick="showPage('produk', this)">
+              <i class="fa-solid fa-box-open text-yellow-500"></i> <span>Katalog Produk & Jasa</span>
+            </a>
+            <a href="#" class="nav-item-custom" data-menu="pengeluaran" onclick="showPage('pengeluaran', this)">
+              <i class="fa-solid fa-arrow-right-from-bracket text-rose-500"></i> <span>Pengeluaran & Fee Tim</span>
+            </a>
+            <a href="#" class="nav-item-custom" data-menu="aruskas" onclick="showPage('aruskas', this)">
+              <i class="fa-solid fa-money-bill-trend-up text-teal-500"></i> <span>Arus Kas (Cash Flow)</span>
+            </a>
           </div>
-          <a href="#" class="nav-item-custom" data-menu="produk" onclick="showPage('produk', this)">
-            <i class="fa-solid fa-box-open"></i> <span>Katalog Produk & Jasa</span>
-          </a>
-          <a href="#" class="nav-item-custom" data-menu="pengeluaran" onclick="showPage('pengeluaran', this)">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Pengeluaran & Fee Tim</span>
-          </a>
-          <a href="#" class="nav-item-custom" data-menu="aruskas" onclick="showPage('aruskas', this)">
-            <i class="fa-solid fa-money-bill-trend-up"></i> <span>Arus Kas (Cash Flow)</span>
-          </a>
         </div>
 
-        <!-- KATEGORI 5: WORKFLOW & SISTEM -->
-        <div class="space-y-1">
-          <div class="sidebar-section-title">
-            <i class="fa-solid fa-sliders"></i> Internal & Sistem
+        <!-- KATEGORI 5: INTERNAL & SISTEM -->
+        <div class="sidebar-group">
+          <button type="button" class="sidebar-section-btn" onclick="toggleSidebarMenu('menu-internal', this)">
+            <span class="flex items-center gap-2 truncate">
+              <i class="fa-solid fa-sliders text-purple-500 text-xs"></i>
+              <span class="sidebar-section-text">INTERNAL & SISTEM</span>
+            </span>
+            <i class="fa-solid fa-chevron-down chevron-icon"></i>
+          </button>
+          <div id="menu-internal" class="sidebar-submenu space-y-1 mt-1">
+            <a href="#" class="nav-item-custom" data-menu="todo" onclick="showPage('todo', this)">
+              <i class="fa-solid fa-list-check text-orange-500"></i> <span>To-do & Target Alat</span>
+            </a>
+            <a href="#" class="nav-item-custom" data-menu="pengaturan" onclick="showPage('pengaturan', this)">
+              <i class="fa-solid fa-gear text-slate-400"></i> <span>Pengaturan Sistem</span>
+            </a>
           </div>
-          <a href="#" class="nav-item-custom" data-menu="todo" onclick="showPage('todo', this)">
-            <i class="fa-solid fa-list-check"></i> <span>To-do & Target Alat</span>
-          </a>
-          <a href="#" class="nav-item-custom" data-menu="pengaturan" onclick="showPage('pengaturan', this)">
-            <i class="fa-solid fa-gear"></i> <span>Pengaturan Sistem</span>
-          </a>
         </div>
 
       </nav>
 
       <!-- User Profile Box -->
-      <div class="mt-auto pt-4">
-        <div class="p-3.5 rounded-2xl card glass-card border flex flex-col gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-extrabold text-sm shadow-sm">
+      <div class="mt-auto pt-3">
+        <div class="p-3 rounded-2xl card glass-card border flex flex-col gap-2.5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-extrabold text-xs shadow-sm">
               <i class="fa-solid fa-user"></i>
             </div>
             <div class="overflow-hidden leading-tight">
@@ -346,7 +376,7 @@
           </div>
           <button type="button" class="w-full py-2 px-3 theme-toggle-btn flex items-center justify-center gap-2" onclick="toggleTheme()" title="Ubah Mode Tampilan">
             <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
-            <span class="theme-toggle-label text-xs">Mode Terang</span>
+            <span class="theme-toggle-label text-xs">Mode Malam</span>
           </button>
           <button class="w-full py-2 px-3 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500 hover:text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5" onclick="logout()">
             <i class="fa-solid fa-power-off"></i> Logout
