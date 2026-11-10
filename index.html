@@ -43,21 +43,25 @@
   <link rel="stylesheet" href="style.css?v=2.1">
 </head>
 
-<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen text-slate-100 font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
+<body class="min-h-screen font-sans antialiased">
 
   <!-- FULL PAGE LOADER -->
-  <div id="fullPageLoader" class="d-none fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex flex-col justify-center items-center">
-    <div class="spinner-border text-amber-500 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
-    <h5 class="font-extrabold text-2xl text-white tracking-tight appNameDisplay">Book<span class="text-[#ECA935]">Hive</span></h5>
-    <p class="mt-2 text-xs font-bold text-amber-400/90 uppercase tracking-[0.2em] vendorNameDisplay" id="loaderText">KAMA VISUAL</p>
+  <div id="fullPageLoader" class="d-none fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-md flex flex-col justify-center items-center">
+    <div class="spinner-border text-indigo-600 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
+    <h5 class="font-extrabold text-2xl tracking-tight appNameDisplay" style="color: var(--text-main);">Book<span class="text-indigo-600">Hive</span></h5>
+    <p class="mt-2 text-xs font-bold text-indigo-500 uppercase tracking-[0.2em] vendorNameDisplay" id="loaderText">KAMA VISUAL</p>
   </div>
 
   <!-- LOGIN & AUTH PAGE -->
   <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-slate-900/85 backdrop-blur-xl border border-amber-500/30 shadow-2xl shadow-amber-500/10 rounded-3xl p-8 relative overflow-hidden text-white">
-      <!-- Top Right Language Dropdown -->
-      <div class="flex justify-end mb-4">
-        <select class="bg-slate-800/80 border border-slate-700 text-slate-300 text-xs font-semibold rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-400 backdrop-blur-sm">
+    <div class="w-full max-w-md card glass-card p-8 relative overflow-hidden shadow-xl border">
+      <!-- Top Actions: Theme Toggle & Language -->
+      <div class="flex justify-between items-center mb-6">
+        <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Ubah Mode Tampilan">
+          <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
+          <span class="theme-toggle-label text-xs">Mode Terang</span>
+        </button>
+        <select class="px-3 py-1.5 text-xs font-semibold rounded-xl focus:outline-none">
           <option>ID</option>
           <option>EN</option>
         </select>
@@ -329,17 +333,21 @@
 
       <!-- User Profile Box -->
       <div class="mt-auto pt-4">
-        <div class="p-3.5 rounded-2xl bg-slate-800/90 backdrop-blur-sm border border-amber-500/30 flex flex-col gap-3">
+        <div class="p-3.5 rounded-2xl card glass-card border flex flex-col gap-3">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-extrabold text-sm shadow-md">
+            <div class="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-extrabold text-sm shadow-sm">
               <i class="fa-solid fa-user"></i>
             </div>
             <div class="overflow-hidden leading-tight">
-              <div class="font-extrabold text-white text-xs truncate" id="displayUser">User</div>
-              <div class="text-[11px] font-bold text-amber-400 truncate" id="displayRole">Role</div>
+              <div class="font-bold text-xs truncate" style="color: var(--text-main);" id="displayUser">User</div>
+              <div class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 truncate" id="displayRole">Role</div>
             </div>
           </div>
-          <button class="w-full py-2 px-3 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-600 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5" onclick="logout()">
+          <button type="button" class="w-full py-2 px-3 theme-toggle-btn flex items-center justify-center gap-2" onclick="toggleTheme()" title="Ubah Mode Tampilan">
+            <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
+            <span class="theme-toggle-label text-xs">Mode Terang</span>
+          </button>
+          <button class="w-full py-2 px-3 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500 hover:text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5" onclick="logout()">
             <i class="fa-solid fa-power-off"></i> Logout
           </button>
         </div>
@@ -352,11 +360,11 @@
     <!-- MAIN CONTENT -->
     <main class="main-content">
       <!-- MOBILE MENU TOGGLE BUTTON (MOBILE ONLY) -->
-      <div class="flex lg:hidden justify-between items-center mb-4 bg-slate-900/80 backdrop-blur-xl border border-amber-500/20 p-3.5 rounded-2xl shadow-xl">
+      <div class="flex lg:hidden justify-between items-center mb-4 glass-card p-3 rounded-2xl shadow-sm border">
         <div class="flex items-center gap-2.5">
           <div class="appLogoContainer flex items-center justify-center">
             <div class="brand-logo flex items-center justify-center appLogoText">
-              <svg viewBox="0 0 100 100" class="w-8 h-8 rounded-lg shadow-sm shadow-amber-500/20" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 100 100" class="w-8 h-8 rounded-lg shadow-sm" xmlns="http://www.w3.org/2000/svg">
                 <rect width="100" height="100" rx="22" fill="#ECA935"/>
                 <path d="M 19.5 24 C 19.5 18.5 24 14 29.5 14 H 57 C 71 14 80 21 80 32.5 C 80 41 74 47.5 64 50.5 C 76 53.5 83 61.5 83 74.5 C 83 87 72.5 96 57 96 H 29.5 C 24 96 19.5 91.5 19.5 86 Z" fill="#FFFFFF"/>
                 <rect x="26" y="30" width="39" height="44" rx="10" fill="#ECA935"/>
@@ -369,42 +377,53 @@
             <img class="appLogoImage d-none max-h-8 object-contain" src="" alt="App Logo">
           </div>
           <div>
-            <h6 class="font-extrabold text-white text-sm leading-tight appNameDisplay">Book<span class="text-[#ECA935]">Hive</span></h6>
-            <small class="text-[10px] font-bold text-amber-400/90 tracking-wider uppercase vendorNameDisplay">KAMA VISUAL</small>
+            <h6 class="font-extrabold text-sm leading-tight appNameDisplay" style="color: var(--text-main);">Book<span class="text-indigo-600">Hive</span></h6>
+            <small class="text-[10px] font-bold text-slate-500 tracking-wider uppercase vendorNameDisplay">KAMA VISUAL</small>
           </div>
         </div>
-        <button class="p-2 bg-slate-800 border border-slate-700 rounded-xl text-amber-400 hover:bg-slate-700 transition-all" onclick="toggleSidebar()">
-          <i class="fa-solid fa-bars text-lg"></i>
-        </button>
+        <div class="flex items-center gap-2">
+          <button class="p-2 theme-toggle-btn rounded-xl" onclick="toggleTheme()" title="Ubah Mode Tampilan">
+            <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
+          </button>
+          <button class="p-2 theme-toggle-btn rounded-xl" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars text-base"></i>
+          </button>
+        </div>
       </div>
 
       <!-- PAGE: DASHBOARD -->
       <div id="page-dashboard" class="space-y-6">
-        <div class="flex flex-wrap justify-between items-center gap-4 glass-card p-6 rounded-3xl shadow-xl">
+        <div class="flex flex-wrap justify-between items-center gap-4 glass-card p-6 rounded-3xl shadow-sm border">
           <div>
-            <h3 class="text-2xl font-extrabold text-white tracking-tight">Dashboard Laporan Usaha</h3>
-            <p class="text-xs font-medium text-slate-300 mt-1">Ringkasan performa usaha & jadwal kerja studio</p>
+            <h3 class="text-2xl font-extrabold tracking-tight" style="color: var(--text-main);">Dashboard Laporan Usaha</h3>
+            <p class="text-xs font-medium text-slate-500 mt-1">Ringkasan performa usaha & jadwal kerja studio</p>
           </div>
-          <div class="flex items-center gap-2 bg-slate-800/90 border border-amber-500/30 rounded-2xl px-4 py-2 backdrop-blur-sm">
-            <select class="bg-transparent font-extrabold text-amber-400 text-xs focus:outline-none cursor-pointer" id="dashTahun" onchange="renderDashboard()">
-              <option value="2026" selected>Tahun: 2026</option>
-            </select>
-            <span class="text-slate-500">|</span>
-            <select class="bg-transparent font-extrabold text-amber-400 text-xs focus:outline-none cursor-pointer" id="dashBulan" onchange="renderDashboard()">
-              <option value="all">Semua Bulan</option>
-              <option value="01">Jan</option>
-              <option value="02">Feb</option>
-              <option value="03">Mar</option>
-              <option value="04">Apr</option>
-              <option value="05">Mei</option>
-              <option value="06">Jun</option>
-              <option value="07">Jul</option>
-              <option value="08">Ags</option>
-              <option value="09">Sep</option>
-              <option value="10">Okt</option>
-              <option value="11">Nov</option>
-              <option value="12">Des</option>
-            </select>
+          <div class="flex items-center gap-3">
+            <button type="button" class="theme-toggle-btn hidden md:inline-flex" onclick="toggleTheme()" title="Ubah Mode Tampilan">
+              <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
+              <span class="theme-toggle-label text-xs">Mode Terang</span>
+            </button>
+            <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2">
+              <select class="bg-transparent font-extrabold text-xs focus:outline-none cursor-pointer text-indigo-600 dark:text-indigo-400" id="dashTahun" onchange="renderDashboard()">
+                <option value="2026" selected>Tahun: 2026</option>
+              </select>
+              <span class="text-slate-400">|</span>
+              <select class="bg-transparent font-extrabold text-xs focus:outline-none cursor-pointer text-indigo-600 dark:text-indigo-400" id="dashBulan" onchange="renderDashboard()">
+                <option value="all">Semua Bulan</option>
+                <option value="01">Jan</option>
+                <option value="02">Feb</option>
+                <option value="03">Mar</option>
+                <option value="04">Apr</option>
+                <option value="05">Mei</option>
+                <option value="06">Jun</option>
+                <option value="07">Jul</option>
+                <option value="08">Ags</option>
+                <option value="09">Sep</option>
+                <option value="10">Okt</option>
+                <option value="11">Nov</option>
+                <option value="12">Des</option>
+              </select>
+            </div>
           </div>
         </div>
 

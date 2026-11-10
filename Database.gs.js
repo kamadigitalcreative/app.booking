@@ -52,6 +52,7 @@ function setupDatabase() {
   checkAndAddHeaders('Pemasukan', ['id', 'id_trx', 'tanggal', 'client', 'phone', 'team', 'layanan', 'jumlah', 'harga', 'diskon', 'dp', 'transport', 'total', 'is_lunas', 'catatan', 'alamat', 'link_maps', 'id_usaha', 'created_at']);
   checkAndAddHeaders('Pengeluaran', ['id', 'tanggal', 'detail', 'kategori', 'nominal', 'catatan', 'status_bayar', 'id_usaha', 'created_at']);
   checkAndAddHeaders('Todo', ['id', 'task', 'kategori', 'prioritas', 'duedate', 'status', 'harga', 'id_usaha', 'created_at']);
+  checkAndAddHeaders('Team_Unavailability', ['id', 'user_id', 'nama_team', 'tanggal', 'jam_mulai', 'jam_selesai', 'alasan', 'id_usaha', 'created_at']);
 
   let sheetPengaturan = ss.getSheetByName('Pengaturan');
   if (!sheetPengaturan) {
@@ -83,9 +84,9 @@ function getAllData() {
   const ss = getDb();
   if (!ss) return { success: false, message: 'Gagal terhubung ke Database Google Sheets.' };
 
-  const resultData = { produk: [], pemasukan: [], pengeluaran: [], todo: [], users: [], pengaturan: [] };
+  const resultData = { produk: [], pemasukan: [], pengeluaran: [], todo: [], users: [], pengaturan: [], team_unavailability: [] };
   const sheets = ss.getSheets();
-  const keyMap = { 'Produk': 'produk', 'Pemasukan': 'pemasukan', 'Pengeluaran': 'pengeluaran', 'Todo': 'todo', 'Users': 'users', 'Pengaturan': 'pengaturan' };
+  const keyMap = { 'Produk': 'produk', 'Pemasukan': 'pemasukan', 'Pengeluaran': 'pengeluaran', 'Todo': 'todo', 'Users': 'users', 'Pengaturan': 'pengaturan', 'Team_Unavailability': 'team_unavailability' };
 
   // OPTIMASI SUPER CEPAT: getValues() 10x lebih cepat dari getDisplayValues()
   const scriptTZ = Session.getScriptTimeZone();

@@ -1,5 +1,44 @@
+// ==========================================
+// 0. THEME ENGINE (LIGHT & DARK MODE)
+// ==========================================
+window.initTheme = function() {
+  const saved = localStorage.getItem('bookhive_theme') || 'light';
+  window.applyTheme(saved);
+};
+
+window.toggleTheme = function() {
+  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const nextTheme = current === 'dark' ? 'light' : 'dark';
+  window.applyTheme(nextTheme);
+};
+
+window.applyTheme = function(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('bookhive_theme', theme);
+
+  document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
+    if (theme === 'dark') {
+      icon.className = 'fa-solid fa-sun text-amber-400 theme-toggle-icon';
+    } else {
+      icon.className = 'fa-solid fa-moon text-indigo-600 theme-toggle-icon';
+    }
+  });
+
+  document.querySelectorAll('.theme-toggle-label').forEach(el => {
+    el.innerText = theme === 'dark' ? 'Mode Malam' : 'Mode Terang';
+  });
+
+  if (dashChart) {
+    const isDark = theme === 'dark';
+    if (dashChart.options && dashChart.options.plugins && dashChart.options.plugins.legend && dashChart.options.plugins.legend.labels) {
+      dashChart.options.plugins.legend.labels.color = isDark ? '#F8FAFC' : '#1E293B';
+      dashChart.update();
+    }
+  }
+};
+
 // 1. STATE
-    var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentInvoiceTrx = null;
+var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentInvoiceTrx = null;
     var dbProduk = [], dbPemasukan = [], dbPengeluaran = [], dbTodo = [], dbUsers = [], dbPengaturan = [], dbTeamUnavailability = [];
 
     // 2. GAS BRIDGE (DECOUPLED API)
@@ -528,23 +567,185 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       });
 
       let tbodyHtml = ''; let countSales = 0;
-      dbProduk.forEach(p => { let stat = salesByProd[p.nama]; if (stat && stat.qty > 0) { countSales++; tbodyHtml += `<tr class="border-b border-slate-700/50"><td class="text-slate-200 font-medium">${p.nama}</td><td class="text-center text-amber-400 font-bold">${stat.qty}</td><td class="text-end text-emerald-400 font-extrabold">${formatRp(stat.nominal)}</td></tr>`; } });
-      if (countSales === 0) tbodyHtml = '<tr><td colspan="3" class="text-center text-slate-300 font-semibold small py-4 bg-transparent">Belum ada paket yang terjual pada periode ini.</td></tr>';
+      dbProduk.forEach(p => { 
+        let stat = salesByProd[p.nama]; 
+        if (stat && stat.qty > 0) { 
+          countSales++; 
+          tbodyHtml += `<tr class="border-b" style="border-color: var(--table-td-border);">
+            <td class="font-medium" style="color: var(--text-main);">${p.nama}</td>
+            <td class="text-center font-bold text-amber-500">${stat.qty}</td>
+            <td class="text-end font-extrabold text-emerald-600 dark:text-emerald-400">${formatRp(stat.nominal)}</td>
+          </tr>`; 
+        } 
+      });
+      if (countSales === 0) tbodyHtml = '<tr><td colspan="3" class="text-center text-muted font-medium small py-4 bg-transparent">Belum ada paket yang terjual pada periode ini.</td></tr>';
 
       const sortedTeam = Object.keys(teamStats).sort((a, b) => teamStats[b].count - teamStats[a].count);
       let teamHtml = '';
       if (sortedTeam.length === 0) teamHtml = '<div class="text-center text-muted small py-4 w-100">Belum ada data team yang bekerja.</div>';
       else {
-        teamHtml = '<div class="row g-3">'; const colors = ['#0072ff', '#00c6ff', '#20c997', '#f6d365', '#ff6b6b', '#6f42c1', '#fd79a8', '#e84393'];
+        teamHtml = '<div class="row g-3">'; const colors = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#3b82f6'];
         sortedTeam.forEach((name, index) => {
           const count = teamStats[name].count; const eligible = teamStats[name].eligibleCount; const percent = maxTeamJobs > 0 ? (count / maxTeamJobs) * 100 : 0; const bonus = calcTeamBonus(teamStats[name], setBonus); const color = colors[index % colors.length];
-          teamHtml += `<div class="col-md-6 col-lg-4 col-xl-3"><div class="p-3 border-0 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: rgba(30,41,59,0.85); backdrop-filter: blur(12px); border: 1px solid rgba(245,158,11,0.25); color: #ffffff; position: relative; overflow: hidden; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'"><div style="position: absolute; left:0; top:0; bottom:0; width: 5px; background: ${color};"></div><div class="ms-2"><div class="d-flex justify-content-between align-items-start mb-2"><div class="fw-bold text-white text-truncate pe-2 fs-6" title="${name}"><i class="fa-solid fa-circle-user me-2" style="color: ${color};"></i>${name}</div><div class="badge rounded-pill shadow-sm" style="background: ${color}; color:#fff;">${count} Job</div></div><div class="progress mt-3 shadow-none" style="height: 6px; background-color: rgba(255,255,255,0.1);"><div class="progress-bar rounded-pill" style="width: ${percent}%; background: ${color};"></div></div><div class="small text-slate-300 mt-2" style="font-size: 10px;">${eligible} Job Paket (Fee ≤ ${formatRp(bMaxFee)})</div></div><div class="mt-3 ms-2 pt-3 d-flex justify-content-between align-items-center" style="border-top: 1px solid rgba(255,255,255,0.1);"><span class="small text-slate-300 fw-medium"><i class="fa-solid fa-gift text-warning me-1"></i> Bonus</span><span class="fw-extrabold text-emerald-400 small bg-emerald-500/20 border border-emerald-500/30 px-2 py-1 rounded">${formatRp(bonus)}</span></div><button class="btn btn-sm btn-outline-warning text-amber-400 border-amber-400/40 w-100 mt-3 fw-bold shadow-sm" style="font-size:11px; border-radius: 8px;" onclick="showDetailTeam('${name}')"><i class="fa-solid fa-list me-1"></i> Rincian Kinerja</button></div></div>`;
+          teamHtml += `<div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="card glass-card p-3.5 border shadow-sm h-100 d-flex flex-column justify-content-between position-relative overflow-hidden" style="border-left: 4px solid ${color} !important;">
+              <div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="fw-bold text-truncate pe-2 fs-6" style="color: var(--text-main);" title="${name}">
+                    <i class="fa-solid fa-circle-user me-1.5" style="color: ${color};"></i>${name}
+                  </div>
+                  <span class="badge rounded-pill font-bold" style="background: ${color}20; color: ${color}; border: 1px solid ${color}40;">${count} Job</span>
+                </div>
+                <div class="progress mt-2.5 shadow-none" style="height: 5px; background-color: var(--border-color);">
+                  <div class="progress-bar rounded-pill" style="width: ${percent}%; background: ${color};"></div>
+                </div>
+                <div class="small text-muted mt-2" style="font-size: 11px;">${eligible} Job Paket (Fee ≤ ${formatRp(bMaxFee)})</div>
+              </div>
+              <div class="mt-3 pt-2.5 d-flex justify-content-between align-items-center border-top" style="border-color: var(--border-color) !important;">
+                <span class="small text-muted fw-semibold"><i class="fa-solid fa-gift text-amber-500 me-1"></i> Bonus</span>
+                <span class="fw-extrabold text-emerald-600 dark:text-emerald-400 small px-2 py-0.5 rounded" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);">${formatRp(bonus)}</span>
+              </div>
+              <button class="btn btn-sm w-100 mt-2.5 fw-bold shadow-none" style="font-size: 11px; border-radius: 8px; background: var(--bg-card-subtle); color: var(--text-main); border: 1px solid var(--border-color);" onclick="showDetailTeam('${name}')">
+                <i class="fa-solid fa-list me-1 text-muted"></i> Rincian Kinerja
+              </button>
+            </div>
+          </div>`;
         }); teamHtml += '</div>';
       }
 
-      container.innerHTML = `<div class="row g-2 mb-4"><div class="col-md-2 col-6"><div class="card glass-card border-0 shadow-sm h-100" style="border-left: 4px solid #38bdf8 !important;"><div class="card-body px-2 py-3"><h6 class="text-slate-300 mb-1 font-semibold" style="font-size:11px;">Total Job</h6><h5 class="fw-extrabold mb-0 text-cyan-400">${totalJob}</h5></div></div></div><div class="col-md-2 col-6"><div class="card glass-card border-0 shadow-sm h-100" style="border-left: 4px solid #34d399 !important;"><div class="card-body px-2 py-3"><h6 class="text-slate-300 mb-1 font-semibold" style="font-size:11px;">Pemasukan Total</h6><h6 class="fw-extrabold mb-0 text-emerald-400" style="font-size:13px;">${formatRp(totalPemasukan)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card glass-card border-0 shadow-sm h-100" style="border-left: 4px solid #f87171 !important;"><div class="card-body px-2 py-3"><h6 class="text-slate-300 mb-1 font-semibold" style="font-size:11px;">Pengeluaran (All)</h6><h6 class="fw-extrabold mb-0 text-rose-400" style="font-size:13px;">${formatRp(totalPengeluaran)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card glass-card border-0 shadow-sm h-100" style="border-left: 4px solid #fb923c !important;"><div class="card-body px-2 py-3"><h6 class="text-slate-300 mb-1 font-semibold" style="font-size:11px;">Distribusi Fee Team</h6><h6 class="fw-extrabold mb-0 text-orange-400" style="font-size:13px;">${formatRp(totalFeeTeam)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card glass-card border-0 shadow-sm h-100" style="border-left: 4px solid #fbbf24 !important;"><div class="card-body px-2 py-3"><h6 class="text-slate-300 mb-1 font-semibold" style="font-size:11px;">Piutang Client</h6><h6 class="fw-extrabold mb-0 text-amber-400" style="font-size:13px;">${formatRp(piutangClient)}</h6></div></div></div><div class="col-md-2 col-6"><div class="card glass-card border-0 shadow-sm h-100" style="border-left: 4px solid #c084fc !important;"><div class="card-body px-2 py-3"><h6 class="text-slate-300 mb-1 font-semibold" style="font-size:11px;">Laba Bersih</h6><h6 class="fw-extrabold mb-0 text-purple-300" style="font-size:13px;">${formatRp(labaBersih)}</h6></div></div></div></div><div class="row g-4 mb-4"><div class="col-md-6"><div class="card glass-card shadow-sm h-100"><div class="card-header border-0 pt-4 pb-0 bg-transparent"><h6 class="fw-extrabold text-amber-400 mb-0"><i class="fa-solid fa-list text-amber-400 me-2"></i> Rekap Paket</h6></div><div class="card-body p-3"><div class="table-responsive"><table class="table table-sm table-custom mb-0 align-middle"><thead class="bg-slate-800/90 border-b border-amber-500/30"><tr><th class="border-0 text-amber-400 font-extrabold uppercase">Nama Produk</th><th class="border-0 text-center text-amber-400 font-extrabold uppercase">Terjual</th><th class="border-0 text-end text-amber-400 font-extrabold uppercase">Nominal</th></tr></thead><tbody>${tbodyHtml}</tbody></table></div></div></div></div><div class="col-md-6"><div class="card glass-card shadow-sm h-100"><div class="card-header border-0 pt-4 pb-0 bg-transparent"><h6 class="fw-extrabold text-amber-400 mb-0"><i class="fa-solid fa-chart-pie text-amber-400 me-2"></i> Sumber Penghasilan</h6></div><div class="card-body d-flex justify-content-center align-items-center"><canvas id="pieChart" style="max-height: 250px;"></canvas></div></div></div></div><div class="card border-0 shadow-sm mb-4 bg-transparent" style="background: transparent !important; box-shadow: none !important; border: none !important; backdrop-filter: none;"><div class="card-header bg-transparent border-0 px-0 pb-3"><h5 class="fw-extrabold text-white mb-0"><i class="fa-solid fa-people-group text-amber-400 me-2"></i> Kinerja Team & Bonus Bulan Ini</h5><p class="text-slate-300 small mb-0 mt-1">${bNote}</p></div><div class="card-body p-0">${teamHtml}</div></div>`;
+      container.innerHTML = `
+      <div class="row g-3 mb-4">
+        <div class="col-md-2 col-6">
+          <div class="card glass-card p-3.5 h-100 shadow-sm border" style="border-left: 3.5px solid #0284c7 !important;">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="text-muted fw-semibold" style="font-size: 11px;">Total Job</span>
+              <i class="fa-solid fa-calendar-check text-sky-500 text-xs"></i>
+            </div>
+            <h5 class="fw-extrabold mb-0 text-sky-600 dark:text-sky-400">${totalJob}</h5>
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <div class="card glass-card p-3.5 h-100 shadow-sm border" style="border-left: 3.5px solid #10b981 !important;">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="text-muted fw-semibold" style="font-size: 11px;">Pemasukan</span>
+              <i class="fa-solid fa-arrow-down-left text-emerald-500 text-xs"></i>
+            </div>
+            <h6 class="fw-extrabold mb-0 text-emerald-600 dark:text-emerald-400" style="font-size: 13px;">${formatRp(totalPemasukan)}</h6>
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <div class="card glass-card p-3.5 h-100 shadow-sm border" style="border-left: 3.5px solid #ef4444 !important;">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="text-muted fw-semibold" style="font-size: 11px;">Pengeluaran</span>
+              <i class="fa-solid fa-arrow-up-right text-rose-500 text-xs"></i>
+            </div>
+            <h6 class="fw-extrabold mb-0 text-rose-600 dark:text-rose-400" style="font-size: 13px;">${formatRp(totalPengeluaran)}</h6>
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <div class="card glass-card p-3.5 h-100 shadow-sm border" style="border-left: 3.5px solid #f97316 !important;">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="text-muted fw-semibold" style="font-size: 11px;">Fee Team</span>
+              <i class="fa-solid fa-users text-orange-500 text-xs"></i>
+            </div>
+            <h6 class="fw-extrabold mb-0 text-orange-600 dark:text-orange-400" style="font-size: 13px;">${formatRp(totalFeeTeam)}</h6>
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <div class="card glass-card p-3.5 h-100 shadow-sm border" style="border-left: 3.5px solid #f59e0b !important;">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="text-muted fw-semibold" style="font-size: 11px;">Piutang Klien</span>
+              <i class="fa-solid fa-hourglass-half text-amber-500 text-xs"></i>
+            </div>
+            <h6 class="fw-extrabold mb-0 text-amber-600 dark:text-amber-400" style="font-size: 13px;">${formatRp(piutangClient)}</h6>
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <div class="card glass-card p-3.5 h-100 shadow-sm border" style="border-left: 3.5px solid #6366f1 !important;">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="text-muted fw-semibold" style="font-size: 11px;">Laba Bersih</span>
+              <i class="fa-solid fa-chart-line text-indigo-500 text-xs"></i>
+            </div>
+            <h6 class="fw-extrabold mb-0 text-indigo-600 dark:text-indigo-400" style="font-size: 13px;">${formatRp(labaBersih)}</h6>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <div class="card glass-card shadow-sm h-100 border">
+            <div class="card-header border-0 pt-4 pb-2 bg-transparent d-flex justify-content-between align-items-center">
+              <h6 class="fw-extrabold mb-0" style="color: var(--text-main);"><i class="fa-solid fa-list-check text-indigo-600 me-2"></i> Rekap Paket Terjual</h6>
+            </div>
+            <div class="card-body p-3">
+              <div class="table-responsive">
+                <table class="table table-sm table-custom mb-0 align-middle">
+                  <thead>
+                    <tr>
+                      <th class="border-0 uppercase font-extrabold">Nama Produk</th>
+                      <th class="border-0 text-center uppercase font-extrabold">Terjual</th>
+                      <th class="border-0 text-end uppercase font-extrabold">Nominal</th>
+                    </tr>
+                  </thead>
+                  <tbody>${tbodyHtml}</tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card glass-card shadow-sm h-100 border">
+            <div class="card-header border-0 pt-4 pb-2 bg-transparent d-flex justify-content-between align-items-center">
+              <h6 class="fw-extrabold mb-0" style="color: var(--text-main);"><i class="fa-solid fa-chart-pie text-indigo-600 me-2"></i> Sumber Penghasilan</h6>
+            </div>
+            <div class="card-body d-flex justify-content-center align-items-center p-4">
+              <canvas id="pieChart" style="max-height: 250px;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card glass-card shadow-sm mb-4 border p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-3 border-bottom" style="border-color: var(--border-color) !important;">
+          <div>
+            <h5 class="fw-extrabold mb-1" style="color: var(--text-main);"><i class="fa-solid fa-people-group text-indigo-600 me-2"></i> Kinerja Team & Bonus Bulan Ini</h5>
+            <p class="text-muted small mb-0">${bNote}</p>
+          </div>
+        </div>
+        <div>${teamHtml}</div>
+      </div>`;
+
       if (dashChart) dashChart.destroy();
-      const ctx = document.getElementById('pieChart'); if (ctx && Object.keys(salesByProd).length > 0) { dashChart = new Chart(ctx, { type: 'pie', data: { labels: Object.keys(salesByProd), datasets: [{ data: Object.values(salesByProd).map(v => v.nominal), backgroundColor: ['#38bdf8', '#34d399', '#f87171', '#fbbf24', '#fb923c', '#c084fc'] }] }, options: { responsive: true, plugins: { legend: { position: 'right', labels: { color: '#F8FAFC', font: { weight: 'bold' } } } } } }); }
+      const ctx = document.getElementById('pieChart'); 
+      if (ctx && Object.keys(salesByProd).length > 0) { 
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        dashChart = new Chart(ctx, { 
+          type: 'doughnut', 
+          data: { 
+            labels: Object.keys(salesByProd), 
+            datasets: [{ 
+              data: Object.values(salesByProd).map(v => v.nominal), 
+              backgroundColor: ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#3b82f6'],
+              borderWidth: 2,
+              borderColor: isDark ? '#111827' : '#ffffff'
+            }] 
+          }, 
+          options: { 
+            responsive: true, 
+            cutout: '65%',
+            plugins: { 
+              legend: { 
+                position: 'right', 
+                labels: { 
+                  color: isDark ? '#F8FAFC' : '#1E293B', 
+                  font: { weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
+                  padding: 12
+                } 
+              } 
+            } 
+          } 
+        }); 
+      }
     };
 
     window.showDetailTeam = function (name) {
@@ -1738,4 +1939,7 @@ isDataLoaded = true; updateDynamicYears(); routeRender(); loadAppBranding();
       }).join('');
     };
 
-    document.addEventListener('DOMContentLoaded', () => { checkLoginState(); });
+    document.addEventListener('DOMContentLoaded', () => { 
+      initTheme(); 
+      checkLoginState(); 
+    });

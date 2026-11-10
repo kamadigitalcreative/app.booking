@@ -5,19 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Online Booking - BookHive</title>
 
-  <!-- Google Fonts: Inter -->
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS v3 CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: ['class', '[data-theme="dark"]'],
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
           }
         }
       }
@@ -26,23 +27,29 @@
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2.2">
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen font-sans text-slate-100 antialiased flex flex-col justify-center items-center p-4 py-8">
+<body class="min-h-screen font-sans antialiased flex flex-col justify-center items-center p-4 py-8">
 
   <!-- LOADING SPINNER -->
-  <div id="fullPageLoader" class="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex flex-col justify-center items-center">
-    <div class="spinner-border text-amber-500 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
+  <div id="fullPageLoader" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-md flex flex-col justify-center items-center">
+    <div class="spinner-border text-indigo-600 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
     <h5 class="font-extrabold text-xl text-white">Memuat Portal Booking...</h5>
   </div>
 
   <div class="w-full max-w-2xl my-auto">
-    <div class="bg-slate-900/85 backdrop-blur-xl border border-amber-500/30 shadow-2xl shadow-amber-500/10 rounded-3xl overflow-hidden">
+    <div class="card glass-card rounded-3xl overflow-hidden shadow-2xl border relative">
       
+      <!-- Top Action: Theme Toggle Button -->
+      <button type="button" class="theme-toggle-btn absolute top-5 right-5 z-20 shadow-sm" onclick="toggleTheme()" title="Ubah Mode Tampilan">
+        <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
+        <span class="theme-toggle-label text-xs">Mode Terang</span>
+      </button>
+
       <!-- HEADER -->
-      <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-8 text-center text-white relative overflow-hidden">
+      <div class="p-8 text-center relative overflow-hidden border-b" style="background: var(--bg-card-subtle); border-color: var(--border-color);">
         <div class="flex items-center justify-center mx-auto mb-3">
-          <svg viewBox="0 0 100 100" class="w-16 h-16 rounded-2xl shadow-xl shadow-amber-500/20" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 100 100" class="w-16 h-16 rounded-2xl shadow-md" xmlns="http://www.w3.org/2000/svg">
             <rect width="100" height="100" rx="22" fill="#ECA935"/>
             <path d="M 19.5 24 C 19.5 18.5 24 14 29.5 14 H 57 C 71 14 80 21 80 32.5 C 80 41 74 47.5 64 50.5 C 76 53.5 83 61.5 83 74.5 C 83 87 72.5 96 57 96 H 29.5 C 24 96 19.5 91.5 19.5 86 Z" fill="#FFFFFF"/>
             <rect x="26" y="30" width="39" height="44" rx="10" fill="#ECA935"/>
@@ -52,59 +59,59 @@
             <path d="M 35 52 L 43 60 L 57 44" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           </svg>
         </div>
-        <h3 class="text-3xl font-extrabold tracking-tight">Book<span class="text-[#ECA935]">Hive</span></h3>
-        <p class="text-xs font-bold text-slate-300 uppercase tracking-[0.2em] mt-1">SIMPLY BOOK. STAY ORGANIZED</p>
+        <h3 class="text-3xl font-extrabold tracking-tight" style="color: var(--text-main);">Book<span class="text-indigo-600">Hive</span></h3>
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mt-1">SIMPLY BOOK. STAY ORGANIZED</p>
       </div>
 
       <div class="p-6 md:p-8">
         <form id="bookingForm" onsubmit="submitBooking(event)" class="space-y-6">
           
           <!-- SECTION 1: Personal Info -->
-          <div class="space-y-4">
-            <h6 class="font-bold text-xs uppercase tracking-wider text-indigo-900 flex items-center gap-2">
-              <i class="fa-solid fa-user text-indigo-600"></i> 1. Informasi Client
+          <div class="space-y-3">
+            <h6 class="font-extrabold text-xs uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+              <i class="fa-solid fa-user"></i> 1. Informasi Client
             </h6>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap *</label>
-                <input type="text" id="clientName" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required placeholder="Cth: Budi Santoso">
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nama Lengkap *</label>
+                <input type="text" id="clientName" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" required placeholder="Cth: Budi Santoso">
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">No. WhatsApp *</label>
-                <input type="tel" id="clientPhone" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required placeholder="Cth: 08123456789">
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">No. WhatsApp *</label>
+                <input type="tel" id="clientPhone" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" required placeholder="Cth: 08123456789">
               </div>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Alamat / Lokasi Acara</label>
-              <textarea id="clientAddress" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" rows="2" placeholder="Detail lokasi acara..."></textarea>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Alamat / Lokasi Acara</label>
+              <textarea id="clientAddress" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" rows="2" placeholder="Detail lokasi acara..."></textarea>
             </div>
           </div>
 
           <!-- SECTION 2: Select Date & Time Range -->
-          <div class="space-y-4 pt-2">
-            <h6 class="font-bold text-xs uppercase tracking-wider text-indigo-900 flex items-center gap-2">
-              <i class="fa-regular fa-calendar-days text-indigo-600"></i> 2. Tanggal & Rentang Jam Acara
+          <div class="space-y-3 pt-2">
+            <h6 class="font-extrabold text-xs uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+              <i class="fa-regular fa-calendar-days"></i> 2. Tanggal & Rentang Jam Acara
             </h6>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Acara *</label>
-                <input type="date" id="bookingDate" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required onchange="fetchAvailableTalents()">
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Tanggal Acara *</label>
+                <input type="date" id="bookingDate" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" required onchange="fetchAvailableTalents()">
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Jam Mulai *</label>
-                <input type="time" id="bookingStart" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required value="09:00" onchange="fetchAvailableTalents()">
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Jam Mulai *</label>
+                <input type="time" id="bookingStart" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" required value="09:00" onchange="fetchAvailableTalents()">
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Jam Selesai *</label>
-                <input type="time" id="bookingEnd" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" required value="13:00" onchange="fetchAvailableTalents()">
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Jam Selesai *</label>
+                <input type="time" id="bookingEnd" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" required value="13:00" onchange="fetchAvailableTalents()">
               </div>
             </div>
           </div>
 
           <!-- SECTION 3: Select Package -->
-          <div class="space-y-4 pt-2">
-            <h6 class="font-bold text-xs uppercase tracking-wider text-indigo-900 flex items-center gap-2">
-              <i class="fa-solid fa-box-open text-indigo-600"></i> 3. Pilih Paket Layanan
+          <div class="space-y-3 pt-2">
+            <h6 class="font-extrabold text-xs uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+              <i class="fa-solid fa-box-open"></i> 3. Pilih Paket Layanan
             </h6>
             <div id="packagesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <!-- Dipopulasi oleh JS -->
@@ -112,42 +119,42 @@
           </div>
 
           <!-- SECTION 4: Select Available Talent (Dynamic Pricing) -->
-          <div class="space-y-4 pt-2">
-            <h6 class="font-bold text-xs uppercase tracking-wider text-indigo-900 flex items-center gap-2">
-              <i class="fa-solid fa-user-check text-indigo-600"></i> 4. Pilih Talent (Fotografer / MUA Available)
+          <div class="space-y-3 pt-2">
+            <h6 class="font-extrabold text-xs uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+              <i class="fa-solid fa-user-check"></i> 4. Pilih Talent (Fotografer / MUA Available)
             </h6>
             <div id="talentsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div class="col-span-full p-4 rounded-2xl bg-white/40 border border-white/60 text-xs text-slate-500 font-medium text-center">
+              <div class="col-span-full p-4 rounded-2xl border text-xs text-slate-500 font-medium text-center" style="background: var(--bg-card-subtle); border-color: var(--border-color);">
                 Pilih tanggal & jam acara terlebih dahulu untuk melihat talent yang tersedia.
               </div>
             </div>
           </div>
 
           <!-- SECTION 5: Summary & Notes -->
-          <div class="space-y-4 pt-2">
-            <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 text-xs space-y-2">
-              <div class="flex justify-between font-medium text-slate-600">
+          <div class="space-y-3 pt-2">
+            <div class="p-4 rounded-2xl border text-xs space-y-2" style="background: var(--bg-card-subtle); border-color: var(--border-color);">
+              <div class="flex justify-between font-medium text-slate-500">
                 <span>Harga Paket Base:</span>
-                <span id="displayBasePrice" class="font-bold">Rp 0</span>
+                <span id="displayBasePrice" class="font-bold text-slate-800 dark:text-slate-200">Rp 0</span>
               </div>
-              <div class="flex justify-between font-medium text-slate-600">
+              <div class="flex justify-between font-medium text-slate-500">
                 <span>Biaya Talent Surcharge:</span>
-                <span id="displayTalentSurcharge" class="font-bold text-indigo-600">+ Rp 0</span>
+                <span id="displayTalentSurcharge" class="font-bold text-indigo-600 dark:text-indigo-400">+ Rp 0</span>
               </div>
-              <hr class="border-indigo-200 my-1">
-              <div class="flex justify-between text-sm font-extrabold text-indigo-900">
+              <hr class="my-1" style="border-color: var(--border-color);">
+              <div class="flex justify-between text-sm font-extrabold" style="color: var(--text-main);">
                 <span>Total Estimasi Booking:</span>
-                <span id="displayGrandTotal" class="text-base text-indigo-700">Rp 0</span>
+                <span id="displayGrandTotal" class="text-base text-indigo-600 dark:text-indigo-400">Rp 0</span>
               </div>
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Khusus (Opsional)</label>
-              <textarea id="bookingNotes" class="w-full px-4 py-3 bg-white/40 border border-white/60 backdrop-blur-sm rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white/60 text-xs font-medium" rows="2" placeholder="Permintaan khusus konsep / busana..."></textarea>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Catatan Khusus (Opsional)</label>
+              <textarea id="bookingNotes" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" rows="2" placeholder="Permintaan khusus konsep / busana..."></textarea>
             </div>
           </div>
 
-          <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-base rounded-2xl shadow-xl shadow-indigo-500/30 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2" id="btnSubmitForm">
+          <button type="submit" class="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-500/25 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2" id="btnSubmitForm">
             Konfirmasi Booking <i class="fa-solid fa-arrow-right"></i>
           </button>
         </form>
@@ -167,6 +174,26 @@
     let availableTalents = [];
     let selectedTalent = null;
 
+    // --- THEME ENGINE ---
+    function initTheme() {
+      const saved = localStorage.getItem('bookhive_theme') || 'light';
+      applyTheme(saved);
+    }
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    }
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('bookhive_theme', theme);
+      document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
+        icon.className = theme === 'dark' ? 'fa-solid fa-sun text-amber-400 theme-toggle-icon' : 'fa-solid fa-moon text-indigo-600 theme-toggle-icon';
+      });
+      document.querySelectorAll('.theme-toggle-label').forEach(el => {
+        el.innerText = theme === 'dark' ? 'Mode Malam' : 'Mode Terang';
+      });
+    }
+
     function formatRp(num) {
       return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
     }
@@ -184,6 +211,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('bookingDate').setAttribute('min', today);
       document.getElementById('bookingDate').value = today;
@@ -218,9 +246,9 @@
         let prodHarga = Number(prod.harga) || 0;
 
         div.innerHTML = `
-          <div class="package-card p-4 rounded-2xl bg-white/40 border border-white/60 backdrop-blur-sm cursor-pointer transition-all hover:bg-white/60 hover:shadow-lg" id="prod-card-${index}" onclick="selectPackage(${index})">
-            <h6 class="font-extrabold text-sm text-slate-900 mb-1">${prodName}</h6>
-            <div class="text-sm font-extrabold text-indigo-600 mb-1.5">${formatRp(prodHarga)}</div>
+          <div class="package-card p-4 rounded-2xl card glass-card cursor-pointer transition-all hover:shadow-md border" id="prod-card-${index}" onclick="selectPackage(${index})">
+            <h6 class="font-extrabold text-sm mb-1" style="color: var(--text-main);">${prodName}</h6>
+            <div class="text-sm font-extrabold text-indigo-600 dark:text-indigo-400 mb-1.5">${formatRp(prodHarga)}</div>
             <p class="text-[11px] text-slate-500 leading-relaxed">${prod.catatan || prod.jenis || ''}</p>
           </div>
         `;
@@ -230,11 +258,11 @@
 
     function selectPackage(index) {
       document.querySelectorAll('.package-card').forEach(c => {
-        c.classList.remove('ring-2', 'ring-indigo-500', 'bg-indigo-50/60');
+        c.classList.remove('ring-2', 'ring-indigo-600', 'border-indigo-600');
       });
       const selectedCard = document.getElementById('prod-card-' + index);
       if(selectedCard) {
-        selectedCard.classList.add('ring-2', 'ring-indigo-500', 'bg-indigo-50/60');
+        selectedCard.classList.add('ring-2', 'ring-indigo-600', 'border-indigo-600');
       }
       selectedProduct = allProducts[index];
       recalculateTotal();
@@ -267,7 +295,7 @@
       container.innerHTML = '';
 
       if (availableTalents.length === 0) {
-        container.innerHTML = '<div class="col-span-full p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold text-center">Maaf, seluruh tim talent sudah terisi pada tanggal & jam ini. Silakan coba pilih jam lain.</div>';
+        container.innerHTML = '<div class="col-span-full p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-semibold text-center">Maaf, seluruh tim talent sudah terisi pada tanggal & jam ini. Silakan coba pilih jam lain.</div>';
         selectedTalent = null;
         recalculateTotal();
         return;
@@ -278,17 +306,17 @@
         let surchargeText = t.talent_surcharge > 0 ? `+ ${formatRp(t.talent_surcharge)}` : 'Standard Rate';
 
         div.innerHTML = `
-          <div class="talent-card p-4 rounded-2xl bg-white/40 border border-white/60 backdrop-blur-sm cursor-pointer transition-all hover:bg-white/60 hover:shadow-lg" id="talent-card-${index}" onclick="selectTalent(${index})">
+          <div class="talent-card p-4 rounded-2xl card glass-card cursor-pointer transition-all hover:shadow-md border" id="talent-card-${index}" onclick="selectTalent(${index})">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-bold text-sm flex items-center justify-center shadow-md">
+              <div class="w-10 h-10 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center shadow-sm">
                 <i class="fa-solid fa-user"></i>
               </div>
               <div>
-                <h6 class="font-extrabold text-xs text-slate-900">${t.fullname}</h6>
-                <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">${t.role}</span>
+                <h6 class="font-extrabold text-xs" style="color: var(--text-main);">${t.fullname}</h6>
+                <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-md">${t.role}</span>
               </div>
             </div>
-            <div class="mt-2 text-right text-xs font-extrabold text-emerald-600">${surchargeText}</div>
+            <div class="mt-2 text-right text-xs font-extrabold text-emerald-600 dark:text-emerald-400">${surchargeText}</div>
           </div>
         `;
         container.appendChild(div);
@@ -297,11 +325,11 @@
 
     function selectTalent(index) {
       document.querySelectorAll('.talent-card').forEach(c => {
-        c.classList.remove('ring-2', 'ring-emerald-500', 'bg-emerald-50/60');
+        c.classList.remove('ring-2', 'ring-emerald-500', 'border-emerald-500');
       });
       const selectedCard = document.getElementById('talent-card-' + index);
       if(selectedCard) {
-        selectedCard.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-50/60');
+        selectedCard.classList.add('ring-2', 'ring-emerald-500', 'border-emerald-500');
       }
       selectedTalent = availableTalents[index];
       recalculateTotal();
