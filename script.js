@@ -106,23 +106,14 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
       let logoImg = set.logo_app || '';
       let brandName = (set.brand && set.brand.trim() !== '') ? set.brand.trim() : 'Kama Visual';
 
-      // 1. Ubah semua teks nama aplikasi secara dinamis
+      // 1. Teks judul atas tetap konsisten nama platform aslinya: BookHive
       document.querySelectorAll('.appNameDisplay').forEach(el => {
         el.classList.remove('text-slate-100', 'text-white');
-        if (appName.toLowerCase() === 'bookhive') {
-          el.innerHTML = 'Book<span style="color: #ECA935;">Hive</span>';
-        } else {
-          let words = appName.split(' ');
-          if (words.length > 1) {
-            let last = words.pop();
-            el.innerHTML = `${words.join(' ')} <span style="color: #ECA935;">${last}</span>`;
-          } else {
-            el.innerHTML = `<span style="color: #ECA935;">${appName}</span>`;
-          }
-        }
+        el.innerHTML = 'Book<span style="color: #ECA935;">Hive</span>';
       });
 
       // 2. Ubah semua teks nama vendor (Subtitle di bawah logo / Login / Sidebar)
+      let brandUpper = (brandName || 'KAMA VISUAL').toUpperCase();
       let vendorName = (typeof currentUser !== 'undefined' && currentUser && (currentUser.fullname || currentUser.username))
         ? (currentUser.fullname || currentUser.username)
         : brandName;
@@ -131,7 +122,11 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
         el.classList.remove('text-amber-400', 'text-amber-400/90');
         // Jangan timpa teks loader jika loader sedang aktif
         if (el.id === 'loaderText' && el.getAttribute('data-is-loader') === 'true') return;
-        el.innerText = vendorName.toUpperCase();
+        if (el.id === 'authSubtitle' || !currentUser) {
+          el.innerText = brandUpper;
+        } else {
+          el.innerText = (vendorName || brandName).toUpperCase();
+        }
       });
 
       // 3. Atur tampilan Logo (apakah pakai gambar atau teks inisial/SVG)
@@ -374,20 +369,50 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
     }
 
     function updateDynamicYears() {
-      let years = new Set(); const currYear = new Date().getFullYear();
-      const extractYear = (dateVal) => {
-        if (!dateVal) return null;
-        if (typeof dateVal === 'string' && dateVal.includes(',')) dateVal = dateVal.split(',')[0].trim();
-        if (typeof dateVal === 'string' && dateVal.length >= 4) { const y = parseInt(dateVal.substring(0, 4)); if (!isNaN(y) && y > 2000 && y < 2100) return y; }
-        const y2 = new Date(dateVal).getFullYear(); if (!isNaN(y2) && y2 > 2000 && y2 < 2100) return y2; return null;
+      let years = new Set();
+      const currYear = new Date().getFullYear();
+
+      // Secara default sediakan rentang tahun mulai dari 2 tahun lalu hingga minimal 4 tahun ke depan
+      // Contoh: saat ini 2026, maka 2024, 2025, 2026, 2027, 2028, 2029, 2030 langsung tersedia otomatis!
+      for (let y = currYear - 2; y <= currYear + 4; y++) {
+        years.add(y);
+      }
+
+      // Pindai semua tahun dari data pemasukan / booking (termasuk jika booking multi-hari bertahun 2028 dst)
+      const extractYears = (dateVal) => {
+        if (!dateVal) return [];
+        let str = String(dateVal);
+        let found = [];
+        let matches = str.match(/\b(20[2-9][0-9])\b/g);
+        if (matches) {
+          matches.forEach(m => {
+            let y = parseInt(m);
+            if (!isNaN(y) && y >= 2020 && y <= 2099) found.push(y);
+          });
+        }
+        return found;
       };
-      dbPemasukan.forEach(x => { const y = extractYear(x.tanggal); if (y) years.add(y); }); dbPengeluaran.forEach(x => { const y = extractYear(x.tanggal); if (y) years.add(y); });
-      const yearArr = Array.from(years); const minY = yearArr.length > 0 ? Math.min(...yearArr, currYear - 1) : currYear - 1; const maxY = yearArr.length > 0 ? Math.max(...yearArr, currYear + 1) : currYear + 1;
-      const sortedYears = []; for (let y = minY; y <= Math.max(maxY, currYear + 1); y++) { sortedYears.push(y); }
+
+      if (typeof dbPemasukan !== 'undefined' && Array.isArray(dbPemasukan)) {
+        dbPemasukan.forEach(x => { extractYears(x.tanggal).forEach(y => years.add(y)); });
+      }
+      if (typeof dbPengeluaran !== 'undefined' && Array.isArray(dbPengeluaran)) {
+        dbPengeluaran.forEach(x => { extractYears(x.tanggal).forEach(y => years.add(y)); });
+      }
+
+      const sortedYears = Array.from(years).sort((a, b) => a - b);
       ['dashTahun', 'calTahun', 'akTahun', 'pemTahun', 'pengTahun'].forEach(id => {
-        const sel = document.getElementById(id); if (sel) {
-          const oldVal = sel.value || currYear; sel.innerHTML = '';
-          sortedYears.forEach(y => { const opt = document.createElement('option'); opt.value = y; opt.text = (id === 'dashTahun' || id === 'akTahun') ? 'Tahun: ' + y : y; if (y == oldVal || (!sel.value && y == currYear)) opt.selected = true; sel.appendChild(opt); });
+        const sel = document.getElementById(id);
+        if (sel) {
+          const oldVal = sel.value || currYear;
+          sel.innerHTML = '';
+          sortedYears.forEach(y => {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.text = (id === 'dashTahun' || id === 'akTahun') ? 'Tahun: ' + y : y;
+            if (y == oldVal || (!sel.value && y == currYear)) opt.selected = true;
+            sel.appendChild(opt);
+          });
           if (sortedYears.includes(parseInt(oldVal))) sel.value = oldVal;
         }
       });
