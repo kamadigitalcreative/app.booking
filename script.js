@@ -148,8 +148,17 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
         }
       });
 
-      // 4. Update Judul Browser Tab
-      document.title = `${appName} - ${vendorName}`;
+      // 4. Update Favicon & Judul Browser Tab agar selalu menampilkan icon BookHive
+      let faviconEl = document.querySelector("link[rel*='icon']");
+      if (!faviconEl) {
+        faviconEl = document.createElement('link');
+        faviconEl.rel = 'icon';
+        document.head.appendChild(faviconEl);
+      }
+      faviconEl.type = (logoImg && logoImg.trim() !== '') ? 'image/png' : 'image/svg+xml';
+      faviconEl.href = (logoImg && logoImg.trim() !== '') ? logoImg : 'favicon.svg';
+
+      document.title = `BookHive - ${vendorName || 'Dashboard'}`;
     }
 
     // 3. UTILS
@@ -216,21 +225,21 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
     window.handleLogin = function () {
       var u = document.getElementById('username').value.trim();
       var p = document.getElementById('password').value.trim();
-      if (!u || !p) return Swal.fire('Oops', 'Isi username & password', 'warning');
+      if (!u || !p) return Swal.fire(t('swal_warning', 'Oops'), t('auth_fill_credentials', 'Isi username & password'), 'warning');
 
       const btnLogin = document.getElementById('btnLogin') || document.querySelector('#formLogin button[type="submit"]');
       if (btnLogin) {
         btnLogin.disabled = true;
-        btnLogin.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin me-2"></i> Memproses Masuk...`;
+        btnLogin.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin me-2"></i> ${t('processing', 'Memproses Masuk...')}`;
       }
 
-      showFullPageLoading('Memuat Sistem & Sinkronisasi Data...');
+      showFullPageLoading(t('loading_system', 'Memuat Sistem & Sinkronisasi Data...'));
 
       gasRun('loginUser', u, p).then(res => {
         hideFullPageLoading();
         if (btnLogin) {
           btnLogin.disabled = false;
-          btnLogin.innerHTML = `Masuk <i class="fa-solid fa-right-to-bracket ml-1.5"></i>`;
+          btnLogin.innerHTML = `${t('auth_login_btn', 'Masuk')} <i class="fa-solid fa-right-to-bracket ml-1.5"></i>`;
         }
         if (res.success) {
           currentUser = res.user;
@@ -253,8 +262,8 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
           let vendorName = (currentUser && (currentUser.fullname || currentUser.username)) ? (currentUser.fullname || currentUser.username) : 'Kama Visual';
           Swal.fire({
             icon: 'success',
-            title: 'Berhasil Masuk!',
-            text: `Selamat Datang "${vendorName}"`,
+            title: t('auth_login_success', 'Berhasil Masuk!'),
+            text: `${t('auth_login_welcome', 'Selamat Datang')} "${vendorName}"`,
             timer: 2500,
             showConfirmButton: false,
             background: '#0F172A',
@@ -262,7 +271,7 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
             iconColor: '#ECA935'
           });
         }
-        else { Swal.fire('Error', res.message || 'Username/Password salah', 'error'); }
+        else { Swal.fire(t('swal_error', 'Error'), res.message || t('auth_invalid_credentials', 'Username/Password salah'), 'error'); }
       }).catch(err => {
         hideFullPageLoading();
         if (btnLogin) {

@@ -27,7 +27,11 @@
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2.5">
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="shortcut icon" href="favicon.svg">
+
+  <link rel="stylesheet" href="style.css?v=2.6">
 </head>
 <body class="min-h-screen font-sans antialiased flex flex-col justify-center items-center p-4 py-8">
 
@@ -40,11 +44,17 @@
   <div class="w-full max-w-2xl my-auto">
     <div class="card glass-card rounded-3xl overflow-hidden shadow-2xl border relative">
       
-      <!-- Top Action: Theme Toggle Button -->
-      <button type="button" class="theme-toggle-btn absolute top-5 right-5 z-20 shadow-sm" onclick="toggleTheme()" title="Ubah Mode Tampilan">
-        <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
-        <span class="theme-toggle-label text-xs">Mode Malam</span>
-      </button>
+      <!-- Top Action: Theme Toggle & Language -->
+      <div class="absolute top-5 right-5 z-20 flex items-center gap-2">
+        <button type="button" class="theme-toggle-btn shadow-sm" onclick="toggleTheme()" title="Ubah Mode Tampilan">
+          <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
+          <span class="theme-toggle-label text-xs">Mode Malam</span>
+        </button>
+        <button type="button" class="theme-toggle-btn shadow-sm flex items-center gap-1.5 px-2.5 py-1.5" onclick="toggleLanguage()" title="Ganti Bahasa / Switch Language">
+          <i class="fa-solid fa-globe text-indigo-600 dark:text-indigo-400 text-xs"></i>
+          <span class="lang-code-display text-xs font-bold uppercase">ID</span>
+        </button>
+      </div>
 
       <!-- HEADER -->
       <div class="p-8 text-center relative overflow-hidden border-b" style="background: var(--bg-card-subtle); border-color: var(--border-color);">
@@ -69,21 +79,21 @@
           <!-- SECTION 1: Personal Info -->
           <div class="space-y-3">
             <h6 class="font-extrabold text-xs uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-              <i class="fa-solid fa-user"></i> 1. Informasi Client
+              <i class="fa-solid fa-user"></i> <span data-i18n="booking_sec1">1. Informasi Client</span>
             </h6>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Nama Lengkap *</label>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1" data-i18n="booking_fullname">Nama Lengkap *</label>
                 <input type="text" id="clientName" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" required placeholder="Cth: Budi Santoso">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">No. WhatsApp *</label>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1" data-i18n="booking_phone">No. WhatsApp *</label>
                 <input type="tel" id="clientPhone" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" required placeholder="Cth: 08123456789">
               </div>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Alamat / Lokasi Acara</label>
-              <textarea id="clientAddress" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" rows="2" placeholder="Detail lokasi acara..."></textarea>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1" data-i18n="booking_address">Alamat / Lokasi Acara</label>
+              <textarea id="clientAddress" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" rows="2" placeholder="Detail lokasi acara..." data-i18n-placeholder="booking_address_ph"></textarea>
             </div>
           </div>
 
@@ -91,10 +101,10 @@
           <div class="space-y-3 pt-2">
             <div class="flex items-center justify-between">
               <h6 class="font-extrabold text-xs uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-                <i class="fa-regular fa-calendar-days"></i> 2. Tanggal & Rentang Jam Acara
+                <i class="fa-regular fa-calendar-days"></i> <span data-i18n="booking_sec2">2. Tanggal & Rentang Jam Acara</span>
               </h6>
               <button type="button" class="py-1 px-2.5 rounded-lg text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-all flex items-center gap-1.5" onclick="addBookingDateField()">
-                <i class="fa-solid fa-plus text-[10px]"></i> Tambah Hari / Tanggal
+                <i class="fa-solid fa-plus text-[10px]"></i> <span data-i18n="booking_add_day">Tambah Hari / Tanggal</span>
               </button>
             </div>
             
@@ -106,20 +116,20 @@
                     <i class="fa-solid fa-calendar-day"></i> Hari 1
                   </span>
                   <button type="button" class="btn-remove-day py-1 px-2 text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 text-xs font-semibold rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all flex items-center gap-1" style="display: none;" onclick="removeBookingDateField(this)">
-                    <i class="fa-regular fa-trash-can"></i> Hapus
+                    <i class="fa-regular fa-trash-can"></i> <span data-i18n="btn_delete">Hapus</span>
                   </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Tanggal Acara *</label>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1" data-i18n="booking_date">Tanggal Acara *</label>
                     <input type="date" class="booking-date-input w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" required onchange="fetchAvailableTalents()">
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Jam Mulai *</label>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1" data-i18n="booking_start">Jam Mulai *</label>
                     <input type="time" class="booking-start-input w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" required value="09:00" onchange="fetchAvailableTalents()">
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Jam Selesai *</label>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1" data-i18n="booking_end">Jam Selesai *</label>
                     <input type="time" class="booking-end-input w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" required value="13:00" onchange="fetchAvailableTalents()">
                   </div>
                 </div>
@@ -130,7 +140,7 @@
           <!-- SECTION 3: Select Package -->
           <div class="space-y-3 pt-2">
             <h6 class="font-extrabold text-xs uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-              <i class="fa-solid fa-box-open"></i> 3. Pilih Paket Layanan
+              <i class="fa-solid fa-box-open"></i> <span data-i18n="booking_sec3">3. Pilih Paket Layanan</span>
             </h6>
             <div id="packagesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <!-- Dipopulasi oleh JS -->
@@ -140,10 +150,10 @@
           <!-- SECTION 4: Select Available Crew (Dynamic Pricing) -->
           <div class="space-y-3 pt-2">
             <h6 class="font-extrabold text-xs uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-              <i class="fa-solid fa-user-check"></i> 4. Pilih Crew
+              <i class="fa-solid fa-user-check"></i> <span data-i18n="booking_sec4">4. Pilih Crew</span>
             </h6>
             <div id="talentsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div class="col-span-full p-4 rounded-2xl border text-xs text-slate-500 font-medium text-center" style="background: var(--bg-card-subtle); border-color: var(--border-color);">
+              <div class="col-span-full p-4 rounded-2xl border text-xs text-slate-500 font-medium text-center" style="background: var(--bg-card-subtle); border-color: var(--border-color);" data-i18n="booking_crew_wait">
                 Pilih tanggal & jam acara terlebih dahulu untuk melihat crew yang tersedia.
               </div>
             </div>
@@ -153,28 +163,28 @@
           <div class="space-y-3 pt-2">
             <div class="p-4 rounded-2xl border text-xs space-y-2" style="background: var(--bg-card-subtle); border-color: var(--border-color);">
               <div class="flex justify-between font-medium text-slate-500">
-                <span>Harga Paket Base:</span>
+                <span data-i18n="booking_base_price">Harga Paket Base:</span>
                 <span id="displayBasePrice" class="font-bold text-slate-800 dark:text-slate-200">Rp 0</span>
               </div>
               <div class="flex justify-between font-medium text-slate-500">
-                <span>Biaya Crew Surcharge:</span>
+                <span data-i18n="booking_crew_fee">Biaya Crew Surcharge:</span>
                 <span id="displayTalentSurcharge" class="font-bold text-indigo-600 dark:text-indigo-400">+ Rp 0</span>
               </div>
               <hr class="my-1" style="border-color: var(--border-color);">
               <div class="flex justify-between text-sm font-extrabold" style="color: var(--text-main);">
-                <span>Total Estimasi Booking:</span>
+                <span data-i18n="booking_grand_total">Total Estimasi Booking:</span>
                 <span id="displayGrandTotal" class="text-base text-indigo-600 dark:text-indigo-400">Rp 0</span>
               </div>
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Catatan Khusus (Opsional)</label>
-              <textarea id="bookingNotes" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" rows="2" placeholder="Permintaan khusus konsep / busana..."></textarea>
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1" data-i18n="booking_notes">Catatan Khusus (Opsional)</label>
+              <textarea id="bookingNotes" class="w-full px-4 py-3 rounded-xl text-xs font-medium focus:outline-none" rows="2" placeholder="Permintaan khusus konsep / busana..." data-i18n-placeholder="booking_notes_ph"></textarea>
             </div>
           </div>
 
           <button type="submit" class="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-500/25 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2" id="btnSubmitForm">
-            Konfirmasi Booking <i class="fa-solid fa-arrow-right"></i>
+            <span data-i18n="booking_confirm_btn">Konfirmasi Booking</span> <i class="fa-solid fa-arrow-right"></i>
           </button>
         </form>
       </div>
@@ -184,6 +194,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="i18n.js?v=2.6"></script>
   
   <script>
     const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_MRP6SWoCXMqGuLaxEDWZR8CowGZ08ccICHoAfdVw6hbfz_8PJbJA2adXcJYHaGQx/exec';
