@@ -232,6 +232,25 @@ const BookHiveI18n = {
       booking_crew_loading: 'Memeriksa ketersediaan crew...',
       booking_no_service: 'Belum ada layanan yang tersedia.',
 
+      // Invoice
+      inv_title: 'Invoice Tagihan',
+      inv_not_found: 'Invoice Tidak Ditemukan',
+      inv_not_found_desc: 'Periksa kembali tautan tagihan yang Anda terima.',
+      inv_back_booking: 'Kembali ke Booking',
+      inv_billed_to: 'Kepada Yth.',
+      inv_waiting_payment: 'Menunggu Pembayaran',
+      inv_paid: 'Lunas',
+      inv_service_details: 'Rincian Layanan',
+      inv_package_service: 'Paket/Layanan',
+      inv_event_date: 'Tanggal Acara',
+      inv_subtotal: 'Subtotal',
+      inv_transport: 'Biaya Transport',
+      inv_discount: 'Diskon',
+      inv_total_bill: 'TOTAL TAGIHAN',
+      inv_payment_account: 'Rekening Pembayaran:',
+      inv_copy_acc: 'Salin No. Rekening',
+      inv_confirm_wa: 'Konfirmasi Pembayaran (WhatsApp)',
+
       // Alerts / Modals
       swal_success: 'Berhasil!',
       swal_error: 'Terjadi Kesalahan',
