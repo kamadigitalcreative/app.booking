@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,9 @@
   <!-- Google Fonts: Plus Jakarta Sans & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
   <!-- Tailwind CSS v3 CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -31,257 +34,300 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="shortcut icon" href="favicon.svg">
 
+  <link rel="stylesheet" href="style.css?v=2.6">
   <link rel="stylesheet" href="style.css?v=3.0">
 </head>
+
 <body class="min-h-screen font-sans antialiased flex flex-col justify-center items-center p-4 py-8">
 
   <!-- LOADING SPINNER -->
-  <div id="fullPageLoader" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-md flex flex-col justify-center items-center">
+  <div id="fullPageLoader"
+    class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-md flex flex-col justify-center items-center">
     <div class="spinner-border text-indigo-600 mb-4" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
+    <h5 class="font-extrabold text-xl text-white">Memuat Tagihan...</h5>
     <h5 class="font-extrabold text-xl text-white" data-i18n="booking_loading_title">Memuat Tagihan...</h5>
   </div>
 
   <div class="w-full max-w-xl my-auto">
-    
-    <!-- Top Action: Theme Toggle & Language Button -->
-    <div class="flex justify-end items-center gap-2 mb-3">
-      <button type="button" class="theme-toggle-btn shadow-sm" onclick="toggleTheme()" title="Ubah Mode Tampilan">
-        <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
-        <span class="theme-toggle-label text-xs">Mode Malam</span>
-      </button>
-      <button type="button" class="theme-toggle-btn shadow-sm flex items-center gap-1.5 px-3 py-2" onclick="toggleLanguage()" title="Ganti Bahasa / Switch Language">
-        <i class="fa-solid fa-globe text-indigo-600 dark:text-indigo-400 text-xs"></i>
-        <span class="lang-code-display text-xs font-bold uppercase">ID</span>
-      </button>
-    </div>
 
-    <!-- ERROR CONTAINER -->
-    <div id="errorContainer" class="hidden text-center p-8 card glass-card rounded-3xl space-y-3 border">
-      <i class="fa-solid fa-file-circle-xmark text-rose-500 text-5xl"></i>
-      <h4 class="text-xl font-extrabold" style="color: var(--text-main);" data-i18n="inv_not_found">Invoice Tidak Ditemukan</h4>
-      <p class="text-xs text-slate-500 font-medium" data-i18n="inv_not_found_desc">Periksa kembali tautan tagihan yang Anda terima.</p>
-      <a href="booking.html" class="inline-block mt-4 py-2.5 px-6 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-md hover:bg-indigo-700 transition-all" data-i18n="inv_back_booking">Kembali ke Booking</a>
-    </div>
-
-    <!-- INVOICE CARD -->
-    <div id="invoiceContainer" class="hidden card glass-card rounded-3xl overflow-hidden shadow-2xl border">
-      <!-- HEADER -->
-      <div class="bg-indigo-600 dark:bg-indigo-700 text-white p-6 md:p-8 flex justify-between items-center">
-        <div>
-          <h4 class="text-2xl font-extrabold tracking-wider" id="invBrandHeader">INVOICE</h4>
-          <p class="text-xs text-indigo-100 font-semibold mt-0.5" id="invBrandTagline"></p>
-          <p class="text-xs text-indigo-200 font-semibold mt-1" id="invId">INV-000000</p>
-        </div>
-        <div id="invLogoBox" class="w-14 h-14 rounded-2xl bg-white text-indigo-600 font-extrabold text-lg flex items-center justify-center shadow-md overflow-hidden p-1">BH</div>
+    <!-- Top Action: Theme Toggle Button -->
+    <div class="flex justify-end mb-3">
+      <!-- Top Action: Theme Toggle & Language Button -->
+      <div class="flex justify-end items-center gap-2 mb-3">
+        <button type="button" class="theme-toggle-btn shadow-sm" onclick="toggleTheme()" title="Ubah Mode Tampilan">
+          <i class="fa-solid fa-moon text-indigo-600 theme-toggle-icon"></i>
+          <span class="theme-toggle-label text-xs">Mode Malam</span>
+        </button>
+        <button type="button" class="theme-toggle-btn shadow-sm flex items-center gap-1.5 px-3 py-2"
+          onclick="toggleLanguage()" title="Ganti Bahasa / Switch Language">
+          <i class="fa-solid fa-globe text-indigo-600 dark:text-indigo-400 text-xs"></i>
+          <span class="lang-code-display text-xs font-bold uppercase">ID</span>
+        </button>
       </div>
 
-      <div class="p-6 md:p-8 space-y-6">
-        <div class="flex justify-between items-start">
+      <!-- ERROR CONTAINER -->
+      <div id="errorContainer" class="hidden text-center p-8 card glass-card rounded-3xl space-y-3 border">
+        <i class="fa-solid fa-file-circle-xmark text-rose-500 text-5xl"></i>
+        <h4 class="text-xl font-extrabold" style="color: var(--text-main);">Invoice Tidak Ditemukan</h4>
+        <p class="text-xs text-slate-500 font-medium">Periksa kembali tautan tagihan yang Anda terima.</p>
+        <a href="booking.html"
+          class="inline-block mt-4 py-2.5 px-6 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-md hover:bg-indigo-700 transition-all">Kembali
+          ke Booking</a>
+        <h4 class="text-xl font-extrabold" style="color: var(--text-main);" data-i18n="inv_not_found">Invoice Tidak
+          Ditemukan</h4>
+        <p class="text-xs text-slate-500 font-medium" data-i18n="inv_not_found_desc">Periksa kembali tautan tagihan yang
+          Anda terima.</p>
+        <a href="booking.html"
+          class="inline-block mt-4 py-2.5 px-6 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-md hover:bg-indigo-700 transition-all"
+          data-i18n="inv_back_booking">Kembali ke Booking</a>
+      </div>
+
+      <!-- INVOICE CARD -->
+      <div id="invoiceContainer" class="hidden card glass-card rounded-3xl overflow-hidden shadow-2xl border">
+        <!-- HEADER -->
+        <div class="bg-indigo-600 dark:bg-indigo-700 text-white p-6 md:p-8 flex justify-between items-center">
           <div>
-            <p class="text-xs text-slate-500 font-semibold mb-1" data-i18n="inv_billed_to">Kepada Yth.</p>
-            <h5 class="text-lg font-extrabold" style="color: var(--text-main);" id="invClient">Nama Klien</h5>
-            <p class="text-xs text-slate-500 font-medium mt-0.5"><i class="fa-solid fa-phone me-1"></i> <span id="invPhone">-</span></p>
+            <h4 class="text-2xl font-extrabold tracking-wider" id="invBrandHeader">INVOICE</h4>
+            <p class="text-xs text-indigo-100 font-semibold mt-0.5" id="invBrandTagline"></p>
+            <p class="text-xs text-indigo-200 font-semibold mt-1" id="invId">INV-000000</p>
           </div>
-          <div id="invStatus" class="px-3.5 py-1.5 rounded-full font-bold text-xs shadow-sm bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">Menunggu Pembayaran</div>
+          <div id="invLogoBox"
+            class="w-14 h-14 rounded-2xl bg-white text-indigo-600 font-extrabold text-lg flex items-center justify-center shadow-md overflow-hidden p-1">
+            BH</div>
         </div>
 
-        <div>
-          <h6 class="font-extrabold text-xs uppercase tracking-wider text-slate-500 border-b pb-2 mb-3" style="border-color: var(--border-color);" data-i18n="inv_service_details">Rincian Layanan</h6>
-          
-          <div class="flex justify-between py-2 border-b border-dashed text-xs" style="border-color: var(--border-color);">
-            <span class="text-slate-500 font-medium" data-i18n="inv_package_service">Paket/Layanan</span>
-            <span class="font-bold text-right" style="color: var(--text-main);" id="invLayanan">-</span>
+        <div class="p-6 md:p-8 space-y-6">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs text-slate-500 font-semibold mb-1">Kepada Yth.</p>
+              <p class="text-xs text-slate-500 font-semibold mb-1" data-i18n="inv_billed_to">Kepada Yth.</p>
+              <h5 class="text-lg font-extrabold" style="color: var(--text-main);" id="invClient">Nama Klien</h5>
+              <p class="text-xs text-slate-500 font-medium mt-0.5"><i class="fa-solid fa-phone me-1"></i> <span
+                  id="invPhone">-</span></p>
+            </div>
+            <div id="invStatus"
+              class="px-3.5 py-1.5 rounded-full font-bold text-xs shadow-sm bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+              Menunggu Pembayaran</div>
           </div>
-          <div class="flex justify-between py-2 border-b border-dashed text-xs" style="border-color: var(--border-color);">
-            <span class="text-slate-500 font-medium" data-i18n="inv_event_date">Tanggal Acara</span>
-            <span class="font-semibold text-right" style="color: var(--text-main);" id="invTanggal">-</span>
-          </div>
-        </div>
 
-        <div class="rounded-2xl p-5 space-y-2 text-xs border" style="background: var(--bg-card-subtle); border-color: var(--border-color);">
-          <div class="flex justify-between items-center">
-            <span class="text-slate-500" data-i18n="inv_subtotal">Subtotal</span>
-            <span class="font-semibold" style="color: var(--text-main);" id="invHarga">Rp 0</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-slate-500" data-i18n="inv_transport">Biaya Transport</span>
-            <span class="font-semibold" style="color: var(--text-main);" id="invTransport">Rp 0</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-slate-500" data-i18n="inv_discount">Diskon</span>
-            <span class="font-semibold text-rose-600" id="invDiskon">- Rp 0</span>
-          </div>
-          <hr class="my-2" style="border-color: var(--border-color);">
-          <div class="flex justify-between items-center text-sm pt-1">
-            <span class="font-extrabold" style="color: var(--text-main);" data-i18n="inv_total_bill">TOTAL TAGIHAN</span>
-            <span class="font-extrabold text-indigo-600 dark:text-indigo-400 text-lg" id="invTotal">Rp 0</span>
-          </div>
-        </div>
+          <div>
+            <h6 class="font-extrabold text-xs uppercase tracking-wider text-slate-500 border-b pb-2 mb-3"
+              style="border-color: var(--border-color);">Rincian Layanan</h6>
+            <h6 class="font-extrabold text-xs uppercase tracking-wider text-slate-500 border-b pb-2 mb-3"
+              style="border-color: var(--border-color);" data-i18n="inv_service_details">Rincian Layanan</h6>
 
-        <!-- BANK TRANSFER INFO -->
-        <div id="invBankContainer" class="hidden rounded-2xl p-4 space-y-1.5 text-xs border" style="background: var(--bg-card-subtle); border-color: var(--border-color);">
-          <div class="font-bold flex items-center gap-1.5" style="color: var(--text-main);">
-            <i class="fa-solid fa-building-columns text-indigo-600"></i> <span data-i18n="inv_payment_account">Rekening Pembayaran:</span>
+            <div class="flex justify-between py-2 border-b border-dashed text-xs"
+              style="border-color: var(--border-color);">
+              <span class="text-slate-500 font-medium">Paket/Layanan</span>
+              <span class="text-slate-500 font-medium" data-i18n="inv_package_service">Paket/Layanan</span>
+              <span class="font-bold text-right" style="color: var(--text-main);" id="invLayanan">-</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-dashed text-xs"
+              style="border-color: var(--border-color);">
+              <span class="text-slate-500 font-medium">Tanggal Acara</span>
+              <span class="text-slate-500 font-medium" data-i18n="inv_event_date">Tanggal Acara</span>
+              <span class="font-semibold text-right" style="color: var(--text-main);" id="invTanggal">-</span>
+            </div>
           </div>
-          <div class="font-extrabold text-sm" style="color: var(--text-main);" id="invBankDetail">-</div>
-          <p class="text-[11px] text-slate-500 font-medium" id="invNotesText"></p>
-        </div>
 
-        <div id="paymentSection" class="text-center pt-2">
-          <p class="text-[11px] text-slate-500 font-medium mb-3 flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-shield-halved text-emerald-600"></i> <span>Pembayaran aman didukung oleh Payment Gateway</span>
-          </p>
-          <button class="w-full py-4 px-6 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm rounded-2xl shadow-lg shadow-emerald-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2" onclick="payNow()">
-            <i class="fa-solid fa-wallet"></i> <span>Bayar Sekarang</span>
-          </button>
-        </div>
+          <div class="rounded-2xl p-5 space-y-2 text-xs border"
+            style="background: var(--bg-card-subtle); border-color: var(--border-color);">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500">Subtotal</span>
+              <span class="text-slate-500" data-i18n="inv_subtotal">Subtotal</span>
+              <span class="font-semibold" style="color: var(--text-main);" id="invHarga">Rp 0</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500">Biaya Transport</span>
+              <span class="text-slate-500" data-i18n="inv_transport">Biaya Transport</span>
+              <span class="font-semibold" style="color: var(--text-main);" id="invTransport">Rp 0</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500">Diskon</span>
+              <span class="text-slate-500" data-i18n="inv_discount">Diskon</span>
+              <span class="font-semibold text-rose-600" id="invDiskon">- Rp 0</span>
+            </div>
+            <hr class="my-2" style="border-color: var(--border-color);">
+            <div class="flex justify-between items-center text-sm pt-1">
+              <span class="font-extrabold" style="color: var(--text-main);">TOTAL TAGIHAN</span>
+              <span class="font-extrabold" style="color: var(--text-main);" data-i18n="inv_total_bill">TOTAL
+                TAGIHAN</span>
+              <span class="font-extrabold text-indigo-600 dark:text-indigo-400 text-lg" id="invTotal">Rp 0</span>
+            </div>
+          </div>
 
+          <!-- BANK TRANSFER INFO -->
+          <div id="invBankContainer" class="hidden rounded-2xl p-4 space-y-1.5 text-xs border"
+            style="background: var(--bg-card-subtle); border-color: var(--border-color);">
+            <div class="font-bold flex items-center gap-1.5" style="color: var(--text-main);">
+              <i class="fa-solid fa-building-columns text-indigo-600"></i> Rekening Pembayaran:
+              <i class="fa-solid fa-building-columns text-indigo-600"></i> <span
+                data-i18n="inv_payment_account">Rekening Pembayaran:</span>
+            </div>
+            <div class="font-extrabold text-sm" style="color: var(--text-main);" id="invBankDetail">-</div>
+            <p class="text-[11px] text-slate-500 font-medium" id="invNotesText"></p>
+          </div>
+
+          <div id="paymentSection" class="text-center pt-2">
+            <p class="text-[11px] text-slate-500 font-medium mb-3 flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-shield-halved text-emerald-600"></i> Pembayaran aman didukung oleh Payment Gateway
+              <i class="fa-solid fa-shield-halved text-emerald-600"></i> <span>Pembayaran aman didukung oleh Payment
+                Gateway</span>
+            </p>
+            <button
+              class="w-full py-4 px-6 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm rounded-2xl shadow-lg shadow-emerald-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+              onclick="payNow()">
+              <i class="fa-solid fa-wallet"></i> Bayar Sekarang
+              <i class="fa-solid fa-wallet"></i> <span>Bayar Sekarang</span>
+            </button>
+          </div>
+
+        </div>
       </div>
+
     </div>
 
-  </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="i18n.js?v=3.0"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="i18n.js?v=3.0"></script>
-  
-  <script>
-    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_MRP6SWoCXMqGuLaxEDWZR8CowGZ08ccICHoAfdVw6hbfz_8PJbJA2adXcJYHaGQx/exec';
-    let invoiceData = null;
+    <script>
+      const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_MRP6SWoCXMqGuLaxEDWZR8CowGZ08ccICHoAfdVw6hbfz_8PJbJA2adXcJYHaGQx/exec';
+      let invoiceData = null;
 
-    // --- THEME ENGINE ---
-    function initTheme() {
-      const saved = localStorage.getItem('bookhive_theme') || 'light';
-      applyTheme(saved);
-    }
-    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-      applyTheme(current === 'dark' ? 'light' : 'dark');
-    }
-    function applyTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
+      // --- THEME ENGINE ---
+      function initTheme() {
+        const saved = localStorage.getItem('bookhive_theme') || 'light';
+        applyTheme(saved);
       }
-      localStorage.setItem('bookhive_theme', theme);
-      document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
-        icon.className = theme === 'dark' ? 'fa-solid fa-sun text-amber-400 theme-toggle-icon' : 'fa-solid fa-moon text-indigo-600 theme-toggle-icon';
-      });
-      document.querySelectorAll('.theme-toggle-label').forEach(el => {
-        el.innerText = theme === 'dark' ? 'Mode Terang' : 'Mode Malam';
-      });
-    }
-
-    function formatRupiah(angka) {
-      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(angka || 0);
-    }
-
-    function formatDate(dateStr) {
-      if (!dateStr) return '-';
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      initTheme();
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
-
-      if (!id) {
-        document.getElementById('fullPageLoader').style.display = 'none';
-        document.getElementById('errorContainer').classList.remove('hidden');
-        return;
+      function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        applyTheme(current === 'dark' ? 'light' : 'dark');
       }
-
-      fetch(GAS_WEB_APP_URL, {
-        redirect: "follow",
-        method: "POST",
-        body: JSON.stringify({ action: 'getPublicInvoice', invoice_id: id }),
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-      })
-      .then(res => res.text())
-      .then(text => {
-        const res = JSON.parse(text);
-        document.getElementById('fullPageLoader').style.display = 'none';
-        
-        if (res.success && res.invoice) {
-          invoiceData = res.invoice;
-          renderInvoice(res.invoice, res.settings || {});
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
         } else {
+          document.documentElement.classList.remove('dark');
+        }
+        localStorage.setItem('bookhive_theme', theme);
+        document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
+          icon.className = theme === 'dark' ? 'fa-solid fa-sun text-amber-400 theme-toggle-icon' : 'fa-solid fa-moon text-indigo-600 theme-toggle-icon';
+        });
+        document.querySelectorAll('.theme-toggle-label').forEach(el => {
+          el.innerText = theme === 'dark' ? 'Mode Terang' : 'Mode Malam';
+        });
+      }
+
+      function formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(angka || 0);
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        initTheme();
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        if (!id) {
+          document.getElementById('fullPageLoader').style.display = 'none';
           document.getElementById('errorContainer').classList.remove('hidden');
+          return;
         }
-      })
-      .catch(err => {
-        document.getElementById('fullPageLoader').style.display = 'none';
-        Swal.fire('Error', 'Sistem sedang sibuk. Gagal memuat tagihan.', 'error');
+
+        fetch(GAS_WEB_APP_URL, {
+          redirect: "follow",
+          method: "POST",
+          body: JSON.stringify({ action: 'getPublicInvoice', invoice_id: id }),
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+        })
+          .then(res => res.text())
+          .then(text => {
+            const res = JSON.parse(text);
+            document.getElementById('fullPageLoader').style.display = 'none';
+
+            if (res.success && res.invoice) {
+              invoiceData = res.invoice;
+              renderInvoice(res.invoice, res.settings || {});
+            } else {
+              document.getElementById('errorContainer').classList.remove('hidden');
+            }
+          })
+          .catch(err => {
+            document.getElementById('fullPageLoader').style.display = 'none';
+            Swal.fire('Error', 'Sistem sedang sibuk. Gagal memuat tagihan.', 'error');
+          });
       });
-    });
 
-    function renderInvoice(inv, settings = {}) {
-      document.getElementById('invoiceContainer').classList.remove('hidden');
-      
-      // Branding from settings
-      const brand = settings.brand || settings.app_name || 'INVOICE';
-      if (document.getElementById('invBrandHeader')) {
-        document.getElementById('invBrandHeader').innerText = brand;
-      }
-      if (document.getElementById('invBrandTagline')) {
-        document.getElementById('invBrandTagline').innerText = settings.tagline || '';
-      }
-      if (document.getElementById('invLogoBox')) {
-        const logoBox = document.getElementById('invLogoBox');
-        if (settings.logo_inv && settings.logo_inv.length > 20) {
-          logoBox.innerHTML = `<img src="${settings.logo_inv}" alt="Logo" class="max-h-full max-w-full object-contain">`;
-        } else if (settings.app_logo_text) {
-          logoBox.innerText = settings.app_logo_text;
+      function renderInvoice(inv, settings = {}) {
+        document.getElementById('invoiceContainer').classList.remove('hidden');
+
+        // Branding from settings
+        const brand = settings.brand || settings.app_name || 'INVOICE';
+        if (document.getElementById('invBrandHeader')) {
+          document.getElementById('invBrandHeader').innerText = brand;
+        }
+        if (document.getElementById('invBrandTagline')) {
+          document.getElementById('invBrandTagline').innerText = settings.tagline || '';
+        }
+        if (document.getElementById('invLogoBox')) {
+          const logoBox = document.getElementById('invLogoBox');
+          if (settings.logo_inv && settings.logo_inv.length > 20) {
+            logoBox.innerHTML = `<img src="${settings.logo_inv}" alt="Logo" class="max-h-full max-w-full object-contain">`;
+          } else if (settings.app_logo_text) {
+            logoBox.innerText = settings.app_logo_text;
+          } else {
+            logoBox.innerText = 'BH';
+          }
+        }
+
+        // Bank Details
+        if (settings.bank && settings.acc) {
+          document.getElementById('invBankContainer').classList.remove('hidden');
+          document.getElementById('invBankDetail').innerText = `${settings.bank} • ${settings.acc} a.n ${settings.acc_name || ''}`;
+          if (settings.notes_inv) {
+            document.getElementById('invNotesText').innerText = settings.notes_inv;
+          }
+        }
+
+        document.title = `Invoice ${inv.id_trx || ''} - ${brand}`;
+
+        document.getElementById('invId').innerText = inv.id_trx;
+        document.getElementById('invClient').innerText = inv.client;
+        document.getElementById('invPhone').innerText = inv.phone;
+        document.getElementById('invLayanan').innerText = inv.layanan;
+        document.getElementById('invTanggal').innerText = formatDate(inv.tanggal);
+
+        document.getElementById('invHarga').innerText = formatRupiah(inv.harga);
+        document.getElementById('invTransport').innerText = formatRupiah(inv.transport);
+        document.getElementById('invDiskon').innerText = "- " + formatRupiah(inv.diskon);
+
+        let total = (Number(inv.harga) || 0) + (Number(inv.transport) || 0) - (Number(inv.diskon) || 0);
+        document.getElementById('invTotal').innerText = formatRupiah(total);
+
+        const statusEl = document.getElementById('invStatus');
+        const paySection = document.getElementById('paymentSection');
+
+        if (inv.is_lunas === true || String(inv.is_lunas).toLowerCase() === 'true') {
+          statusEl.className = 'px-3.5 py-1.5 rounded-full font-bold text-xs shadow-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300';
+          statusEl.innerHTML = '<i class="fa-solid fa-check-circle me-1"></i> LUNAS';
+          paySection.style.display = 'none';
         } else {
-          logoBox.innerText = 'BH';
+          statusEl.className = 'px-3.5 py-1.5 rounded-full font-bold text-xs shadow-sm bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300';
+          statusEl.innerHTML = '<i class="fa-solid fa-clock me-1"></i> BELUM LUNAS';
         }
       }
 
-      // Bank Details
-      if (settings.bank && settings.acc) {
-        document.getElementById('invBankContainer').classList.remove('hidden');
-        document.getElementById('invBankDetail').innerText = `${settings.bank} • ${settings.acc} a.n ${settings.acc_name || ''}`;
-        if (settings.notes_inv) {
-          document.getElementById('invNotesText').innerText = settings.notes_inv;
-        }
-      }
-
-      document.title = `Invoice ${inv.id_trx || ''} - ${brand}`;
-
-      document.getElementById('invId').innerText = inv.id_trx;
-      document.getElementById('invClient').innerText = inv.client;
-      document.getElementById('invPhone').innerText = inv.phone;
-      document.getElementById('invLayanan').innerText = inv.layanan;
-      document.getElementById('invTanggal').innerText = formatDate(inv.tanggal);
-      
-      document.getElementById('invHarga').innerText = formatRupiah(inv.harga);
-      document.getElementById('invTransport').innerText = formatRupiah(inv.transport);
-      document.getElementById('invDiskon').innerText = "- " + formatRupiah(inv.diskon);
-      
-      let total = (Number(inv.harga) || 0) + (Number(inv.transport) || 0) - (Number(inv.diskon) || 0);
-      document.getElementById('invTotal').innerText = formatRupiah(total);
-
-      const statusEl = document.getElementById('invStatus');
-      const paySection = document.getElementById('paymentSection');
-      
-      if (inv.is_lunas === true || String(inv.is_lunas).toLowerCase() === 'true') {
-        statusEl.className = 'px-3.5 py-1.5 rounded-full font-bold text-xs shadow-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300';
-        statusEl.innerHTML = '<i class="fa-solid fa-check-circle me-1"></i> LUNAS';
-        paySection.style.display = 'none';
-      } else {
-        statusEl.className = 'px-3.5 py-1.5 rounded-full font-bold text-xs shadow-sm bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300';
-        statusEl.innerHTML = '<i class="fa-solid fa-clock me-1"></i> BELUM LUNAS';
-      }
-    }
-
-    function payNow() {
-      Swal.fire({
-        title: 'Pilih Metode Pembayaran',
-        html: `
+      function payNow() {
+        Swal.fire({
+          title: 'Pilih Metode Pembayaran',
+          html: `
           <div class="flex flex-col gap-2.5 mt-4 text-xs font-bold text-left">
             <button class="w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-slate-800 flex items-center justify-start gap-3 transition-all"><i class="fa-solid fa-building-columns text-indigo-600 text-base"></i> Virtual Account Bank</button>
             <button class="w-full p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-slate-800 flex items-center justify-start gap-3 transition-all"><i class="fa-solid fa-qrcode text-emerald-600 text-base"></i> QRIS (Gopay/OVO/Dana)</button>
@@ -290,10 +336,11 @@
           <hr class="my-4" style="border-color: var(--border-color);">
           <p class="text-[11px] text-slate-500">Simulasi Payment Gateway terintegrasi.</p>
         `,
-        showConfirmButton: false,
-        showCloseButton: true
-      });
-    }
-  </script>
+          showConfirmButton: false,
+          showCloseButton: true
+        });
+      }
+    </script>
 </body>
+
 </html>
