@@ -420,18 +420,6 @@
         renderProducts();
       });
     }
-              document.getElementById('portalSubTitle').innerText = (set.brand + ' - ' + (set.tagline || 'BOOKING ONLINE')).toUpperCase();
-            }
-          }
-          fetchAvailableTalents();
-        } else {
-          renderProducts();
-        }
-      }).catch(err => {
-        document.getElementById('fullPageLoader').style.display = 'none';
-        renderProducts();
-      });
-    }
 
     function renderProducts() {
       const container = document.getElementById('packagesContainer');
