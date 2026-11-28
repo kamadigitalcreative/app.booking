@@ -42,6 +42,8 @@ function doPost(e) {
       result = handleCreatePublicBooking(payload.data);
     } else if (action === 'getPublicInvoice') {
       result = handleGetPublicInvoice(payload.invoice_id);
+    } else if (action === 'syncGoogleCalendar') {
+      result = syncBookingToGoogleCalendar(payload.booking);
     } else {
       result = { success: false, message: "Aksi tidak dikenali oleh Server: " + action };
     }
@@ -155,3 +157,45 @@ function handleGetPublicInvoice(invoiceId) {
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
+
+// =========================================================================
+// 5. GOOGLE CALENDAR SYNC HANDLER
+// =========================================================================
+function syncBookingToGoogleCalendar(bookingData) {
+  try {
+    var cal = CalendarApp.getDefaultCalendar();
+    if (!cal) return { success: false, message: "Google Calendar default tidak ditemukan atau belum diotorisasi." };
+
+    var tgl = bookingData.tanggal || new Date().toISOString().substring(0, 10);
+    var jamMulai = bookingData.jam_mulai || '09:00';
+    var jamSelesai = bookingData.jam_selesai || '13:00';
+
+    var startDateTime = new Date(tgl + 'T' + jamMulai + ':00');
+    var endDateTime = new Date(tgl + 'T' + jamSelesai + ':00');
+    if (isNaN(startDateTime.getTime())) {
+      startDateTime = new Date(tgl);
+      endDateTime = new Date(tgl);
+    }
+
+    var title = "Booking: " + (bookingData.client || "Client") + " (" + (bookingData.layanan || "Layanan") + ")";
+    var desc = "=== BOOKHIVE CALENDAR SYNC ===\n" +
+               "ID Transaksi: " + (bookingData.id_trx || "-") + "\n" +
+               "Client: " + (bookingData.client || "-") + "\n" +
+               "WhatsApp: " + (bookingData.kontak || "-") + "\n" +
+               "Crew Bertugas: " + (bookingData.team || "-") + "\n" +
+               "Paket: " + (bookingData.layanan || "-") + "\n" +
+               "Lokasi: " + (bookingData.lokasi || "-") + "\n" +
+               "Total: Rp " + (bookingData.total || "0") + "\n" +
+               "Status: " + (bookingData.status || "Belum Lunas");
+
+    var event = cal.createEvent(title, startDateTime, endDateTime, {
+      description: desc,
+      location: bookingData.lokasi || ""
+    });
+
+    return { success: true, eventId: event.getId(), calendarName: cal.getName() };
+  } catch (err) {
+    return { success: false, message: "Calendar Sync Error: " + err.toString() };
+  }
+}
+

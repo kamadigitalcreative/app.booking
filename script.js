@@ -282,6 +282,42 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
       });
     };
 
+    const MENU_ALIASES = {
+      'dashboard': 'dashboard',
+      'kalender': 'kalender',
+      'calendar': 'kalender',
+      'jadwal': 'kalender',
+      'order': 'pemasukan',
+      'pemasukan': 'pemasukan',
+      'pesanan': 'pemasukan',
+      'booking': 'booking-link',
+      'booking-link': 'booking-link',
+      'client': 'client',
+      'crm': 'client',
+      'produk': 'produk',
+      'layanan': 'produk',
+      'pengeluaran': 'pengeluaran',
+      'biaya': 'pengeluaran',
+      'aruskas': 'aruskas',
+      'kas': 'aruskas',
+      'todo': 'todo',
+      'task': 'todo',
+      'tim': 'tim-schedule',
+      'tim-schedule': 'tim-schedule',
+      'crew': 'tim-schedule',
+      'talent': 'tim-schedule',
+      'unavailability': 'unavailability',
+      'libur': 'unavailability',
+      'pengaturan': 'pengaturan',
+      'setting': 'pengaturan',
+      'settings': 'pengaturan'
+    };
+
+    function resolvePageFromHash() {
+      const raw = window.location.hash.replace(/^#\/?/, '').trim().toLowerCase();
+      return MENU_ALIASES[raw] || (document.getElementById('page-' + raw) ? raw : null);
+    }
+
     function checkLoginState() {
       if (currentUser) {
         document.getElementById('loginPage').classList.add('d-none');
@@ -293,16 +329,26 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
           el.innerText = vendorName;
         });
         loadAppBranding(); applyMenuAccess();
-        let firstMenu = 'dashboard';
+        let firstMenu = resolvePageFromHash() || 'dashboard';
         const allowedMenus = currentUser.akses_menu ? currentUser.akses_menu.split(',') : [];
-        if (currentUser.role !== 'Admin' && allowedMenus.length > 0) { firstMenu = allowedMenus[0]; }
-        showPage(firstMenu);
+        if (currentUser.role !== 'Admin' && allowedMenus.length > 0 && !allowedMenus.includes(firstMenu)) { 
+          firstMenu = allowedMenus[0]; 
+        }
+        showPage(firstMenu, null, true);
       } else {
         document.getElementById('mainApp').classList.add('d-none');
         document.getElementById('loginPage').classList.remove('d-none');
         loadAppBranding();
       }
     }
+
+    window.addEventListener('hashchange', () => {
+      if (!currentUser) return;
+      const target = resolvePageFromHash();
+      if (target && target !== activePage) {
+        showPage(target, null, false);
+      }
+    });
 
     function applyMenuAccess() {
       if (!currentUser) return;
@@ -322,7 +368,7 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
     window.toggleSidebarMenu = function (menuId, btn) {
       const menu = document.getElementById(menuId);
       if (!menu) return;
-      const chevron = btn.querySelector('.chevron-icon');
+      const chevron = btn ? btn.querySelector('.chevron-icon') : null;
       const isHidden = menu.classList.contains('d-none');
       
       if (isHidden) {
@@ -334,8 +380,19 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
       }
     };
 
-    window.showPage = function (pageName, navEl) {
+    window.showPage = function (pageName, navEl, updateHash = true) {
+      if (!pageName) pageName = 'dashboard';
+      pageName = MENU_ALIASES[pageName] || pageName;
       activePage = pageName;
+
+      if (updateHash && window.location.hash !== '#/' + pageName) {
+        try {
+          history.pushState(null, null, '#/' + pageName);
+        } catch(e) {
+          window.location.hash = '/' + pageName;
+        }
+      }
+
       document.querySelectorAll('.nav-item-custom').forEach(n => n.classList.remove('active'));
       const activeEl = navEl || document.querySelector(`.nav-item-custom[data-menu="${pageName}"]`);
       if (activeEl) {
@@ -351,7 +408,10 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
       }
       document.querySelectorAll('[id^="page"]').forEach(p => p.classList.add('d-none'));
       const target = document.getElementById('page-' + pageName); if (target) target.classList.remove('d-none');
-      if (window.innerWidth < 992) toggleSidebar();
+      if (window.innerWidth < 992 && typeof toggleSidebar === 'function') {
+        const sb = document.querySelector('.sidebar');
+        if (sb && sb.classList.contains('active')) toggleSidebar();
+      }
       loadDataMaster();
     };
 
@@ -1075,11 +1135,61 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
 
       tb.innerHTML = filteredData.map((p, i) => {
         let rawDate = String(p.tanggal || ''); let tglHtml = '';
-        if (rawDate.includes(',')) { let tglArr = rawDate.split(','); tglHtml = `<div class="d-flex flex-column gap-1"><span class="badge bg-light text-dark border"><i class="fa-regular fa-clock me-1"></i>D1: ${safeDate(tglArr[0])}</span><span class="badge bg-light text-dark border"><i class="fa-regular fa-clock me-1"></i>D2: ${safeDate(tglArr[1])}</span></div>`; } else { tglHtml = safeDate(p.tanggal); }
-        let rawTeam = String(p.team || ''); let teamHtml = '';
-        if (rawTeam.includes('|')) { let tmArr = rawTeam.split('|'); teamHtml = `<div class="d-flex flex-column gap-1"><span class="small text-muted fw-bold">D1: ${tmArr[0] ? tmArr[0].trim() : '-'}</span><span class="small text-muted fw-bold">D2: ${tmArr[1] ? tmArr[1].trim() : '-'}</span></div>`; } else { teamHtml = `<span class="small">${p.team || '-'}</span>`; }
+        if (rawDate.includes(',')) {
+          let tglArr = rawDate.split(',');
+          tglHtml = `<div class="flex flex-col gap-1">
+            <span class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[10px] font-semibold"><i class="fa-regular fa-clock me-1"></i>D1: ${safeDate(tglArr[0])}</span>
+            <span class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[10px] font-semibold"><i class="fa-regular fa-clock me-1"></i>D2: ${safeDate(tglArr[1])}</span>
+          </div>`;
+        } else {
+          tglHtml = `<span class="font-medium text-slate-700 dark:text-slate-300">${safeDate(p.tanggal)}</span>`;
+        }
 
-        return `<tr class="${p._isSyncing ? 'syncing-item' : ''}"><td class="d-none d-md-table-cell">${i + 1}</td><td class="d-none d-md-table-cell"><span class="badge bg-light text-dark border shadow-sm">${p.id_trx || '-'}</span></td><td class="d-none d-md-table-cell">${tglHtml}</td><td><div class="fw-bold text-dark" style="font-size: 14px;">${p.client || '-'}</div><div class="d-md-none mt-1 mb-1">${tglHtml}</div><div class="d-md-none mt-1"><span class="badge" style="background: rgba(0, 114, 255, 0.1); color: #0072ff; font-size:10px;">${p.layanan || '-'}</span></div></td><td class="d-none d-md-table-cell">${teamHtml}</td><td class="d-none d-md-table-cell"><span class="badge" style="background: rgba(0, 114, 255, 0.2); color: #0072ff;">${p.layanan || '-'}</span></td><td class="text-center fw-bold d-none d-md-table-cell">${p.jumlah || 1}</td><td><div class="fw-bold text-dark">${formatRp(p.total)}</div><div class="d-md-none mt-1">${p.is_lunas === true || String(p.is_lunas) === 'true' ? '<span class="badge bg-success shadow-sm" style="font-size:9px;">LUNAS</span>' : '<span class="badge bg-danger shadow-sm" style="font-size:9px;">BELUM LUNAS</span>'}</div></td><td class="d-none d-md-table-cell">${p.is_lunas === true || String(p.is_lunas) === 'true' ? '<span class="badge bg-success shadow-sm">LUNAS</span>' : '<span class="badge bg-danger shadow-sm">BELUM LUNAS</span>'}</td><td>${p._isSyncing ? '<span class="spinner-border spinner-border-sm text-success"></span>' : `<div class="d-flex gap-1 flex-wrap align-items-center" style="max-width: 90px;"><button class="btn btn-sm btn-secondary text-white shadow-sm" style="padding:4px 8px; font-size:11px;" onclick="showDetailPemasukan(${p.id})" title="Detail"><i class="fa-solid fa-circle-info"></i></button><button class="btn btn-sm btn-info text-white shadow-sm" style="padding:4px 8px; font-size:11px; background: linear-gradient(135deg, #17ead9 0%, #6078ea 100%); border:none;" onclick="openInvoicePreview(${p.id})" title="Invoice"><i class="fa-solid fa-print"></i></button><button class="btn btn-sm btn-light border text-primary shadow-sm" style="padding:4px 8px; font-size:11px;" onclick="editPemasukan(${p.id})" title="Edit"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-light border text-danger shadow-sm" style="padding:4px 8px; font-size:11px;" onclick="delData('Pemasukan', ${p.id})" title="Hapus"><i class="fa-solid fa-trash"></i></button></div>`}</td></tr>`;
+        let rawTeam = String(p.team || ''); let teamHtml = '';
+        if (rawTeam.includes('|')) {
+          let tmArr = rawTeam.split('|');
+          teamHtml = `<div class="flex flex-col gap-0.5">
+            <span class="font-bold text-[11px] text-indigo-600 dark:text-indigo-400">D1: ${tmArr[0] ? tmArr[0].trim() : '-'}</span>
+            <span class="font-bold text-[11px] text-purple-600 dark:text-purple-400">D2: ${tmArr[1] ? tmArr[1].trim() : '-'}</span>
+          </div>`;
+        } else {
+          teamHtml = `<span class="font-semibold text-slate-800 dark:text-slate-200">${p.team || '-'}</span>`;
+        }
+
+        const isLunas = p.is_lunas === true || String(p.is_lunas).toLowerCase() === 'true';
+        const statusBadge = isLunas
+          ? '<span class="px-2.5 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 font-extrabold text-[11px]"><i class="fa-solid fa-check-circle me-1"></i>LUNAS</span>'
+          : '<span class="px-2.5 py-1 rounded-xl bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800 font-extrabold text-[11px]"><i class="fa-solid fa-clock me-1"></i>BELUM LUNAS</span>';
+
+        return `
+          <tr class="${p._isSyncing ? 'syncing-item' : ''} hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+            <td class="py-3 px-4 font-bold text-slate-400">${i + 1}</td>
+            <td class="py-3 px-4"><span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 border rounded-lg font-mono font-bold text-[11px]">${p.id_trx || '-'}</span></td>
+            <td class="py-3 px-4">${tglHtml}</td>
+            <td class="py-3 px-4">
+              <div class="font-extrabold text-sm" style="color: var(--text-main);">${p.client || '-'}</div>
+              <div class="text-[11px] text-slate-500 font-medium mt-0.5"><i class="fa-brands fa-whatsapp text-emerald-500 mr-1"></i>${p.phone || '-'}</div>
+            </td>
+            <td class="py-3 px-4">${teamHtml}</td>
+            <td class="py-3 px-4"><span class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-xl font-bold text-xs">${p.layanan || '-'}</span></td>
+            <td class="py-3 px-4 text-center font-bold">${p.jumlah || 1}</td>
+            <td class="py-3 px-4">
+              <div class="font-extrabold text-sm text-indigo-600 dark:text-indigo-400">${formatRp(p.total)}</div>
+              ${Number(p.dp || 0) > 0 && !isLunas ? `<div class="text-[10px] text-amber-600 font-semibold mt-0.5">DP: ${formatRp(p.dp)} (Sisa: ${formatRp((Number(p.total) || 0) - (Number(p.dp) || 0))})</div>` : ''}
+            </td>
+            <td class="py-3 px-4">${statusBadge}</td>
+            <td class="py-3 px-4 text-center">
+              ${p._isSyncing ? '<span class="spinner-border spinner-border-sm text-success"></span>' : `
+                <div class="flex items-center justify-center gap-1">
+                  <button class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700 transition-all" onclick="showDetailPemasukan(${p.id})" title="Detail Order"><i class="fa-solid fa-circle-info"></i></button>
+                  <button class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-cyan-50 dark:hover:bg-slate-700 text-cyan-600 dark:text-cyan-400 border border-slate-200 dark:border-slate-700 transition-all" onclick="openInvoicePreview(${p.id})" title="Invoice Tagihan"><i class="fa-solid fa-file-invoice"></i></button>
+                  <button class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 border border-slate-200 dark:border-slate-700 transition-all" onclick="editPemasukan(${p.id})" title="Edit Order"><i class="fa-solid fa-pen"></i></button>
+                  <button class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-slate-700 text-rose-600 dark:text-rose-400 border border-slate-200 dark:border-slate-700 transition-all" onclick="delData('Pemasukan', ${p.id})" title="Hapus Order"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              `}
+            </td>
+          </tr>
+        `;
       }).join('');
     };
 
@@ -1100,8 +1210,35 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
         let textAlamat = p.alamat && p.alamat.trim() !== '-' ? p.alamat : '<span class="text-muted fst-italic">Belum ada detail alamat</span>';
         lokasiHtmlDisplay = `<div class="small fw-medium mb-1 text-muted" style="white-space: pre-wrap;">${textAlamat}</div>${btnMaps}`;
       }
-      document.getElementById('detailPemasukanContent').innerHTML = `<div class="d-flex flex-column gap-3"><div class="p-3 rounded-4 shadow-sm" style="background: rgba(0, 114, 255, 0.05); border: 1px solid rgba(0, 114, 255, 0.1);"><div class="d-flex justify-content-between align-items-start mb-2"><div><small class="text-muted fw-bold d-block mb-1">ID TRX: ${p.id_trx || '-'}</small><h5 class="fw-bold text-dark mb-0">${p.client || '-'}</h5><div class="text-muted small mt-1"><i class="fa-brands fa-whatsapp me-1 text-success"></i> ${p.phone || '-'}</div></div>${statusHtml}</div></div><div><h6 class="fw-bold text-primary mb-2 small"><i class="fa-regular fa-calendar-check me-2"></i>Detail Acara</h6><table class="table table-sm table-borderless mb-0" style="font-size: 13px;"><tr><td class="text-muted" style="width: 120px;">Tanggal</td><td class="fw-bold">${tglHtml}</td></tr><tr><td class="text-muted">Paket</td><td class="fw-bold text-info">${p.layanan || '-'}</td></tr><tr><td class="text-muted">Team</td><td>${teamHtml}</td></tr></table></div><div><h6 class="fw-bold text-primary mb-2 small"><i class="fa-solid fa-location-dot me-2"></i>Lokasi Acara</h6><div class="ps-3 border-start border-2 border-primary">${lokasiHtmlDisplay}</div></div><hr class="opacity-10 my-1"><div><h6 class="fw-bold text-primary mb-2 small"><i class="fa-solid fa-receipt me-2"></i>Rincian Biaya</h6><table class="table table-sm table-borderless mb-0" style="font-size: 13px;"><tr><td class="text-muted">Harga Satuan</td><td class="text-end fw-bold">${formatRp(p.harga)}</td></tr><tr><td class="text-muted">Jumlah (Qty)</td><td class="text-end fw-bold">${p.jumlah || 1}</td></tr><tr><td class="text-muted">Transport</td><td class="text-end fw-bold">${formatRp(p.transport)}</td></tr><tr><td class="text-muted">Diskon</td><td class="text-end fw-bold text-danger">- ${formatRp(p.diskon)}</td></tr><tr><td class="text-muted">Down Payment</td><td class="text-end fw-bold text-warning">- ${formatRp(p.dp)}</td></tr><tr style="border-top: 1px dashed #ccc;"><td class="fw-bold pt-2">Total Akhir</td><td class="text-end fw-bold text-success fs-6 pt-2">${formatRp(p.total)}</td></tr></table></div><div class="p-3 rounded-4 bg-light border shadow-sm"><h6 class="fw-bold text-muted mb-1 small"><i class="fa-solid fa-note-sticky me-1"></i>Catatan Tambahan</h6><div class="small text-dark" style="white-space: pre-wrap;">${p.catatan || '<span class="text-muted fst-italic">Tidak ada catatan</span>'}</div></div></div>`;
+      document.getElementById('detailPemasukanContent').innerHTML = `<div class="d-flex flex-column gap-3"><div class="p-3 rounded-4 shadow-sm" style="background: rgba(0, 114, 255, 0.05); border: 1px solid rgba(0, 114, 255, 0.1);"><div class="d-flex justify-content-between align-items-start mb-2"><div><small class="text-muted fw-bold d-block mb-1">ID TRX: ${p.id_trx || '-'}</small><h5 class="fw-bold text-dark mb-0">${p.client || '-'}</h5><div class="text-muted small mt-1"><i class="fa-brands fa-whatsapp me-1 text-success"></i> ${p.phone || '-'}</div></div><div class="d-flex flex-column align-items-end gap-1">${statusHtml}<button class="btn btn-xs btn-outline-primary rounded-pill px-2.5 py-1 mt-1 shadow-sm text-[11px] fw-bold" onclick="syncOrderToGoogleCalendar('${p.id}')"><i class="fa-solid fa-calendar-plus me-1"></i> Sync G-Calendar</button></div></div></div><div><h6 class="fw-bold text-primary mb-2 small"><i class="fa-regular fa-calendar-check me-2"></i>Detail Acara</h6><table class="table table-sm table-borderless mb-0" style="font-size: 13px;"><tr><td class="text-muted" style="width: 120px;">Tanggal</td><td class="fw-bold">${tglHtml}</td></tr><tr><td class="text-muted">Paket</td><td class="fw-bold text-info">${p.layanan || '-'}</td></tr><tr><td class="text-muted">Team</td><td>${teamHtml}</td></tr></table></div><div><h6 class="fw-bold text-primary mb-2 small"><i class="fa-solid fa-location-dot me-2"></i>Lokasi Acara</h6><div class="ps-3 border-start border-2 border-primary">${lokasiHtmlDisplay}</div></div><hr class="opacity-10 my-1"><div><h6 class="fw-bold text-primary mb-2 small"><i class="fa-solid fa-receipt me-2"></i>Rincian Biaya</h6><table class="table table-sm table-borderless mb-0" style="font-size: 13px;"><tr><td class="text-muted">Harga Satuan</td><td class="text-end fw-bold">${formatRp(p.harga)}</td></tr><tr><td class="text-muted">Jumlah (Qty)</td><td class="text-end fw-bold">${p.jumlah || 1}</td></tr><tr><td class="text-muted">Transport</td><td class="text-end fw-bold">${formatRp(p.transport)}</td></tr><tr><td class="text-muted">Diskon</td><td class="text-end fw-bold text-danger">- ${formatRp(p.diskon)}</td></tr><tr><td class="text-muted">Down Payment</td><td class="text-end fw-bold text-warning">- ${formatRp(p.dp)}</td></tr><tr style="border-top: 1px dashed #ccc;"><td class="fw-bold pt-2">Total Akhir</td><td class="text-end fw-bold text-success fs-6 pt-2">${formatRp(p.total)}</td></tr></table></div><div class="p-3 rounded-4 bg-light border shadow-sm"><h6 class="fw-bold text-muted mb-1 small"><i class="fa-solid fa-note-sticky me-1"></i>Catatan Tambahan</h6><div class="small text-dark" style="white-space: pre-wrap;">${p.catatan || '<span class="text-muted fst-italic">Tidak ada catatan</span>'}</div></div></div>`;
       new bootstrap.Modal(document.getElementById('modalDetailPemasukan')).show();
+    };
+
+    window.syncOrderToGoogleCalendar = function(id) {
+      const p = dbPemasukan.find(x => x.id == id);
+      if (!p) return;
+      Swal.fire({
+        title: 'Hubungkan ke Google Calendar',
+        text: `Sinkronkan booking "${p.client || 'Client'}" ke akun Google Calendar Anda?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fa-solid fa-calendar-check me-1"></i> Ya, Sinkronkan!',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#4f46e5'
+      }).then(res => {
+        if (res.isConfirmed) {
+          Swal.fire({ title: 'Menyinkronkan...', text: 'Mengirim data ke Google Calendar...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+          gasRun('syncGoogleCalendar', { booking: p }).then(resp => {
+            if (resp && resp.success) {
+              Swal.fire('Berhasil!', `Acara telah tersinkronisasi ke Google Calendar (${resp.calendarName || 'Utama'}).`, 'success');
+            } else {
+              Swal.fire('Info', resp.message || 'Sinkronisasi siap digunakan setelah otorisasi Google Calendar diaktifkan pada script.', 'info');
+            }
+          }).catch(err => {
+            Swal.fire('Error', 'Gagal memanggil server: ' + err.message, 'error');
+          });
+        }
+      });
     };
 
     window.openModalPemasukan = function () {
@@ -1148,8 +1285,29 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
 
       if (dataOps.length === 0) tbOps.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">Belum ada pengeluaran operasional</td></tr>`;
       else tbOps.innerHTML = dataOps.map((p, i) => {
-        const isLunas = String(p.status_bayar).trim().toLowerCase() === 'lunas'; const badgeStatus = isLunas ? '<span class="badge bg-success shadow-sm">LUNAS</span>' : '<span class="badge bg-warning text-dark shadow-sm">Belum Dibayar</span>';
-        return `<tr class="${p._isSyncing ? 'syncing-item' : ''}"><td class="d-none d-md-table-cell">${i + 1}</td><td class="d-none d-md-table-cell">${safeDate(p.tanggal)}</td><td><div class="fw-bold">${p.detail}</div><div class="d-md-none mt-1 small text-muted"><i class="fa-regular fa-calendar me-1"></i>${safeDate(p.tanggal)}</div><div class="d-md-none mt-1"><span class="badge bg-danger rounded-pill bg-opacity-75" style="font-size:10px;">${p.kategori}</span></div></td><td class="d-none d-md-table-cell"><span class="badge bg-danger rounded-pill bg-opacity-75">${p.kategori}</span></td><td><div class="fw-bold text-danger">${formatRp(p.nominal)}</div><div class="d-md-none mt-1 small text-muted fst-italic">${p.catatan || ''}</div><div class="d-md-none mt-1">${badgeStatus}</div></td><td class="small d-none d-md-table-cell">${p.catatan || '-'}</td><td class="d-none d-md-table-cell">${badgeStatus}</td><td>${p._isSyncing ? '<span class="spinner-border spinner-border-sm text-danger"></span>' : `<div class="d-flex gap-1"><button class="btn btn-sm btn-light border text-primary shadow-sm" style="padding:4px 8px; font-size:11px;" onclick="editPengeluaran(${p.id})"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-light border text-danger shadow-sm" style="padding:4px 8px; font-size:11px;" onclick="delData('Pengeluaran', ${p.id})"><i class="fa-solid fa-trash"></i></button></div>`}</td></tr>`;
+        const isLunas = String(p.status_bayar).trim().toLowerCase() === 'lunas';
+        const badgeStatus = isLunas
+          ? '<span class="px-2.5 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 font-extrabold text-[11px]"><i class="fa-solid fa-check-circle me-1"></i>LUNAS</span>'
+          : '<span class="px-2.5 py-1 rounded-xl bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800 font-extrabold text-[11px]"><i class="fa-solid fa-clock me-1"></i>Belum Dibayar</span>';
+        return `
+          <tr class="${p._isSyncing ? 'syncing-item' : ''} hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+            <td class="py-3 px-4 font-bold text-slate-400">${i + 1}</td>
+            <td class="py-3 px-4 font-semibold text-slate-700 dark:text-slate-300">${safeDate(p.tanggal)}</td>
+            <td class="py-3 px-4"><div class="font-bold text-sm" style="color: var(--text-main);">${p.detail}</div></td>
+            <td class="py-3 px-4"><span class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-xl font-bold text-xs">${p.kategori}</span></td>
+            <td class="py-3 px-4"><div class="font-extrabold text-sm text-rose-600 dark:text-rose-400">${formatRp(p.nominal)}</div></td>
+            <td class="py-3 px-4 text-xs text-slate-500">${p.catatan || '-'}</td>
+            <td class="py-3 px-4">${badgeStatus}</td>
+            <td class="py-3 px-4 text-center">
+              ${p._isSyncing ? '<span class="spinner-border spinner-border-sm text-danger"></span>' : `
+                <div class="flex items-center justify-center gap-1.5">
+                  <button class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 border border-slate-200 dark:border-slate-700 transition-all" onclick="editPengeluaran(${p.id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                  <button class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-slate-700 text-rose-600 dark:text-rose-400 border border-slate-200 dark:border-slate-700 transition-all" onclick="delData('Pengeluaran', ${p.id})" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              `}
+            </td>
+          </tr>
+        `;
       }).join('');
 
       const tbFee = document.getElementById('tbody-pengeluaran-fee'); let htmlFee = ''; let countFee = 1;
@@ -1216,43 +1374,86 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
       if (calendar) { calendar.destroy(); calendar = null; }
 
       let events = [];
+      // 1. Booking Events from dbPemasukan
       dbPemasukan.forEach(p => {
         if (p.tanggal) {
           let tglArr = String(p.tanggal).split(',');
           let teamArr = String(p.team || '').split('|');
+          const isLunas = p.is_lunas === true || String(p.is_lunas).toLowerCase() === 'true';
+          const bgCol = isLunas ? '#6366f1' : '#f59e0b';
+          const borderCol = isLunas ? '#4f46e5' : '#d97706';
+
           tglArr.forEach((d, idx) => {
             let trimD = d.trim();
             if (trimD) {
               let tName = teamArr.length > idx ? teamArr[idx].trim() : (teamArr[0] || 'TBA');
               events.push({
-                title: `${p.client || 'Client'} (${tName})`,
+                title: `📸 ${p.client || 'Client'} (${tName}) - ${p.layanan || ''}`,
                 start: safeDate(trimD),
-                backgroundColor: '#0072ff',
-                borderColor: '#0072ff',
-                allDay: true
+                backgroundColor: bgCol,
+                borderColor: borderCol,
+                textColor: '#ffffff',
+                allDay: true,
+                extendedProps: { pemId: p.id }
               });
             }
           });
         }
       });
 
+      // 2. Off-Day / Block Day Events from dbTeamUnavailability
+      if (Array.isArray(dbTeamUnavailability)) {
+        dbTeamUnavailability.forEach(un => {
+          if (un.tanggal) {
+            events.push({
+              title: `🚫 [LIBUR] ${un.nama_team || 'Crew'} (${un.alasan || 'Off'})`,
+              start: safeDate(un.tanggal),
+              backgroundColor: '#ef4444',
+              borderColor: '#dc2626',
+              textColor: '#ffffff',
+              allDay: true,
+              extendedProps: { isUnavail: true, data: un }
+            });
+          }
+        });
+      }
+
       calendar = new FullCalendar.Calendar(calEl, {
         initialView: 'dayGridMonth',
         events: events,
-        height: 550,
+        height: 580,
         headerToolbar: {
           left: 'prev,next today',
           center: 'title',
           right: 'dayGridMonth,listMonth'
         },
         buttonText: {
-          dayGridMonth: 'Kotak',
-          listMonth: 'List'
+          dayGridMonth: 'Kotak (Bulan)',
+          listMonth: 'List (Agenda)'
+        },
+        eventClick: function (info) {
+          if (info.event.extendedProps && info.event.extendedProps.pemId) {
+            showDetailPemasukan(info.event.extendedProps.pemId);
+          } else if (info.event.extendedProps && info.event.extendedProps.isUnavail) {
+            const u = info.event.extendedProps.data;
+            Swal.fire({
+              icon: 'info',
+              title: 'Jadwal Libur Kru',
+              html: `
+                <div class="text-left text-xs space-y-2 mt-3">
+                  <div><strong>Nama Kru:</strong> ${u.nama_team || '-'}</div>
+                  <div><strong>Tanggal:</strong> ${safeDate(u.tanggal)}</div>
+                  <div><strong>Jam:</strong> ${u.jam_mulai || '00:00'} - ${u.jam_selesai || '23:59'}</div>
+                  <div><strong>Alasan:</strong> ${u.alasan || '-'}</div>
+                </div>
+              `
+            });
+          }
         },
         datesSet: function (info) {
           const d = info.view.currentStart;
-          document.getElementById('calTahun').value = d.getFullYear();
-          document.getElementById('calBulan').value = String(d.getMonth() + 1).padStart(2, '0');
+          if (document.getElementById('calTahun')) document.getElementById('calTahun').value = d.getFullYear();
+          if (document.getElementById('calBulan')) document.getElementById('calBulan').value = String(d.getMonth() + 1).padStart(2, '0');
         }
       });
       calendar.render();
@@ -1329,10 +1530,24 @@ var currentUser = null, activePage = 'dashboard', isDataLoaded = false, currentI
       if (anyLunas || grandTotal <= 0) { grandTotal = Math.max(0, grandTotal); wm.innerText = 'LUNAS'; wm.classList.add('watermark-lunas'); }
       else if (sumDP > 0) { wm.innerText = 'DP'; wm.classList.add('watermark-dp'); }
       document.getElementById('invBalance').innerText = formatRp(grandTotal);
-      document.getElementById('mainApp').style.display = 'none'; document.getElementById('invoicePreviewWrapper').style.display = 'block'; window.scrollTo(0, 0);
+      document.getElementById('mainApp').classList.add('d-none');
+      const invWrap = document.getElementById('invoicePreviewWrapper');
+      if (invWrap) {
+        invWrap.classList.remove('d-none');
+        invWrap.style.display = 'block';
+      }
+      window.scrollTo(0, 0);
     };
 
-    window.closeInvoicePreview = function () { document.getElementById('invoicePreviewWrapper').style.display = 'none'; document.getElementById('mainApp').style.display = ''; currentInvoiceTrx = null; };
+    window.closeInvoicePreview = function () {
+      const invWrap = document.getElementById('invoicePreviewWrapper');
+      if (invWrap) {
+        invWrap.classList.add('d-none');
+        invWrap.style.display = 'none';
+      }
+      document.getElementById('mainApp').classList.remove('d-none');
+      currentInvoiceTrx = null;
+    };
 
     window.exportJPG = function (isForWA = false) {
       const area = document.getElementById('invoicePrintArea'); const noInv = currentInvoiceTrx.id_trx || Date.now(); Swal.fire({ title: 'Memproses Gambar...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });

@@ -394,17 +394,45 @@ h1, h2, h3, h4, h5, h6,
   transition: all 0.2s ease !important;
 }
 
-.auth-input::placeholder {
-  color: var(--text-muted) !important;
+[data-theme="light"] .auth-input,
+body:not([data-theme="dark"]) .auth-input {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .auth-input::placeholder,
+body:not([data-theme="dark"]) .auth-input::placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+[data-theme="dark"] .auth-input {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .auth-input::placeholder {
+  color: #94a3b8 !important;
   opacity: 1 !important;
 }
 
 .auth-input:focus {
   border-color: #ECA935 !important;
   box-shadow: 0 0 0 3px rgba(236, 169, 53, 0.2) !important;
-  background-color: var(--input-bg) !important;
-  color: var(--text-main) !important;
   outline: none !important;
+}
+
+[data-theme="light"] .auth-input:focus,
+body:not([data-theme="dark"]) .auth-input:focus {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+[data-theme="dark"] .auth-input:focus {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
 }
 
 /* Chrome / Browser Autofill Text Color Fix */
@@ -655,9 +683,57 @@ tbody tr:hover, .table tbody tr:hover, tbody tr:hover > td {
   font-size: 0.72rem !important;
   font-weight: 600 !important;
   border: none !important;
-  background: var(--primary-accent) !important;
   color: #ffffff !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.fc-daygrid-event .fc-event-title,
+.fc-daygrid-event .fc-event-time {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* FullCalendar List View */
+.fc-theme-standard .fc-list {
+  border-color: var(--border-color) !important;
+  background: var(--bg-card) !important;
+  border-radius: 1rem !important;
+  overflow: hidden;
+}
+
+.fc-list-day-cushion {
+  background: var(--bg-card-subtle) !important;
+  color: var(--text-main) !important;
+  font-weight: 700 !important;
+  padding: 10px 16px !important;
+}
+
+.fc-list-event {
+  background: transparent !important;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.fc-list-event:hover td {
+  background: var(--table-row-hover) !important;
+}
+
+.fc-list-event td {
+  border-color: var(--border-color) !important;
+  padding: 10px 16px !important;
+}
+
+.fc-list-event-title, 
+.fc-list-event-title a,
+.fc-list-event-time {
+  color: var(--text-main) !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+
+.fc-list-empty {
+  background: var(--bg-card) !important;
+  color: var(--text-sub) !important;
 }
 
 .fc-button-primary {
@@ -856,4 +932,55 @@ tbody tr:hover, .table tbody tr:hover, tbody tr:hover > td {
   letter-spacing: 0.22em !important;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8) !important;
   opacity: 1 !important;
+}
+
+/* ==========================================================================
+   GLOBAL DARK MODE TEXT CONTRAST & MODAL OVERRIDES
+   ========================================================================== */
+[data-theme="dark"] .text-slate-900,
+[data-theme="dark"] .text-slate-800,
+[data-theme="dark"] .text-dark,
+[data-theme="dark"] .fw-bold.text-dark {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .text-slate-700,
+[data-theme="dark"] .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .bg-light {
+  background-color: rgba(30, 41, 59, 0.7) !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .table {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .modal-content {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-theme="dark"] .modal-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .modal-footer {
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #f8fafc !important;
 }
